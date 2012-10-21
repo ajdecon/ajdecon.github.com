@@ -1,0 +1,17 @@
+--- 
+layout: post
+title: "Some micro-benchmarks for #HPC: 10Gb Ethernet on #EC2 vs QDR #Infiniband"
+published: true
+date: 2012-05-02
+categories: []
+
+posterous_url: http://blog.ajdecon.org/some-micro-benchmarks-for-hpc-10gb-ethernet-o
+posterous_slug: some-micro-benchmarks-for-hpc-10gb-ethernet-o
+---
+<p>I was recently interviewed by Jon Brodkin for an article on Ars Technica called <a href="http://arstechnica.com/business/news/2012/05/amazons-hpc-cloud-supercomputing-for-the-99.ars">"Amazon&rsquo;s HPC cloud: supercomputing for the 99%"</a>; I suppose I was the dissenting voice. :-) It's actually a pretty good article talking about the current state of Amazon's cloud for doing high-performance computing, and devotes a decent amount of space to the shortcomings in the interconnect.</p>
+<p>At one point the article summarizes the results of some benchmarks I did to compare 10-gigabit Ethernet on EC2's cluster compute instances to an R Systems cluster with QDR Infiniband.</p>
+<p style="padding-left: 30px;"><span style="color: #333333; line-height: 17px;">Tests run by R Systems using an&nbsp;</span><a href="http://mvapich.cse.ohio-state.edu/benchmarks/" style="color: #ffae00; text-decoration: none; line-height: 17px;">MPI benchmark</a><span style="color: #333333; line-height: 17px;">&nbsp;from Ohio State showed latencies in the passing of small messages (up to 4KB) to be between 1.4 and 6 microseconds in an InfiniBand-based cluster. Comparatively, Amazon&rsquo;s 10 Gigabit Ethernet connections produced latencies of 100 to 111 microseconds. For passing of larger messages (4MB), bandwidth hit 3,031 megabytes per second with InfiniBand, and only 484 megabytes per second on Amazon.</span></p>
+<p>I used the&nbsp;<a href="http://mvapich.cse.ohio-state.edu/benchmarks/">micro-benchmarks</a> from the Mvapich team. In case it's interesting to anyone, the full results can be found below.</p>
+<p><!--more--></p>
+<p>Note that no real optimizations were done with either network, so these are pretty "naive" numbers.</p>
+<p><script src="https://gist.github.com/2580249.js"></script></p>

@@ -1,0 +1,287 @@
+--- 
+layout: post
+title: "Learning Chef: Compute Cluster with SLURM"
+published: true
+date: 2012-01-21
+categories: 
+- chef
+- hpc
+- learning
+- slurm
+posterous_url: http://blog.ajdecon.org/learning-chef-compute-cluster-with-slurm
+posterous_slug: learning-chef-compute-cluster-with-slurm
+---
+<p>I've recently started playing with Chef, a configuration management system which provides a lot of nice automation for setting up servers quickly and easily. As a science/HPC guy, my default question for any system like this is, "How easily can this be used to set up a cluster?" &nbsp;</p>
+<p>This blog post is a quick walkthrough of a simple cookbook I put together for a SLURM-managed compute cluster, targeted at running MPI applications. &nbsp;I put it together simultaneously with learning a lot of the basics of Chef, so this is by no means a fully general SLURM cookbook, just a demonstration of concepts. In particular, I'm only targeting Ubuntu installations with this cookbook rather than generalizing to RHEL-ish distros as well, and I'm only testing on EC2 at the moment. &nbsp;Nevertheless, I think it's a useful learning exercise.</p>
+<p><em>The cookbook I walk through below can be found in my <a href="https://github.com/ajdecon/hpc-chef">hpc-chef repo</a> on Github, along with other HPC-related cookbooks. The version used in this blog post is at <a href="https://github.com/ajdecon/hpc-chef/tree/4a80d92c21047a44057157af8a40b538f72daff3">this commit</a>.</em></p>
+<p><em><!--more--><br /></em></p>
+<p>Opscode provides a <a href="http://wiki.opscode.com/display/chef/Fast+Start+Guide" title="Chef Fast Start">fast start tutorial</a>&nbsp;for getting up and running using their Hosted Chef option; and I used the <a href="http://wiki.opscode.com/display/chef/Installing+Chef+Server+on+Debian+or+Ubuntu+using+Packages" title="Installing Chef Server On Ubuntu">Ubuntu server tutorial</a> for setting up the Chef server I used while developing. &nbsp;Once I had a Chef server and a development repository to work with, I created a new cookbook for my compute cluster using the <strong>knife</strong> command-line tool:</p>
+<div class="CodeRay">
+  <div class="code"><pre>[ajdecon@exp chef-repo]$ knife cookbook create slurm-mpi-cluster</pre></div>
+</div>
+
+<p>This created a cookbook, with a lot of the directory structure and README files pre-populated, under cookbooks/slurm-mpi-cluster.&nbsp;</p>
+<h3>SLURM</h3>
+<p>The <a href="http://www.schedmd.com/slurmdocs/" title="SLURM">SLURM resource manager</a> is a flexible and scalable cluster resource manager commonly used at a lot of national labs, and I've been noticing more and more usage in private-sector projects as well. &nbsp;It's doesn't seem as popular yet as Grid Engine or PBS/Torque, but I've had at least one production project require it for R Systems and it seems to be gaining, especially in CFD-heavy groups. &nbsp;I chose to use it for this project because&nbsp;</p>
+<ul>
+<li>I've been using it at work recently</li>
+<li>It can be configured using a single file, slurm.conf</li>
+<li>It's included in the default Ubuntu repositories</li>
+</ul>
+<p>The first step is to begin a Chef <strong>recipe</strong> for SLURM: basically, a little Ruby program in the Chef DSL which tells Chef what resources to create on the server we're configuring. This file will be in <code>cookbooks/slurm-mpi-cluster/recipes/slurm.rb</code>. (<a href="https://gist.github.com/1653386" title="slurm.rb gist">The final version is in this Github gist.</a>)</p>
+<p>First, I installed SLURM-related packages from the Ubuntu repositories:</p>
+<div class="CodeRay">
+  <div class="code"><pre>%w{munge slurm-llnl slurm-llnl-torque slurm-llnl-basic-plugins slurm-llnl-basic-plugins-dev}.each do |pkg|
+    package pkg do
+        action [:install]
+    end
+end</pre></div>
+</div>
+
+<p>This is just a little loop over a Ruby list of package names. For each one, there is a <code>package</code> directive with a single <code>action</code> line instructing Chef to install that package.</p>
+<p>SLURM typically uses the <strong>munge</strong> package for authentication, and munge requires a little set-up: basically, make sure its configuration directory is present, that /etc has the right permissions, and that we have a key-file. This key-file is shared with all the nodes in the cluster.</p>
+<div class="CodeRay">
+  <div class="code"><pre># Make sure /etc/munge directory exists
+directory &quot;/etc/munge&quot; do
+    action :create
+end
+
+# Make /etc have suitable permissions
+directory &quot;/etc&quot; do
+    mode &quot;0755&quot;
+end
+
+# Make sure the munge user exists
+user(&quot;munge&quot;)
+
+# Create the munge key from template
+template &quot;/etc/munge/munge.key&quot; do
+    source &quot;munge.key.erb&quot;
+    owner &quot;munge&quot;
+end</pre></div>
+</div>
+
+<p>Stepping through this, we first create the <code>/etc/munge</code> directory, if it doesn't already; then make sure that the <code>/etc</code> directory has the correct permissions, and that the munge user exists. Finally we insert the <code>/etc/munge/munge.key</code> file based on a template file we haven't created yet.</p>
+<p><em>It's useful to note that in general, these operations are <strong>idempotent</strong>: that is, you can apply all of these operations repeatedly by running <code>sudo chef-client</code> more than once, and the final state will be the same. This isn't guaranteed with all Chef operations, but it's a good goal, so that Chef enforces a known-good state on the server.</em></p>
+<p>Next I set up SLURM itself. Conveniently, SLURM determines whether to run the head-node daemon (slurmctld) or the compute-node daemon (slurmd) based on whether the hostname of the server it's running on is listed as a head-node or compute-node in slurm.conf.  This means that I don't need to have separate recipes for the two node types or otherwise distinguish them here; I just need to set up the correct templates and services again.</p>
+<div class="CodeRay">
+  <div class="code"><pre># Create the slurm user based on settings
+user(node.slurm['user'])
+
+# Make sure the config directory exists
+directory &quot;/etc/slurm-llnl&quot; do 
+    owner &quot;root&quot;
+    group &quot;root&quot;
+    mode &quot;0755&quot;
+    action :create
+end
+
+# Build slurm.conf based on the template
+template &quot;/etc/slurm-llnl/slurm.conf&quot; do
+    source &quot;slurm.conf.erb&quot;
+    owner &quot;slurm&quot;
+    mode &quot;0755&quot;
+end
+
+# Enable and start the slurm service
+service &quot;slurm-llnl&quot; do
+    action [:enable,:start]
+end</pre></div>
+</div>
+
+<p>Of course, a lot of the configuration logic therefore ends up in the <code>slurm.conf.erb</code> template.</p>
+<h4>slurm.conf and attributes</h4>
+<p>The first step in configuring SLURM is to set some basic properties for the cluster. &nbsp;For this we use Chef's attributes. Default values can be defined in the cookbook, in this case using the <code>attributes/default.rb</code> file (<a href="https://gist.github.com/1654044">gist</a>), and you can override them later.  For SLURM, I used the following default attributes:</p>
+<div class="CodeRay">
+  <div class="code"><pre>default['slurm']['master']         = &quot;slmaster&quot;
+default['slurm']['master_addr']    = &quot;10.0.0.1&quot;
+default['slurm']['computes']       = [ &quot;compute1&quot;, &quot;compute2&quot; ]
+default['slurm']['compute_addrs']  = [ &quot;10.0.1.1&quot;, &quot;10.0.1.2&quot; ]
+default['slurm']['part_name']      = &quot;production&quot;
+default['slurm']['user']           = &quot;slurm&quot;
+default['slurm']['cpus']           = &quot;1&quot;</pre></div>
+</div>
+
+<p>These define a pretty generic cluster of 1-core compute nodes.  To generate the slurm.conf I would use as a template, I used the <a href="https://computing.llnl.gov/linux/slurm/configurator.html" title="SLURM Configurator">SLURM Configurator</a>. I then replaced the relevant values with Ruby template code to use the attributes I defined in <code>templates/default/slurm.conf.erb</code> (<a href="https://gist.github.com/1654086">gist</a>):</p>
+<div class="CodeRay">
+  <div class="code"><pre>ControlMachine=&lt;%= node.slurm['master'] %&gt;
+ControlAddr=&lt;%= node.slurm['master_addr'] %&gt;
+...
+SlurmUser=&lt;%= node.slurm['user'] %&gt;
+...
+NodeName=&lt;%= node.slurm['computes'].join(',') %&gt;
+NodeAddr=&lt;%= node.slurm['compute_addrs'].join(',') %&gt; Procs=&lt;%= node.slurm['cpus'] %&gt; State=UNKNOWN 
+PartitionName=&lt;%= node.slurm['part_name'] %&gt; Nodes=&lt;%= node.slurm['computes'].join(',') %&gt; 
+Default=YES MaxTime=INFINITE State=UP</pre></div>
+</div>
+
+<p>We also need a <code>munge.key</code> file we can share across the cluster for authentication. Typically this is generated by dd'ing from <code>/dev/random</code> or similar, but here, I just used a text-based key I can override with an attribute later:</p>
+<div class="CodeRay">
+  <div class="code"><pre>default['munge']['key']    = &quot;RandomKeyGoesHereRandomKeyGoesHereRandomKeyGoesHereRandomKeyGoesHere&quot;</pre></div>
+</div>
+
+<p>And munge.key.erb (<a href="https://gist.github.com/1654107">gist</a>):</p>
+<div class="CodeRay">
+  <div class="code"><pre>&lt;%= node.munge['key'] %&gt;</pre></div>
+</div>
+
+<h3>NFS share</h3>
+<p>Most compute clusters include an NFS share of either <code>/home</code> or a scratch space from the head node to the compute nodes.  To set this up, I wrote two pretty basic recipes.</p>
+<p>nfs_headnode.rb (<a href="https://gist.github.com/1654135">gist</a>):</p>
+<div class="CodeRay">
+  <div class="code"><pre># Install NFS packages
+package(&quot;nfs-common&quot;)
+package(&quot;nfs-kernel-server&quot;)
+
+# Make sure the diretory to be exported exists
+node.nfs['shared_dirs'].each do |d|
+    directory d do
+        mode &quot;0777&quot;
+        action :create
+    end
+end
+
+# Create the exports file and refresh the NFS exports
+template &quot;/etc/exports&quot; do
+    source &quot;exports.erb&quot;
+    owner &quot;root&quot;
+    group &quot;root&quot;
+    mode &quot;0644&quot;
+end
+
+# Start the NFS server
+service &quot;nfs-kernel-server&quot; do
+    action [:enable,:start,:restart]
+end
+
+execute &quot;exportfs&quot; do
+    command &quot;exportfs -a&quot;
+    action :run
+end</pre></div>
+</div>
+
+<p>Note that I included an "execute" directive here, that calls for a command to be executed. This type of operation is not necessarily idempotent, though in this case it is (as <code>exportfs -a</code> should always produce the same result for a given exports file).  This makes it a little less predictable than most Chef directives.</p>
+<p>exports.erb (<a href="https://gist.github.com/1654148">gist</a>):</p>
+<div class="CodeRay">
+  <div class="code"><pre>&lt;% node.nfs['shared_dirs'].each do |dir| -%&gt;
+&lt;%= dir %&gt;  &lt;% node.nfs['clients'].each do |client| -%&gt;&lt;%= client %&gt;(rw) &lt;% end -%&gt;
+&lt;% end -%&gt;</pre></div>
+</div>
+
+<p>nfs_computenode.rb (<a href="https://gist.github.com/1654155">gist</a>):</p>
+<div class="CodeRay">
+  <div class="code"><pre>package(&quot;nfs-common&quot;)
+
+# Make sure the diretory to be exported exists
+node.nfs['shared_dirs'].each do |dir|
+    directory dir do
+        mode &quot;0777&quot;
+        action :create
+    end
+end
+
+
+file &quot;/etc/fstab&quot; do
+
+    sourceip = node.nfs['headnode_addr']
+    dirs = node.nfs['shared_dirs']
+
+    # Generate the new fstab lines
+    new_lines = &quot;&quot;
+    dirs.each do |d| 
+        new_lines = new_lines + &quot;#{sourceip}:#{d}  #{d}  nfs  defaults 0 0\n&quot;
+    end
+
+    print &quot;*** Mount line: #{new_lines}\n&quot;
+
+    # Get current content, check for duplication
+    only_if do
+        current_content = File.read('/etc/fstab')
+        current_content.index(new_lines).nil?
+    end
+
+    print &quot;*** Passed the conditional for current content\n&quot;
+
+    # Set up the file and content
+    owner &quot;root&quot;
+    group &quot;root&quot;
+    mode  &quot;0644&quot;
+    current_content = File.read('/etc/fstab')
+    new_content = current_content + new_lines
+    content new_content
+
+end
+
+execute &quot;mount&quot; do
+    command &quot;mount -a&quot;
+    action :run
+end</pre></div>
+</div>
+
+<p>In the compute node template, note that rather than using a template, I'm directly modifying a system file; in this case, the <code>/etc/fstab</code> file.  This is more dangerous in some ways, but also means that I don't care what the previous content of the file was (so other mounts can exist there, etc).  The recipe works in three steps:</p>
+<ol>
+<li>Generate new fstab lines for the NFS mounts</li>
+<li>Check to see if these lines are present in the fstab, and stop if they are</li>
+<li>Modify the content</li>
+</ol>
+<p>And with attributes...</p>
+<div class="CodeRay">
+  <div class="code"><pre>default['nfs']['headnode_addr']    = default['slurm']['master_addr']
+default['nfs']['shared_dirs']      = [&quot;/scratch&quot;]
+default['nfs']['clients']          = default['slurm']['compute_addrs']</pre></div>
+</div>
+
+<h3>Other software</h3>
+<p>Finally, we have a couple of other small recipes to add.  First, all the nodes should include the OpenMPI binaries and libraries (<a href="https://gist.github.com/1654169">openmpi.rb</a>):</p>
+<div class="CodeRay">
+  <div class="code"><pre>%w{openmpi-common openmpi-bin openmpi-checkpoint libopenmpi-dev openmpi-doc}.each do |pkg|
+    package pkg do
+        action [:install]
+    end
+end</pre></div>
+</div>
+
+<p>And we should install the pdsh "parallel ssh" command on the head node, for management (<a href="https://gist.github.com/1654172">pdsh.rb</a>):</p>
+<div class="CodeRay">
+  <div class="code"><pre>package(&quot;pdsh&quot;)</pre></div>
+</div>
+
+<h3>Roles</h3>
+<p>Of course, now we have some recipes which should only be applied on either the head node or the compute node; for example, our two NFS recipes. Thankfully, Chef has <strong>roles</strong> that allow you to group related recipes:</p>
+<p>slurm-headnode.rb:</p>
+<div class="CodeRay">
+  <div class="code"><pre>name &quot;slurm-headnode&quot;
+description &quot;SLURM cluster headnode&quot;
+run_list(
+    &quot;recipe[slurm-mpi-cluster::slurm]&quot;,
+    &quot;recipe[slurm-mpi-cluster::nfs_headnode]&quot;,
+    &quot;recipe[slurm-mpi-cluster::openmpi]&quot;,
+    &quot;recipe[slurm-mpi-cluster::pdsh]&quot;
+)</pre></div>
+</div>
+
+<p>slurm-computenode.rb:</p>
+<div class="CodeRay">
+  <div class="code"><pre>name &quot;slurm-computenode&quot;
+description &quot;SLURM cluster compute node&quot;
+run_list(
+    &quot;recipe[slurm-mpi-cluster::slurm]&quot;,
+    &quot;recipe[slurm-mpi-cluster::nfs_computenode]&quot;,
+    &quot;recipe[slurm-mpi-cluster::openmpi]&quot;
+)</pre></div>
+</div>
+
+<h3>Overriding attributes</h3>
+<p>Finally, when I actually deploy this cookbook, I want to override the default attributes so that hostnames, IP addresses, and so on are correct. Chef provides a number of ways to do this, but one of the easiest is using <strong>environments</strong>.  These are, more-or-less, just a list of attribute overrides which can be applied to nodes using the Chef server.  An example of an environment I used when testing on EC2 (<a href="https://gist.github.com/1654243">gist</a>):</p>
+<div class="CodeRay">
+  <div class="code"><pre>name &quot;ec2&quot;
+description &quot;An environment for testing the slurm cookbook on ec2&quot;
+override_attributes &quot;slurm&quot; =&gt; { 'master' =&gt; 'domU-12-31-39-00-A4-87', 'master_addr' =&gt; '10.254.171.117',
+'computes' =&gt; ['domU-12-31-39-16-C9-DB','domU-12-31-39-13-D5-27'],
+'compute_addrs' =&gt; ['10.96.202.41', '10.201.214.213'],
+    'cpus' =&gt; '1' }, 
+&quot;nfs&quot; =&gt; { 'headnode_addr' =&gt; '10.254.171.117', 'shared_dirs' =&gt; ['/scratch'],
+    'clients' =&gt; ['10.96.202.41','10.201.214.213'] }</pre></div>
+</div>
+
+<p>&nbsp;</p>
