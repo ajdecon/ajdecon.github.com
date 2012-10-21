@@ -1,29 +1,30 @@
 ---
-layout: default
+layout: page
+footer: true
 ---
 
-<div class="span9">
-  {% assign index = true %}
-  {% for post in paginator.posts %}
-  {% assign content = post.content %}
-    <article>
-      {% include article.html %}
-    </article>
-  {% endfor %}
-  <ul class="pager">
-    {% if paginator.next_page %}
-    <li class="previous"><a href="{{paginator.next_page}}">&larr; Older</a></li>
-    {% endif %}
-    <li><a href="/blog/archives">Blog Archives</a></li>
-    {% if paginator.previous_page %}
-    <li class="next"><a href="{{paginator.previous_page}}">Newer &rarr;</a></li>
-    {% endif %}
-  </ul>
+<table border=0 width="100%">
+<tr>
+<td align="left">
+<h1>Hi, I’m Adam.</h1>
+</td>
+<td align="right">
+<img src="http://www.ajdecon.org/images/profile_new.png" width=200 />
+</td>
+</tr></table>
+
+<div style="font-size: 160%; line-height: 120%">
+<br/>
+<p>I build and maintain high-performance computing clusters, and 
+sometimes write software for them. I currently work at <a href="http://www.nvidia.com/">NVIDIA</a>, where I work on 
+problems related to GPUs for HPC and maintain internal HPC infrastructure. In 
+the past I’ve done research in physics and materials science.</p>
+
+<p>I also fence, play board games, play the trumpet, entertain our cats, and cheer wildly at my 
+wife <a href="http://about.me/lfeather">Leigh's</a> 
+roller derby bouts. All of these things will make an appearance from time to time on 
+<a href="/blog">this blog.</a></p>
+
+<p>Have a question for me? Want to say hi? Email and social networking are in the navbar.</p>
 </div>
-<aside class="sidebar-nav span3">
-  {% if site.blog_index_asides.size %}
-    {% include_array blog_index_asides %}
-  {% else %}
-    {% include_array default_asides %}
-  {% endif %}
-</aside>
+
