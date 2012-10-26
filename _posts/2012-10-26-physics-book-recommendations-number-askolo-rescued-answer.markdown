@@ -12,10 +12,11 @@ my own usage of the site did tail off pretty quickly. I did have a couple of ans
 thought into, so I might rescue a few of them as blog posts. Here's one.*
 
 
-## Q: Do you have any recommendations for high quality physics books? (I've been enjoying the Structure and Interpretation of Classical Mechanics recently). ##
+#### Q: Do you have any recommendations for high quality physics books? (I've been enjoying the Structure and Interpretation of Classical Mechanics recently). ####
+
 A: It's been a little while since I sat down with a good physics text, but here are some I remember liking:
 
-### General physics: ###
+#### General physics: ####
 
 * Anything of Feynman's is good, particularly his Lectures on Physics and The Character of Physical Law (absolutely one of my favorite short physics books). One exception: they're selling a book of problem sets with his lectures now, but to be honest I didn't care for them much.
 * Quantum Physics by Eisberg and Resnick - I remember liking this as a good general intro for quantum physics, but it doesn't use braket notation which quite bothered me at the time. 
@@ -29,7 +30,7 @@ AVOID "Electromagnetism" by Pollack and Stump, and "Optical Waves in Crystals" b
 
 Edit: I notice after-the-fact that there's not a single book on classical mechanics in above list, except Feynman. I honestly just never liked any of them. Perhaps I should read Newton? :-)
 
-Materials science, soft-matter physics and polymer physics:
+#### Materials science, soft-matter physics and polymer physics: ####
 
 * Electronic Materials and Devices by Kasap - My second intro to solid state physics, and perhaps it was strictly more useful than Kittel: I remember the problem sets being much better. It was much more focused on the materials science and practical engineering.
 * Molecular Driving Forces by Dill and Bromberg - Starts as another stat-mech book, but flows into some generic materials science and polymer physics 
