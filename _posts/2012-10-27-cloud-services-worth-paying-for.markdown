@@ -3,7 +3,7 @@ layout: post
 title: "Cloud services worth paying for"
 date: 2012-10-27 06:00
 comments: true
-categories: random, geekery, cloud
+categories: random geekery cloud
 ---
 
 Despite being generally suspicious of any branding relating to "the cloud", I actually do use
