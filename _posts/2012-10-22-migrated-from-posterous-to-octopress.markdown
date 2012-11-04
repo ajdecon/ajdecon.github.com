@@ -3,7 +3,7 @@ layout: post
 title: "Migrated from Posterous to Octopress"
 date: 2012-10-22 06:49
 comments: false
-categories: 
+categories: geekery sysadmin 
 ---
 
 Today I decided to take a leap I'd been thinking about for a while, and migrated 

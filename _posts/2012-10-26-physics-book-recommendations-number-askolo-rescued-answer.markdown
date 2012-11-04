@@ -3,7 +3,7 @@ layout: post
 title: "Physics book recommendations (#askolo rescued answer)"
 date: 2012-10-26 01:42
 comments: true
-categories: 
+categories: physics books askolo 
 ---
 *[Askolo](http://www.askolo.com) is a question-answer site 
 [I played with for a while](http://blog.ajdecon.org/some-thoughts-on-hpc-in-the-cloud-askolo-ques/), but it was recently accounced that
