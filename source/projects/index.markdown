@@ -2,18 +2,31 @@
 layout: page
 title: "Projects"
 comments: false
-sharing: true
+sharing: false
 footer: true
 ---
 
-A few things I enjoyed or am proud of having worked on (that I can 
-actually show in public!):
+## HPC ##
+
+* [torque_qhistory](http://blog.ajdecon.org/torque_qhistory/): A 
+tool for viewing and doing simple queries on PBS/Torque accounting files.
+
+* [modules_logger](http://blog.ajdecon.org/modules_logger/): A system for logging 
+the usage of environment-modules to help system administrators better manage 
+cluster software. Uses MongoDB as the persistence layer.
 
 * [Warewulf](http://warewulf.lbl.gov): a system for provisioning and managing 
 Linux systems, well-optimized for working with HPC clusters, and developed
-out of Berkeley Labs. I've done a little
+out of Berkeley National Lab. I'm a minor contributer to the project, and have
+done a little
 work on the stateful provisioning, IPMI and user interface, and mostly done a
 lot of bugfixing as I run into problems. One of my primary tools as an HPC admin.
+
+* [hpc-chef](https://github.com/ajdecon/hpc-chef): A Chef repo with some 
+cookbooks related to HPC (and some other experiments). Woefully out-of-date
+at the moment, but occasionally new things filter in.
+
+## From grad school ##
 
 * [imagej_morphology](https://github.com/ajdecon/imagej_morphology): A library
 based on the popular [ImageJ](http://rsb.info.nih.gov/ij/) image processing 
@@ -38,4 +51,10 @@ Really only of interest if you enjoy soft matter materials science, but analyzin
 the microscopy data was also
 a good "practical" application of morphological image processing.
 
-Also, see a list of my [publications](/pubs).
+ - [grad school matlab](https://github.com/ajdecon/gradschool_matlab): A bunch
+   of the matlab scripts I used for processing data for my thesis. Like much
+   academic code it's uniformly horrible, but it might be worth reading and
+   re-writing if you're doing related work. Licensed under the
+   [CRAPL](http://matt.might.net/articles/crapl/)
+
+Also, see a list of my [academic publications](/pubs).
