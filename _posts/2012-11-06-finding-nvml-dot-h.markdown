@@ -3,6 +3,7 @@ layout: post
 title: "Finding nvml.h"
 date: 2012-11-06 01:21
 comments: true
+published: false
 categories: hpc nvml nvidia gpu 
 ---
 
