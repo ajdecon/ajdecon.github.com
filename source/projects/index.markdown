@@ -15,6 +15,10 @@ tool for viewing and doing simple queries on PBS/Torque accounting files.
 the usage of environment-modules to help system administrators better manage 
 cluster software. Uses MongoDB as the persistence layer.
 
+* [hpc-helper-scripts](http://blog.ajdecon.org/hpc-helper-scripts/): 
+This is just an assortment of scripts, notes, and miscellaneous tools I've put together for helping with managing HPC clusters. Some of these are trivial, others are decent tools in their own right;
+they're included here in case they are useful to others.
+
 * [Warewulf](http://warewulf.lbl.gov): a system for provisioning and managing 
 Linux systems, well-optimized for working with HPC clusters, and developed
 out of Berkeley National Lab. I'm a minor contributer to the project, and have
