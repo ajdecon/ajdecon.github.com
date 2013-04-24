@@ -10,6 +10,8 @@ __Updates:__
 
 - 2012-04-23: Added notes on [build automation](#automate).
 
+- - -
+
 __In this post, I'm mostly organizing a set of notes I've been using to help
 people put together small high-performance computing clusters.__
 
