@@ -6,6 +6,10 @@ comments: true
 categories: hpc linux sysadmin  
 ---
 
+__Updates:__
+
+- 2012-04-23: Added notes on [build automation](#automate).
+
 __In this post, I'm mostly organizing a set of notes I've been using to help
 people put together small high-performance computing clusters.__
 
@@ -26,6 +30,7 @@ The levels of the software stack I discuss include:
   * with some notes on [ad-hoc tools](#adhoc) that are useful
 * [Message passing libraries](#mpi)
   * with some notes on [library management](#modules) with environment-modules
+  * and on [automating software builds](#automate)
 * [Job scheduler](#scheduling)
 * [Shared filesystems](#filesystem)
 * [Monitoring](#monitoring)
@@ -417,6 +422,42 @@ point to the right files:
     [ajdecon@exp ~]$ echo $PATH
     /opt/openmpi-1.6.2/bin:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/home/ajdecon/bin
 
+### <a id="automate"></a>Automating software builds (added 2013-04-23) ###
+
+When you start building a large number of libraries of different versions 
+around, you may encounter an ugly truth: the build process for many scientific
+and HPC packages sucks. 
+
+Many scientific applications have complex custom build
+processes which deviate from the simple `./configure && make && make install`
+you might wish for, and it can be difficult to get all the dependencies sorted
+out properly. And even when you do get them built, many applications and 
+libraries are updated frequently with new features you want, making the 
+software build challenge an ongoing issue.
+
+For these reasons, many HPC sites make use of some method for automating the
+process of building and updating software which is distributed as source.
+Keeping a large library of home-grown scripts is not uncommon, and Oak Ridge
+National Lab has a system called [SWTools](http://www.olcf.ornl.gov/center-projects/swtools/)
+which is used in a number of places.
+
+My current favorite tool for this problem is called [EasyBuild](https://github.com/hpcugent/easybuild).
+EasyBuild provides a convenient framework for automating most software build
+processes via Python, as well as a fairly large library of existing recipes
+for a variety of common applications. If it knows how to build the dependencies
+of a given package, it will build those too... And it will automatically generate
+Module files with the right dependencies set up as well, to make your new
+software easy to use.
+
+Even more interesting (for those of us with demanding users), EasyBuild
+works just as well in a user's home directory as it does installing in a 
+system location, and it will cheerfully create a local repository of software
+installs complete with generated Module files. Handy for both the users and the
+admins!
+
+For more details I suggest checking out the [EasyBuild wiki](https://github.com/hpcugent/easybuild/wiki)
+on GitHub. 
+
 ### <a id="scheduling"></a>Cluster scheduler ###
 
 HPC clusters are often expensive systems, and it's important to make efficient use 
@@ -587,6 +628,7 @@ based on the needs of the particular situation.
 * __Warewulf__ and __Chef__ for configuration management
 * __OpenMPI__ for MPI, or whatever your app works best with
 * __Environment modules__ for managing different libraries and compilers
+* __EasyBuild__ for automating software builds
 * __SLURM__ for job scheduling
 * __NFS__ for a shared filesystem, __Lustre__ if I need the performance
 * __Ganglia__ and __Nagios__ for monitoring.
