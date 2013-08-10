@@ -8,6 +8,11 @@ footer: true
 
 ## HPC ##
 
+* [ansible-pi-cluster](https://github.com/ajdecon/ansible-pi-cluster):
+A set of Ansible playbooks I used to build a SLURM cluster using
+Raspberry Pi's. May be useful to someone interested in learning about
+HPC clusters.
+
 * [torque_qhistory](http://blog.ajdecon.org/torque_qhistory/): A 
 tool for viewing and doing simple queries on PBS/Torque accounting files.
 
@@ -21,14 +26,8 @@ they're included here in case they are useful to others.
 
 * [Warewulf](http://warewulf.lbl.gov): a system for provisioning and managing 
 Linux systems, well-optimized for working with HPC clusters, and developed
-out of Berkeley National Lab. I'm a minor contributer to the project, and have
-done a little
-work on the stateful provisioning, IPMI and user interface, and mostly done a
+out of Berkeley National Lab. I've done a little bit of work for this on IPMI and user interface, and mostly done a
 lot of bugfixing as I run into problems. One of my primary tools as an HPC admin.
-
-* [hpc-chef](https://github.com/ajdecon/hpc-chef): A Chef repo with some 
-cookbooks related to HPC (and some other experiments). Woefully out-of-date
-at the moment, but occasionally new things filter in.
 
 ## From grad school ##
 
