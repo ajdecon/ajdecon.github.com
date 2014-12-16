@@ -1,0 +1,168 @@
+--- 
+layout: post
+title: Parallel Word Count with Julia, an interesting new language for technical computing
+published: true
+date: 2012-03-06
+categories: []
+
+posterous_url: http://blog.ajdecon.org/parallel-word-count-with-julia-an-interesting
+posterous_slug: parallel-word-count-with-julia-an-interesting
+---
+<p><a href="http://julialang.org/" title="Julia programming language">Julia</a> is an interesting new language focused on scientific computing which "launched" to the community at large a few weeks ago. I ran across the launch post via a <a href="http://news.ycombinator.com/item?id=3606380">link on Hacker News</a> (where there is actually a very good discussion), and was immediately impressed. &nbsp;In this post I'll provide a little background about the language, and walk through a parallelized "word count" example I wrote to play with the language's built-in parallelism.</p>
+<p><!--more--></p>
+<h3>A little background</h3>
+<p>To quote from the <a href="http://julialang.org/blog/2012/02/why-we-created-julia/">launch post</a>:</p>
+<blockquote>
+<p><span style="font-family: Georgia, Arial, sans-serif; line-height: 23px; text-align: left; font-size: small;">We want a language that&rsquo;s open source, with a liberal license. We want the speed of C with the dynamism of Ruby. We want a language that&rsquo;s homoiconic, with true macros like Lisp, but with obvious, familiar mathematical notation like Matlab. We want something as usable for general programming as Python, as easy for statistics as R, as natural for string processing as Perl, as powerful for linear algebra as Matlab, as good at gluing programs together as the shell. Something that is dirt simple to learn, yet keeps the most serious hackers happy. We want it interactive and we want it compiled.</span></p>
+</blockquote>
+<p>Which I find refreshingly ambitious! Because in my own programming I have a somewhat split personality. For general programming or exploratory data analysis, my tool of choice is generally Python (or to a lesser extent Ruby and R); but as an HPC guy, my prejudice is that these tools just won't cut it for big datasets or large simulations. That's the point at which I break usually out Fortran, cursing at myself as I port algorithms, wishing that NumPy was just a little bit faster.</p>
+<p>(That dramatic phrasing is not quite fair to Python; I've recently been playing a bit with Cython, which does perform quite nicely and is getting a lot of attention in the SciPy community. But we're talking about Julia. ;-) )</p>
+<p>Julia uses a JIT compiler based on LLVM and some clever language design to get some very good performance on their (admittedly selective) benchmarks, and they've definitely achieved the goal of a scientist-friendly syntax: it looks very much like Matlab. For example, the random matrix statistics benchmark looks like this:</p>
+<div class="CodeRay">
+  <div class="code"><pre>function randmatstat(t)
+    n = 5
+    v = zeros(t)
+    w = zeros(t)
+    for i=1:t
+        a = randn(n, n)
+        b = randn(n, n)
+        c = randn(n, n)
+        d = randn(n, n)
+        P = [a b c d]
+        Q = [a b; c d]
+        v[i] = trace((P.'*P)^4)
+        w[i] = trace((Q.'*Q)^4)
+    end
+    return (std(v)/mean(v), std(w)/mean(w))
+end
+
+(s1, s2) = randmatstat(1000)
+@assert 0.5 &lt; s1 &lt; 1.0 &amp;&amp; 0.5 &lt; s2 &lt; 1.0
+@timeit randmatstat(1000) &quot;rand_mat_stat&quot;</pre></div>
+</div>
+
+<p>Pretty easy to follow if you've ever done any Matlab (or even if you haven't).  The language also has some good parallel programming support, and support for calling libraries written in C and Fortran. If you want to play with Julia without building it, there's a web-based REPL up at <a href="http://tryjulia.xvm.mit.edu/">http://tryjulia.xvm.mit.edu/</a></p>
+<h3>Word Count example</h3>
+<p>Julia provides some very easy built-in mechanisms for parallelising your code, so to learn a bit of Julia and test out the language I decided to write a simple map-reduce "word count" program in the vein of the <a href="http://wiki.apache.org/hadoop/WordCount">classic Hadoop example</a>. &nbsp;The code that follows can also be found <a href="https://github.com/ajdecon/julia-wordcount">on Github</a>.</p>
+<p>Map function:</p>
+<div class="CodeRay">
+  <div class="code"><pre># &quot;Map&quot; function.
+# Takes a string. Returns a HashTable with the number of times each word 
+# appears in that string.
+function wordcount(text)
+    words=split(text,(' ','\n','\t','-','.',',',':','_','&quot;',';','!'),false)
+    counts=HashTable()
+    for w = words
+        counts[w]=get(counts,w,0)+1
+    end
+    return counts
+end</pre></div>
+</div>
+
+<p>Reduce function:</p>
+<div class="CodeRay">
+  <div class="code"><pre># &quot;Reduce&quot; function.
+# Takes a collection of HashTables in the format returned by wordcount()
+# Returns a HashTable in which words that appear in multiple inputs
+# have their totals added together.
+function wcreduce(wcs)
+    counts=HashTable()
+    for c = wcs
+        for (k,v)=c
+            counts[k] = get(counts,k,0)+v
+        end
+    end
+    return counts
+end</pre></div>
+</div>
+
+<p>Parallel word count on a string:</p>
+<div class="CodeRay">
+  <div class="code"><pre># Splits input string into nprocs() equal-sized chunks (last one rounds up), 
+# and @spawns wordcount() for each chunk to run in parallel. Then fetch()s
+# results and performs wcreduce().
+# Limitations: splitting the string and reduction step are single-threaded.
+function parallel_wordcount(text)
+    lines=split(text,'\n',false)
+    np=nprocs()
+    unitsize=ceil(length(lines)/np)
+    wcounts={}
+    rrefs={}
+    # spawn procs
+    for i=1:np
+        first=unitsize*(i-1)+1
+        last=unitsize*i
+        if last&gt;length(lines)
+            last=length(lines)
+        end
+        subtext=join(lines[int(first):int(last)],&quot;\n&quot;)
+        push(rrefs, @spawn wordcount( subtext ) )
+    end
+    # fetch results
+    while length(rrefs)&gt;0
+        push(wcounts,fetch(pop(rrefs)))
+    end
+    # reduce
+    count=wcreduce(wcounts)
+    return count
+end</pre></div>
+</div>
+
+<p>... on a group of files:</p>
+<div class="CodeRay">
+  <div class="code"><pre># Takes the name of a result file, and a list of input file names.
+# Combines the contents of all files, then performs a parallel_wordcount
+# on the resulting string. Writes the results to result_file.
+# Limitation: Performs all file IO single-threaded.
+function wordcount_files(result_file,input_file_names...)
+    text=&quot;&quot;
+    for f = input_file_names
+        fh=open(f)
+        text=join( {text,readall(fh)}, &quot;\n&quot; )
+        close(fh)
+    end
+    wc=parallel_wordcount(text)
+    fo=open(result_file,&quot;w&quot;)
+    for (k,v) = wc
+        with_output_stream(fo,println,k,&quot;=&quot;,v)
+    end
+end</pre></div>
+</div>
+
+<p>To run this example, you can launch Julia with 4 workers and launch the wordcount example with:</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ julia -p 4
+julia&gt; @everywhere load(&quot;wordcount.jl&quot;)
+julia&gt; wordcount_files(&quot;output.txt&quot;,&quot;input1.txt,&quot;input2.txt&quot;,&quot;input3.txt&quot;)</pre></div>
+</div>
+
+<p>To run with multiple compute nodes (which have Julia in the same location, or a shared filesystem), you would use a machine file with one entry per core. Note that you need to have SSH access to each of these machines in the account you run Julia with.</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ julia --machinefile file
+machinefile:
+  node01
+  node01
+  node02 
+  node02
+...</pre></div>
+</div>
+
+<p>The limitation here is that the reduce function is still single-threaded. Hadoop has a built-in "partitioner" which can efficiently sort the key-value pairs from the Mappers based on keys and partition the to Reducers properly, but I couldn't easily come up with anything similar in Julia which would perform well using the HashTable data structure. (Granted, I did not spend a lot of time on it.)</p>
+<p>Also, I did manual management of the parallelization using @spawn and fetch(), partly because I was using HashTables here. But Julia does provide some more succinct parallelization macros (from the <a href="http://julialang.org/manual/parallel-computing/">manual</a>):</p>
+<div class="CodeRay">
+  <div class="code"><pre># flip a coin 200000000 times
+nheads = @parallel (+) for i=1:200000000
+  randbit()
+end
+
+# apply a function f to each 2d-slice of a 3d distributed array
+B = darray(eltype(A), size(A), 3)
+for i = 1:size(A,3)
+    @spawnat owner(B,i) B[:,:,i] = f(A[:,:,i])
+end</pre></div>
+</div>
+
+<h3>Overall impressions</h3>
+<p>Generally I'm pretty impressed with Julia. The syntax is easy to understand, it has some very easy parallelization mechanisms, and is obviously very in-touch with its target market of scientists and engineers.</p>
+<p>It does show that this is a language still in development: getting the parallel word count working actually required some mails to the dev list and a fix in the HashTable serialization code, and there are a fair number of rough edges. But it <em>is</em> very much in development: the <a href="http://groups.google.com/group/julia-dev/">dev list</a> and <a href="https://github.com/JuliaLang/julia">activity on Github</a> are both very active, and the language has developed a lot just in the couple weeks it took me to get around to writing this post.</p>
+<p>From an HPC perspective, I'm very happy that it's taking parallelization seriously and already provides a mechanism for running on multiple compute nodes.  There's a little bit of SGE integration in the multiprocessing library, as well, which will hopefully get better. However, inter-node communication uses serialized objects over SSH, which is not exactly my first choice for high-performance networking. I'd be much happier if Julia used MPI as a backend for their parallelization, even if they don't want to expose it in the language, so they could take advantage of RDMA and all the optimization that has already been done in that layer.</p>

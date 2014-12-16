@@ -1,0 +1,12 @@
+--- 
+layout: post
+title: PostgreSQL to include JSON as a core type
+published: true
+date: 2012-01-16
+categories: 
+- databases
+- programming
+posterous_url: http://blog.ajdecon.org/postgresql-to-include-json-as-a-core-type
+posterous_slug: postgresql-to-include-json-as-a-core-type
+---
+<p>In what I think is a rather cool move, <a href="http://people.planetpostgresql.org/andrew/index.php?/archives/244-Under-the-wire.html">PostgreSQL will be adding support for JSON as a core data type</a> for database fields.</p> <p /> <p>When I've written any kind of database-driven project I've typically used MySQL or just SQLite, mostly due to familiarity. But this might be the stimulus for me to seriously try out PostreSQL in my next project. I've been moving more and more to using JSON as an interchange format when my programs need to talk to other software, especially over a network (see my <a href="https://bitbucket.org/ajdecon/warewulf-module-rest/overview">REST module for Warewulf</a> as an example). The libraries are solid for just about every language, and both Perl and Python supply very good functionality for translating variables to and from JSON with minimal pain. In Python in particular, working with JSON is <a href="http://www.doughellmann.com/PyMOTW/json/">not quite as easy as Pickle-ing</a>, but it's close.</p> <p /> <p>What would be nice is if I could find a database which let me search for specific key/values in a JSON field from SQL, i.e. "SELECT * FROM Users WHERE Address%City == 'Urbana'", where City is a key in the JSON field Address. This may very well exist somewhere, and if it does, feel free to let me know: not a lot of the software I write has much to do with large databases, but the proportion has been increasing so I've been trying to get better-acquainted with the popular options.</p>
