@@ -3,8 +3,8 @@
 # ----------------------- #
 
 url: http://blog.ajdecon.org
-title: "Adam DeConinck"
-subtitle: 
+title: "Thinking Out Loud"
+subtitle: "Occasional thoughts on supercomputers, sysadmin, and other random geekery"
 author: Adam DeConinck
 simple_search: http://google.com/search
 description:
@@ -90,6 +90,9 @@ googleplus_post_amount: 10
 # Google Api Console
 google_api_key: AIzaSyCqR5_JXEJlRpJJmjLwiRxNR2M5xyxEOBI
 
+# LinkedIn
+linkedin_user: ajdecon
+
 # Pinboard
 pinboard_user:
 pinboard_count: 3
@@ -107,3 +110,16 @@ google_analytics_tracking_id: UA-12576607-2
 
 # Facebook Like
 facebook_like: false
+
+# Navigation
+navigation:
+- text: Home
+  url: /
+- text: About Adam
+  url: /about
+- text: GPG key
+  url: "https://www.ajdecon.org/ajdecon-key.txt"
+- text: Publications
+  url: /pubs
+- text: RSS
+  url: /atom.xml
