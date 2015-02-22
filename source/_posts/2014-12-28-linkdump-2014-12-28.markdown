@@ -1,0 +1,38 @@
+---
+layout: post
+title: "Linkdump 2014-12-28"
+date: 2014-12-28 12:59
+comments: true
+categories: linkdump 
+---
+
+Been a while since I did one of these, so here's a list of some of the
+interesting links I find in my Pinboard bookmarks from this December.
+
+### Computing
+
+* [Eureka! Why You Shouldn’t Use ZooKeeper for Service Discovery](http://www.knewton.com/tech/blog/2014/12/eureka-shouldnt-use-zookeeper-service-discovery/) - knewton developer blog
+* [Introducing Atlas: Netflix's Primary Telemetry Platform ](http://techblog.netflix.com/2014/12/introducing-atlas-netflixs-primary.html) - Netflix Tech Blog
+* [JMAP - A better way to email](http://blog.fastmail.com/2014/12/23/jmap-a-better-way-to-email/) - Fastmail blog
+* [Principles of Distributed Computing](http://dcg.ethz.ch/lectures/podc_allstars/lecture/podc.pdf) - A good book I saw linked to several times this month, by Roger Wattenhofer
+* [How Docker Simplifies Distributed Systems Development at VoltDB](http://voltdb.com/blog/how-docker-simplifies-distributed-systems-development-voltdb) - VoltDB blog
+* [Nuitka](http://nuitka.net/) - A Python compiler
+* [Please Offer An Excel Export Option](http://www.evanmiller.org/please-offer-an-excel-export-option.html) - Evan Miller
+* [Managing Repositories with Pulp](http://sysadvent.blogspot.com/2014/12/day-13-managing-repositories-with-pulp.html) - [Justin Garrison](https://twitter.com/rothgar) on the Sysadvent blog
+* [Docker Image Insecurity](https://titanous.com/posts/docker-insecurity) - [Jonathan Rudenberg](https://twitter.com/titanous)
+* [Ross Anderson talks about practical tradecraft for journalists](https://www.youtube.com/watch?v=wvIca1KLDYg) - from The Logan Symposium
+
+### Physics
+
+* [Equivalence of wave–particle duality to entropic uncertainty](http://www.nature.com/ncomms/2014/141219/ncomms6814/full/ncomms6814.html)
+
+### Books and Fun
+
+* [Dear Committee Members, by Julie Schumacher](https://www.goodreads.com/book/show/19288259-dear-committee-members) - A fun epistolary novel about an emattled English professor at a small research university. Mostly letters of recommendation.
+* [Legion: Skin Deep](http://www.amazon.com/Legion-Skin-Deep-Brandon-Sanderson/dp/1596066903) - by Brandon Sanderson
+* [The Box: How the Shipping Container Made the World Smaller and the World Economy Bigger](http://www.amazon.com/Box-Shipping-Container-Smaller-Economy/dp/0691136408/ref=sr_1_1?ie=UTF8&qid=1419797840&sr=8-1&keywords=the+box) - by Mark Levinson
+* [The Peripheral](http://www.amazon.com/Peripheral-William-Gibson-ebook/dp/B00INIXKV2/ref=sr_1_1?ie=UTF8&qid=1419797934&sr=8-1&keywords=peripheral) - by William Gibson
+* [The Black Company](http://www.amazon.com/The-Black-Company-Chronicles/dp/0812521390) - by Glen Cook (re-read this month)
+
+
+* [Mistborn Allomancy Dice](https://www.kickstarter.com/projects/craftygames/mistborn-allomancy-dice) - A Kickstarter project

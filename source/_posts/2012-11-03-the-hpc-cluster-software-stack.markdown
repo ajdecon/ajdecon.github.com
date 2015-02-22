@@ -38,7 +38,6 @@ The levels of the software stack I discuss include:
 * [Job scheduler](#scheduling)
 * [Shared filesystems](#filesystem)
 * [Monitoring](#monitoring)
-* [What about the cloud?](#cloud)
 
 <!-- more -->
 
@@ -371,32 +370,32 @@ In case you haven't seen much MPI code, here's
 a simple example of an MPI prorgram which includes communication between
 processes, where each process sends a greeting message to the rank-0 process:
 
-    #include <stdio.h>
-    #include <mpi.h>
-    #include <string.h>
+        #include <stdio.h>
+        #include <mpi.h>
+        #include <string.h>
 
-    int main(int argc, char* argv[]) {
-        int rank, count, source, dest;
-        int tag = 0;
-        char message[100];
-        MPI_Status status;
+        int main(int argc, char* argv[]) {
+            int rank, count, source, dest;
+            int tag = 0;
+            char message[100];
+            MPI_Status status;
 
-        MPI_Init(&argc, &argv);
-        MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-        MPI_Comm_size(MPI_COMM_WORLD, &count);
+            MPI_Init(&argc, &argv);
+            MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+            MPI_Comm_size(MPI_COMM_WORLD, &count);
 
-        if (rank != 0) {
-            sprintf(message, "Greetings from process %d!",my_rank);
-            dest = 0;
-            MPI_Send(message, strlen(message)+1, MPI_CHAR, dest, tag, MPI_COMM_WORLD);
-        } else {
-            for (source = 1; source < count; source++) {
-                MPI_Recv(message,100,MPI_CHAR,source,tag,MPI_COMM_WORLD, &status);
-                printf("%s\n",message);
+            if (rank != 0) {
+                sprintf(message, "Greetings from process %d!",my_rank);
+                dest = 0;
+                MPI_Send(message, strlen(message)+1, MPI_CHAR, dest, tag, MPI_COMM_WORLD);
+            } else {
+                for (source = 1; source < count; source++) {
+                    MPI_Recv(message,100,MPI_CHAR,source,tag,MPI_COMM_WORLD, &status);
+                    printf("%s\n",message);
+                }
             }
+            MPI_Finalize();
         }
-        MPI_Finalize();
-    }
 
 This program can be run across multiple systems, on whatever interconnect you like,
 without thinking about any of the networking involved: MPI abstracts the communication
@@ -467,13 +466,13 @@ to the user's environment variables which are required to use the software packa
 in question. For our OpenMPI package, the modulefile might look something like 
 this:
 
-    #%Module
-    set     root            /opt/openmpi-1.6.2
-    prepend-path    PATH                    $root/bin
-    prepend-path    LD_LIBRARY_PATH         $root/lib
-    prepend-path    C_INCLUDE_PATH          $root/include
-    prepend-path    MANPATH                 $root/share/man
-    conflict mpi
+        #%Module
+        set     root            /opt/openmpi-1.6.2
+        prepend-path    PATH                    $root/bin
+        prepend-path    LD_LIBRARY_PATH         $root/lib
+        prepend-path    C_INCLUDE_PATH          $root/include
+        prepend-path    MANPATH                 $root/share/man
+        conflict mpi
 
 Let's go line-by-line. The first line declare this to be a module-file; the next
 line defines a "root" variable which shows where the software is installed. The next
@@ -486,22 +485,22 @@ We then put this file in the modulefiles directory (/usr/share/Modules/modulefil
 On my personal development system, I have this and other modules installed to manage my 
 software. If I type "module avail", I see the following output:
 
-    [ajdecon@exp ~]$ module avail
-    
-    ----------------------------------------------------------- /usr/share/Modules/modulefiles -----------------------------------------------------------
-    dot                     module-info             mpi/openmpi/1.6.2       python/2.7.3            use.own
-    gcc/4.7.2               modules                 mpi/openmpi/1.7-current python/3.2.3
-    module-cvs              mpi/mpich2/1.4.1        null                    ruby/1.9.3-p194
+        [ajdecon@exp ~]$ module avail
+        
+        ----------------------------------------------------------- /usr/share/Modules/modulefiles -----------------------------------------------------------
+        dot                     module-info             mpi/openmpi/1.6.2       python/2.7.3            use.own
+        gcc/4.7.2               modules                 mpi/openmpi/1.7-current python/3.2.3
+        module-cvs              mpi/mpich2/1.4.1        null                    ruby/1.9.3-p194
 
 So you can see that I have multiple conflicting MPI and Python versions installed, as well as some 
 other software. Then, when I load my OpenMPI 1.6.2 module, it changes my PATH to make sure I 
 point to the right files:
 
-    [ajdecon@exp ~]$ echo $PATH
-    /usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/home/ajdecon/bin
-    [ajdecon@exp ~]$ module load mpi/openmpi/1.6.2 
-    [ajdecon@exp ~]$ echo $PATH
-    /opt/openmpi-1.6.2/bin:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/home/ajdecon/bin
+        [ajdecon@exp ~]$ echo $PATH
+        /usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/home/ajdecon/bin
+        [ajdecon@exp ~]$ module load mpi/openmpi/1.6.2 
+        [ajdecon@exp ~]$ echo $PATH
+        /opt/openmpi-1.6.2/bin:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/home/ajdecon/bin
 
 *(Update: 2014-12-15)* There is also an alternative implementation of Modules called 
 [Lmod](https://www.tacc.utexas.edu/research-development/tacc-projects/lmod) which
@@ -569,12 +568,12 @@ the head of the queue.
 For example, a script for the PBS scheduler to run an MPI program which requires
 a temporary data directory might look like this:
 
-    #!/bin/bash
-    #PBS -l nodes=4:ppn=12
-    #PBS -l walltime=02:00:00
-    mkdir /tmp/data
-    cd $HOME/myprogram
-    mpirun -np 48 ./myprogram --datadir=/tmp/data
+        #!/bin/bash
+        #PBS -l nodes=4:ppn=12
+        #PBS -l walltime=02:00:00
+        mkdir /tmp/data
+        cd $HOME/myprogram
+        mpirun -np 48 ./myprogram --datadir=/tmp/data
 
 This script includes directives to the scheduler saying that it needs 4 nodes with
 12 processors per node and that it will need 2 hours to run. It creates its data directory,

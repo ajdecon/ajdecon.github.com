@@ -1,0 +1,26 @@
+---
+layout: post
+title: "Linkdump 2015-01-11"
+date: 2015-01-11 12:00
+comments: true
+categories: linkdump 
+---
+
+### HPC
+
+* [Using Infiniband with MATLAB Parallel Computing Toolbox ](http://www.failureasaservice.com/2015/01/using-infiniband-with-matlab-parallel.html) by [Brock Palen](https://www.twitter.com/brockpalen)
+
+* [A Major Advance for Numerical Weather Prediction in the U.S. ](http://cliffmass.blogspot.com/2015/01/a-major-advance-for-numerical-weather.html) by [Cliff Mass](http://cliffmass.blogspot.com/)
+
+* [TACC's summer internships in HPC](https://www.tacc.utexas.edu/icert-reu)
+
+* [Accelerating ORNL’s Applications to the Exascale](http://insidehpc.com/2014/12/video-accelerating-ornls-applications-exascale/) (video)
+
+### Distributed systems
+
+* [An introduction to containers, Kubernetes, and the trajectory of modern cloud computing](http://googlecloudplatform.blogspot.com/2015/01/in-coming-weeks-we-will-be-publishing.html) from Google's
+  [Cloud Platform Blog](http://googlecloudplatform.blogspot.com/)
+
+### Happy news
+
+* [Intel takes on diversity and inclusion in tech with $300M initiative](http://mashable.com/2015/01/06/intel-diversity-initiative/)

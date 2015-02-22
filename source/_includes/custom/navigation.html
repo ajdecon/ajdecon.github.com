@@ -1,11 +1,5 @@
 <ul class="nav">
-  <li><a href="{{ root_url }}/blog">Blog</a></li>
-<!--  <li><a href="{{ root_url }}/blog/archives">Archives</a></li> -->
-  <li><a href="mailto:ajdecon@ajdecon.org">Email</a></li>
-  <li><a href="{{ root_url }}/ajdecon-public-key.asc">(gpg key)</a></li>
-  <li><a href="http://www.twitter.com/ajdecon">Twitter</a></li>
-  <li><a href="http://www.github.com/ajdecon">Github</a></li>
-  <li><a href="http://www.linkedin.com/in/ajdecon">LinkedIn</a></li>
-  <li><a href="http://www.goodreads.com/ajdecon">Goodreads</a></li>
-  <li><a href="{{ root_url }}/pubs">Publications</a></li>
+    {% for link in site.navigation %}
+        <li {% if page.url == link.url %}class="active"{% endif %}><a href="{{ link.url }}">{{ link.text }}</a></li>
+    {% endfor %}
 </ul>

@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Good links from the past week"
+title: "Good links from the past week - 11/11"
 date: 2014-11-11 08:10
 comments:
 categories: linkdump

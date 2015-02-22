@@ -1,28 +1,26 @@
 ---
-layout: page
-footer: true
-sharing: false
+layout: default
 ---
+{% include header.html %}
+<div class="blog-index">
+  {% assign index = true %}
+  {% for post in paginator.posts %}
+  {% assign content = post.content %}
+    <article>
+      {% include article.html %}
+    </article>
+    {% unless post == paginator.posts.last %}
+    <hr>
+    {% endunless %}
+  {% endfor %}
+  <div class="pagination">
+    {% if paginator.next_page %}
+    <a class="prev" href="{{paginator.next_page}}">&larr; Older</a>
+    {% endif %}
 
-<h1>Hi, I'm Adam DeConinck.</h1>
-<p>I work in high-performance computing, mostly focused on deployment and
-system administration for HPC clusters geared towards scientific computing.
-I'm also interested in the more general problems of building and operating
-distributed computing system.</p>
-
-<p>When I'm not thinking about computers, I tend to spend a lot of time
-reading, playing board games, and hanging out with my lovely wife
-<a href="https://twitter.com/Leigh_47">Leigh</a> and our two cats.
-I've also been known to pick up an epee on occasion.</p>
-
-<ul>
-  <li><a href="mailto:ajdecon@ajdecon.org">Email</a> (<a href="{{ root_url }}/ajdecon-public-key.asc">gpg public key</a>)</li>
-  <li><a href="{{ root_url }}/blog">Blog</a></li>
-  <li><a href="{{ root_url }}/pubs">Publications</a></li>
-  <li><a href="http://www.twitter.com/ajdecon">Twitter</a></li>
-  <li><a href="http://www.github.com/ajdecon">Github</a></li>
-  <li><a href="http://www.keybase.io/ajdecon">Keybase</a></li>
-  <li><a href="http://www.linkedin.com/in/ajdecon">LinkedIn</a></li>
-  <li><a href="http://www.goodreads.com/ajdecon">Goodreads</a></li>
-</ul>
+    {% if paginator.previous_page %}
+    <a class="next" href="{{paginator.previous_page}}">Newer &rarr;</a>
+    {% endif %}
+  </div>
+</div>
 
