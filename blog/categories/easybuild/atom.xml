@@ -4,7 +4,7 @@
   <title><![CDATA[Category: easybuild | Thinking Out Loud]]></title>
   <link href="http://blog.ajdecon.org/blog/categories/easybuild/atom.xml" rel="self"/>
   <link href="http://blog.ajdecon.org/"/>
-  <updated>2015-04-12T13:38:18-06:00</updated>
+  <updated>2015-04-12T13:42:12-06:00</updated>
   <id>http://blog.ajdecon.org/</id>
   <author>
     <name><![CDATA[Adam DeConinck]]></name>
@@ -315,7 +315,58 @@ show you can install them. In this case, let's install GROMACS:</p>
 
 <p>And then, as a test, run one of the GROMACS benchmarks:</p>
 
-<pre><code>    [easybuild@ip-10-0-0-75 d.dppc]$ mpirun -np 2 mdrun_mpi
+<pre><code>    [easybuild@ip-10-0-0-75 ~]$ wget ftp://ftp.gromacs.org/pub/benchmarks/gmxbench-3.0.tar.gz
+    --2015-04-12 16:50:33--  ftp://ftp.gromacs.org/pub/benchmarks/gmxbench-3.0.tar.gz
+               =&gt; `gmxbench-3.0.tar.gz'
+    Resolving ftp.gromacs.org... 130.238.41.205
+    Connecting to ftp.gromacs.org|130.238.41.205|:21... connected.
+    Logging in as anonymous ... Logged in!
+    ==&gt; SYST ... done.    ==&gt; PWD ... done.
+    ==&gt; TYPE I ... done.  ==&gt; CWD (1) /pub/benchmarks ... done.
+    ==&gt; SIZE gmxbench-3.0.tar.gz ... 4060558
+    ==&gt; PASV ... done.    ==&gt; RETR gmxbench-3.0.tar.gz ... done.
+    Length: 4060558 (3.9M) (unauthoritative)
+
+    100%[============================================================================================&gt;] 4,060,558    803K/s   in 5.6s
+
+    2015-04-12 16:50:40 (712 KB/s) - `gmxbench-3.0.tar.gz' saved [4060558]
+
+    [easybuild@ip-10-0-0-75 ~]$ tar xzf gmxbench-3.0.tar.gz
+    [easybuild@ip-10-0-0-75 ~]$ cd d.dppc/
+    [easybuild@ip-10-0-0-75 d.dppc]$ grompp_mpi
+    ...
+    NOTE 1 [file grompp.mdp]:
+      The Berendsen thermostat does not generate the correct kinetic energy
+      distribution. You might want to consider using the V-rescale thermostat.
+
+    Generated 91 of the 91 non-bonded parameter combinations
+    Generating 1-4 interactions: fudge = 1
+    Generated 91 of the 91 1-4 parameter combinations
+    Excluding 3 bonded neighbours molecule type 'DPPC'
+    turning all bonds into constraints...
+    Excluding 2 bonded neighbours molecule type 'SOL'
+    turning all bonds into constraints...
+    Analysing residue names:
+    There are:  1024      Other residues
+    There are: 23552      Water residues
+    Analysing residues not classified as Protein/DNA/RNA/Water and splitting into groups...
+    Number of degrees of freedom in T-Coupling group DPPC is 103422.73
+    Number of degrees of freedom in T-Coupling group SOL is 141310.27
+
+    NOTE 2 [file grompp.mdp]:
+      You are using a plain Coulomb cut-off, which might produce artifacts.
+      You might want to consider using PME electrostatics.
+
+
+    Largest charge group radii for Van der Waals: 0.190, 0.190 nm
+    Largest charge group radii for Coulomb:       0.190, 0.190 nm
+    This run will generate roughly 9 Mb of data
+
+    There were 2 notes
+
+    gcq#280: "There's Still Time to Change the Rope You're On" (Led Zeppelin)
+
+    [easybuild@ip-10-0-0-75 d.dppc]$ mpirun -np 2 mdrun_mpi
                              :-)  G  R  O  M  A  C  S  (-:
 
                            Great Red Owns Many ACres of Sand
