@@ -1,0 +1,454 @@
+---
+layout: post
+title: "Notes on building and packaging environment modules with EasyBuild and FPM"
+date: 2015-04-11 11:41
+comments: true
+categories: ['hpc', 'sysadmin', 'easybuild', 'packaging'] 
+---
+
+Like any good sysadmin, I strongly prefer to install software using my OS's
+built-in package management system. Unfortunately, a lot of the software
+used in scientific high-performance computing doesn't make this easy.
+Many popular software projects, including both user applications and common
+libraries, don't distribute packages but expect their users to build from source.
+And many of these projects have non-standard, arcane, or just-plain-weird
+build processes.
+
+This post consists of some notes on a workflow I've used for building scientific software and
+producing RPMs which can be used to distribute that software in the future.
+I mostly use this workflow mostly for **personal projects** -- building and testing
+clusters on Amazon EC2, for example. (**Disclaimer:** This is not the workflow in production use
+at the Day Job, where the software management problems are much more challenging!)
+
+The core components of this workflow are [EasyBuild](https://hpcugent.github.io/easybuild/) --
+which automates building HPC software projects -- and [FPM](https://github.com/jordansissel/fpm) --
+which makes it easy to build OS packages from a directory.
+
+<!-- more -->
+
+
+Build server configuration
+--------------------------
+
+For building my packages I typically use a c4.xlarge server on
+[Amazon EC2](http://aws.amazon.com). The c4.xlarge has the advantage of being
+relatively powerful (typically I get 4 Sandy Bridge CPUs when I launch one)
+while also being relatively cheap (spot price is currently hovering around
+$0.032/hr). I run CentOS 6.x on the server as this is typical of the HPC
+environments I generally use.
+
+The following [Ansible](http://www.ansible.com) script installs a set of
+basic development tools (the "@development" yum group), EasyBuild, and FPM.
+It also pulls down my "module2pkg" wrapper script for packaging modules
+with FPM. (More on that later.)
+
+    ---
+    - hosts: builder
+      user: root
+      tasks:
+      - name: install dev and packaging tools
+        yum: name="{{ item }}" state=present
+        with_items:
+        - "@development"
+        - "environment-modules"
+        - "python-pip"
+ 
+      # Set up module2pkg script
+      - name: install fpm
+        gem: name=fpm state=present
+      - name: pull down module2pkg script
+        git: repo="https://github.com/ajdecon/module2pkg" dest=/opt/module2pkg
+ 
+      - name: symlink for running module2pkg
+        file: src="/opt/module2pkg/module2pkg" dest="/usr/local/bin/module2pkg" state=link
+ 
+ 
+      # Set up and configure EasyBuild
+      - name: easybuild user for building software
+        user: name=easybuild createhome=yes state=present
+ 
+      - name: /opt/easybuild where EB sw will go
+        file: path="/opt/easybuild" owner=easybuild mode=0755 state=directory
+             - name: install easybuild
+        pip: name=easybuild state=present
+ 
+      - name: ensure easybuild user .config dir exists
+        file: path="/home/easybuild/.config/easybuild" owner=easybuild mode=0755
+              state=directory
+ 
+      - name: ensure ~easybuild/.config/config.cfg exists
+        file: path="/home/easybuild/.config/easybuild/config.cfg" owner=easybuild
+              mode=0644 state=touch
+ 
+      - name: configure prefix
+        ini_file: dest="/home/easybuild/.config/easybuild/config.cfg" section="config"
+                  option="prefix" value="/opt/easybuild"
+
+Building Modules with EasyBuild
+-------------------------------
+
+[EasyBuild](https://hpcugent.github.io/easybuild/) is a framework for building
+and installing scientific applications on HPC systems. It comes with a huge
+library of build scripts for commonly-used compilers, support libraries, and
+simulations -- all of which can be built and installed just by running the
+appropriate EasyBuild command.
+
+(This is hugely useful because many of these applications have *horrible*
+build processes. While many can be built with a regular "configure; make; make
+install" workflow, many others include custom build scripts or have a long
+list of required-but-arcane build options.)
+
+EasyBuild also generates Module files for each software package it builds, which
+is very convenient in HPC environments where we may have many users who want to
+easily use different versions of each software package. (For example, it's not
+uncommon to have strict dependencies on specific compiler or MPI versions -- so
+a good HPC platform should make it easy to use those versions.)
+
+EasyBuild resolves dependencies, and can be run with a "dry run" option which will show you what
+software it will build to support any given application. For example, this is the output
+when you request a dry run for running a particular recipe for
+[GROMACS](http://www.gromacs.org/):
+
+        [easybuild@ip-10-0-0-88 ~]$ eb GROMACS-4.6.5-gmpolf-1.4.8-hybrid.eb --robot --dry-run
+        == temporary log file in case of crash /tmp/eb-2U1YxO/easybuild-jmFjre.log
+        Dry run: printing build status of easyconfigs and dependencies
+         * [ ] /usr/easybuild/easyconfigs/g/GCC/GCC-4.8.1.eb (module: GCC/4.8.1)
+         * [ ] /usr/easybuild/easyconfigs/m/MPICH/MPICH-3.0.4-GCC-4.8.1.eb (module: MPICH/3.0.4-GCC-4.8.1)
+         * [ ] /usr/easybuild/easyconfigs/g/gmpich/gmpich-1.4.8.eb (module: gmpich/1.4.8)
+         * [ ] /usr/easybuild/easyconfigs/o/OpenBLAS/OpenBLAS-0.2.6-gmpich-1.4.8-LAPACK-3.4.2.eb (module: OpenBLAS/0.2.6-gmpich-1.4.8-LAPACK-3.4.2)
+         * [ ] /usr/easybuild/easyconfigs/f/FFTW/FFTW-3.3.3-gmpich-1.4.8.eb (module: FFTW/3.3.3-gmpich-1.4.8)
+         * [ ] /usr/easybuild/easyconfigs/s/ScaLAPACK/ScaLAPACK-2.0.2-gmpich-1.4.8-OpenBLAS-0.2.6-LAPACK-3.4.2.eb (module: ScaLAPACK/2.0.2-gmpich-1.4.8-OpenBLAS-0.2.6-LAPACK-3.4.2)
+         * [ ] /usr/easybuild/easyconfigs/g/gmpolf/gmpolf-1.4.8.eb (module: gmpolf/1.4.8)
+         * [ ] /usr/easybuild/easyconfigs/n/ncurses/ncurses-5.9-gmpolf-1.4.8.eb (module: ncurses/5.9-gmpolf-1.4.8)
+         * [ ] /usr/easybuild/easyconfigs/c/CMake/CMake-2.8.12-gmpolf-1.4.8.eb (module: CMake/2.8.12-gmpolf-1.4.8)
+         * [ ] /usr/easybuild/easyconfigs/g/GROMACS/GROMACS-4.6.5-gmpolf-1.4.8-hybrid.eb (module: GROMACS/4.6.5-gmpolf-1.4.8-hybrid)
+        == temporary log file /tmp/eb-2U1YxO/easybuild-jmFjre.log has been removed.
+        == temporary directory /tmp/eb-2U1YxO has been removed.
+
+EasyBuild will first build all the modules which GROMACS depends on, all the way
+down to the compiler stack. This may seem a little unnecessary -- after all, doesn't
+the system come with a perfectly good compiler? However, it provides an easy way to
+decouple your HPC software stack from the underlying OS, so that you can perform
+OS upgrades for security or other issues while having less of an impact on your
+users' software. It also means that you can build those lower level components
+with options which are useful for HPC, but which your system vendor may not
+have used in their stock build.
+
+(A note on EC2: When you launch a particular
+instance type, like c4.xlarge, you may get Sandy Bridge CPUs... or you may get
+Westmeres or Ivy Bridges. The CPUs may also not actually support all the options
+that they should: I initially tried to build software with EasyBuild's default
+optimization levels which include `-march=native` and got "instruction not
+supported" errors for some of the AVX instructions. Given that I am going to be 
+building RPMs anyway, I want them to be as general
+as possible. So when building on EC2, I typically use the EasyBuild option
+`--optarch=''` to turn off CPU-specific optimizations.)
+
+Now execute without the dry run:
+
+        [easybuild@ip-10-0-0-88 ~]$ eb GROMACS-4.6.5-gmpolf-1.4.8-hybrid.eb --robot --optarch=''
+
+And wait a long time, as we're starting with GCC:
+
+        == temporary log file in case of crash /tmp/eb-AGI9Yh/easybuild-DLAzfR.log
+        == resolving dependencies ...
+        == processing EasyBuild easyconfig /usr/easybuild/easyconfigs/g/GCC/GCC-4.8.1.eb
+        == building and installing GCC/4.8.1...
+        == fetching files...
+        == creating build dir, resetting environment...
+        == unpacking...
+        == patching...
+        == preparing...
+        == configuring...
+        == building...
+
+Once everything has finished building, we can see the new software
+available in Modules:
+
+        [easybuild@ip-10-0-0-88 ~]$ module use /opt/easybuild/modules/all/
+        [easybuild@ip-10-0-0-88 ~]$ module av
+
+        ---------------------------------------------------- /opt/easybuild/modules/all/ -----------------------------------------------------
+        CMake/2.8.10.2-gmpolf-1.4.8                              ScaLAPACK/2.0.2-gmpich-1.4.8-OpenBLAS-0.2.6-LAPACK-3.4.2
+        CMake/2.8.12-gmpolf-1.4.8                                bzip2/1.0.6-gmpolf-1.4.8
+        FFTW/3.3.3-gmpich-1.4.8                                  gettext/0.18.2-gmpolf-1.4.8
+        GCC/4.8.1                                                gmpich/1.4.8
+        GLib/2.34.3-gmpolf-1.4.8                                 gmpolf/1.4.8
+        GROMACS/4.6.5-gmpolf-1.4.8-hybrid                        libffi/3.0.13-gmpolf-1.4.8
+        HPL/2.1-gmpolf-1.4.8                                     libreadline/6.2-gmpolf-1.4.8
+        MPICH/3.0.4-GCC-4.8.1                                    ncurses/5.9-gmpolf-1.4.8
+        OpenBLAS/0.2.6-gmpich-1.4.8-LAPACK-3.4.2                 zlib/1.2.7-gmpolf-1.4.8
+        Python/2.7.3-gmpolf-1.4.8
+
+        --------------------------------------------------- /usr/share/Modules/modulefiles ---------------------------------------------------
+        dot         module-git  module-info modules     null        use.own
+
+
+Packaging the Modules with FPM
+------------------------------
+
+[FPM](https://github.com/jordansissel/fpm) is a wonderful tool which
+makes it very easy to build Linux packages such as RPMs and DEBs. While I'll
+sometimes still go to the trouble of writing a real RPM SPEC file if I'm putting
+together a maintainable build process, for ad-hoc work I will always prefer to
+use FPM.
+
+For working with Modules, I've written a simple helper script called
+[module2pkg](https://github.com/ajdecon/module2pkg) which makes it a little
+easier to build RPMs when you already have Modules. When you give it the name of a 
+Module, it
+
+1. Reads the Modulefile to get the Module's root directory
+2. Resolves the dependencies of that Module recursively, by checking to see which modules it
+either loads or lists as prerequisites
+3. Runs FPM to package each Module in the dependency tree, including specifying its dependencies
+
+(EasyBuild is actually working on [integrating fpm support](https://github.com/hpcugent/easybuild-framework/pull/1224)
+for building packages, at which point I will mostly be able to retire module2pkg.
+The only advantage of my approach is that it depends only on the Modulefiles themselves,
+so it can be used to package hand-compiled Modules as well as those
+built by EasyBuild.)
+
+module2pkg also includes an option for adding a prefix to each package name --
+in this case "eb". This lets me package things like GCC without worrying about
+any potential conflict with the system packages.
+
+Note that module2pkg prints out the fpm command it uses for each module.
+
+        [root@ip-10-0-0-88 ~]# module2pkg -p eb HPL/2.1-gmpolf-1.4.8
+        fpm -s dir -t rpm -n eb-GCC -v 4.8.1 -p eb-GCC-VERSION_ARCH.rpm -C / /opt/easybuild/software/GCC/4.8.1 /opt/easybuild/modules/all/GCC/4.8.1
+        no value for epoch is set, defaulting to nil {:level=>:warn}
+        no value for epoch is set, defaulting to nil {:level=>:warn}
+        Created package {:path=>"eb-GCC-4.8.1_x86_64.rpm"}
+        fpm -s dir -t rpm -n eb-MPICH -v 3.0.4-GCC-4.8.1 -p eb-MPICH-VERSION_ARCH.rpm -d "eb-GCC = 4.8.1" -C / /opt/easybuild/software/MPICH/3.0.4-GCC-4.8.1 /opt/easybuild/modules/all/MPICH/3.0.4-GCC-4.8.1
+        Package version '3.0.4-GCC-4.8.1' includes dashes, converting to underscores {:level=>:warn}
+        no value for epoch is set, defaulting to nil {:level=>:warn}
+        no value for epoch is set, defaulting to nil {:level=>:warn}
+        Created package {:path=>"eb-MPICH-3.0.4_GCC_4.8.1_x86_64.rpm"}
+        fpm -s dir -t rpm -n eb-OpenBLAS -v 0.2.6-gmpich-1.4.8-LAPACK-3.4.2 -p eb-OpenBLAS-VERSION_ARCH.rpm -d "eb-MPICH = 3.0.4-GCC-4.8.1" -d "eb-gmpich = 1.4.8" -d "eb-GCC = 4.8.1" -C / /opt/easybuild/software/OpenBLAS/0.2.6-gmpich-1.4.8-LAPACK-3.4.2 /opt/easybuild/modules/all/OpenBLAS/0.2.6-gmpich-1.4.8-LAPACK-3.4.2
+        Package version '0.2.6-gmpich-1.4.8-LAPACK-3.4.2' includes dashes, converting to underscores {:level=>:warn}
+        no value for epoch is set, defaulting to nil {:level=>:warn}
+        no value for epoch is set, defaulting to nil {:level=>:warn}
+        Created package {:path=>"eb-OpenBLAS-0.2.6_gmpich_1.4.8_LAPACK_3.4.2_x86_64.rpm"}
+        fpm -s dir -t rpm -n eb-gmpich -v 1.4.8 -p eb-gmpich-VERSION_ARCH.rpm -d "eb-MPICH = 3.0.4-GCC-4.8.1" -d "eb-GCC = 4.8.1" -C / /opt/easybuild/software/gmpich/1.4.8 /opt/easybuild/modules/all/gmpich/1.4.8
+        no value for epoch is set, defaulting to nil {:level=>:warn}
+        no value for epoch is set, defaulting to nil {:level=>:warn}
+        Created package {:path=>"eb-gmpich-1.4.8_x86_64.rpm"}
+        fpm -s dir -t rpm -n eb-ScaLAPACK -v 2.0.2-gmpich-1.4.8-OpenBLAS-0.2.6-LAPACK-3.4.2 -p eb-ScaLAPACK-VERSION_ARCH.rpm -d "eb-MPICH = 3.0.4-GCC-4.8.1" -d "eb-OpenBLAS = 0.2.6-gmpich-1.4.8-LAPACK-3.4.2" -d "eb-GCC = 4.8.1" -d "eb-gmpich = 1.4.8" -C / /opt/easybuild/software/ScaLAPACK/2.0.2-gmpich-1.4.8-OpenBLAS-0.2.6-LAPACK-3.4.2 /opt/easybuild/modules/all/ScaLAPACK/2.0.2-gmpich-1.4.8-OpenBLAS-0.2.6-LAPACK-3.4.2
+        Package version '2.0.2-gmpich-1.4.8-OpenBLAS-0.2.6-LAPACK-3.4.2' includes dashes, converting to underscores {:level=>:warn}
+        no value for epoch is set, defaulting to nil {:level=>:warn}
+        no value for epoch is set, defaulting to nil {:level=>:warn}
+        Created package {:path=>"eb-ScaLAPACK-2.0.2_gmpich_1.4.8_OpenBLAS_0.2.6_LAPACK_3.4.2_x86_64.rpm"}
+        fpm -s dir -t rpm -n eb-HPL -v 2.1-gmpolf-1.4.8 -p eb-HPL-VERSION_ARCH.rpm -d "eb-FFTW = 3.3.3-gmpich-1.4.8" -d "eb-gmpolf = 1.4.8" -d "eb-OpenBLAS = 0.2.6-gmpich-1.4.8-LAPACK-3.4.2" -d "eb-ScaLAPACK = 2.0.2-gmpich-1.4.8-OpenBLAS-0.2.6-LAPACK-3.4.2" -d "eb-gmpich = 1.4.8" -d "eb-MPICH = 3.0.4-GCC-4.8.1" -d "eb-GCC = 4.8.1" -C / /opt/easybuild/software/HPL/2.1-gmpolf-1.4.8 /opt/easybuild/modules/all/HPL/2.1-gmpolf-1.4.8
+        Package version '2.1-gmpolf-1.4.8' includes dashes, converting to underscores {:level=>:warn}
+        no value for epoch is set, defaulting to nil {:level=>:warn}
+        no value for epoch is set, defaulting to nil {:level=>:warn}
+        Created package {:path=>"eb-HPL-2.1_gmpolf_1.4.8_x86_64.rpm"}
+        fpm -s dir -t rpm -n eb-FFTW -v 3.3.3-gmpich-1.4.8 -p eb-FFTW-VERSION_ARCH.rpm -d "eb-MPICH = 3.0.4-GCC-4.8.1" -d "eb-gmpich = 1.4.8" -d "eb-GCC = 4.8.1" -C / /opt/easybuild/software/FFTW/3.3.3-gmpich-1.4.8 /opt/easybuild/modules/all/FFTW/3.3.3-gmpich-1.4.8
+        Package version '3.3.3-gmpich-1.4.8' includes dashes, converting to underscores {:level=>:warn}
+        no value for epoch is set, defaulting to nil {:level=>:warn}
+        no value for epoch is set, defaulting to nil {:level=>:warn}
+        Created package {:path=>"eb-FFTW-3.3.3_gmpich_1.4.8_x86_64.rpm"}
+        fpm -s dir -t rpm -n eb-gmpolf -v 1.4.8 -p eb-gmpolf-VERSION_ARCH.rpm -d "eb-FFTW = 3.3.3-gmpich-1.4.8" -d "eb-OpenBLAS = 0.2.6-gmpich-1.4.8-LAPACK-3.4.2" -d "eb-ScaLAPACK = 2.0.2-gmpich-1.4.8-OpenBLAS-0.2.6-LAPACK-3.4.2" -d "eb-gmpich = 1.4.8" -d "eb-MPICH = 3.0.4-GCC-4.8.1" -d "eb-GCC = 4.8.1" -C / /opt/easybuild/software/gmpolf/1.4.8 /opt/easybuild/modules/all/gmpolf/1.4.8
+        no value for epoch is set, defaulting to nil {:level=>:warn}
+        no value for epoch is set, defaulting to nil {:level=>:warn}
+        Created package {:path=>"eb-gmpolf-1.4.8_x86_64.rpm"}
+
+        [root@ip-10-0-0-88 ~]# ls *rpm
+        eb-FFTW-3.3.3_gmpich_1.4.8_x86_64.rpm  eb-HPL-2.1_gmpolf_1.4.8_x86_64.rpm
+        eb-GCC-4.8.1_x86_64.rpm                eb-MPICH-3.0.4_GCC_4.8.1_x86_64.rpm
+        eb-gmpich-1.4.8_x86_64.rpm             eb-OpenBLAS-0.2.6_gmpich_1.4.8_LAPACK_3.4.2_x86_64.rpm
+        eb-gmpolf-1.4.8_x86_64.rpm             eb-ScaLAPACK-2.0.2_gmpich_1.4.8_OpenBLAS_0.2.6_LAPACK_3.4.2_x86_64.rpm
+
+
+Installing the resulting packages
+---------------------------------
+
+To demonstrate that the new packages actually work, you can spin up a new server and
+show you can install them. In this case, let's install GROMACS:
+
+        Running Transaction
+          Installing : eb-GCC-4.8.1-1.x86_64                                                                                              1/8
+          Installing : eb-MPICH-3.0.4_GCC_4.8.1-1.x86_64                                                                                  2/8
+          Installing : eb-gmpich-1.4.8-1.x86_64                                                                                           3/8
+          Installing : eb-OpenBLAS-0.2.6_gmpich_1.4.8_LAPACK_3.4.2-1.x86_64                                                               4/8
+          Installing : eb-ScaLAPACK-2.0.2_gmpich_1.4.8_OpenBLAS_0.2.6_LAPACK_3.4.2-1.x86_64                                               5/8
+          Installing : eb-FFTW-3.3.3_gmpich_1.4.8-1.x86_64                                                                                6/8
+          Installing : eb-gmpolf-1.4.8-1.x86_64                                                                                           7/8
+          Installing : eb-GROMACS-4.6.5_gmpolf_1.4.8_hybrid-1.x86_64                                                                      8/8
+          Verifying  : eb-MPICH-3.0.4_GCC_4.8.1-1.x86_64                                                                                  1/8
+          Verifying  : eb-ScaLAPACK-2.0.2_gmpich_1.4.8_OpenBLAS_0.2.6_LAPACK_3.4.2-1.x86_64                                               2/8
+          Verifying  : eb-GROMACS-4.6.5_gmpolf_1.4.8_hybrid-1.x86_64                                                                      3/8
+          Verifying  : eb-FFTW-3.3.3_gmpich_1.4.8-1.x86_64                                                                                4/8
+          Verifying  : eb-OpenBLAS-0.2.6_gmpich_1.4.8_LAPACK_3.4.2-1.x86_64                                                               5/8
+          Verifying  : eb-gmpich-1.4.8-1.x86_64                                                                                           6/8
+          Verifying  : eb-GCC-4.8.1-1.x86_64                                                                                              7/8
+          Verifying  : eb-gmpolf-1.4.8-1.x86_64                                                                                           8/8
+
+        Installed:
+          eb-GROMACS.x86_64 0:4.6.5_gmpolf_1.4.8_hybrid-1
+
+        Dependency Installed:
+          eb-FFTW.x86_64 0:3.3.3_gmpich_1.4.8-1                                     eb-GCC.x86_64 0:4.8.1-1
+          eb-MPICH.x86_64 0:3.0.4_GCC_4.8.1-1                                       eb-OpenBLAS.x86_64 0:0.2.6_gmpich_1.4.8_LAPACK_3.4.2-1
+          eb-ScaLAPACK.x86_64 0:2.0.2_gmpich_1.4.8_OpenBLAS_0.2.6_LAPACK_3.4.2-1    eb-gmpich.x86_64 0:1.4.8-1
+          eb-gmpolf.x86_64 0:1.4.8-1
+
+        Complete!
+
+And then, as a test, run one of the GROMACS benchmarks:
+
+        [easybuild@ip-10-0-0-75 d.dppc]$ mpirun -np 2 mdrun_mpi
+                                 :-)  G  R  O  M  A  C  S  (-:
+
+                               Great Red Owns Many ACres of Sand
+
+                                    :-)  VERSION 4.6.5  (-:
+
+                Contributions from Mark Abraham, Emile Apol, Rossen Apostolov,
+                   Herman J.C. Berendsen, Aldert van Buuren, Pär Bjelkmar,
+             Rudi van Drunen, Anton Feenstra, Gerrit Groenhof, Christoph Junghans,
+                Peter Kasson, Carsten Kutzner, Per Larsson, Pieter Meulenhoff,
+                   Teemu Murtola, Szilard Pall, Sander Pronk, Roland Schulz,
+                        Michael Shirts, Alfons Sijbers, Peter Tieleman,
+
+                       Berk Hess, David van der Spoel, and Erik Lindahl.
+
+               Copyright (c) 1991-2000, University of Groningen, The Netherlands.
+                 Copyright (c) 2001-2012,2013, The GROMACS development team at
+                Uppsala University & The Royal Institute of Technology, Sweden.
+                    check out http://www.gromacs.org for more information.
+
+                 This program is free software; you can redistribute it and/or
+               modify it under the terms of the GNU Lesser General Public License
+                as published by the Free Software Foundation; either version 2.1
+                     of the License, or (at your option) any later version.
+
+                                      :-)  mdrun_mpi  (-:
+
+        Option     Filename  Type         Description
+        ------------------------------------------------------------
+          -s      topol.tpr  Input        Run input file: tpr tpb tpa
+          -o       traj.trr  Output       Full precision trajectory: trr trj cpt
+          -x       traj.xtc  Output, Opt. Compressed trajectory (portable xdr format)
+        -cpi      state.cpt  Input, Opt.  Checkpoint file
+        -cpo      state.cpt  Output, Opt. Checkpoint file
+          -c    confout.gro  Output       Structure file: gro g96 pdb etc.
+          -e       ener.edr  Output       Energy file
+          -g         md.log  Output       Log file
+        -dhdl      dhdl.xvg  Output, Opt. xvgr/xmgr file
+        -field    field.xvg  Output, Opt. xvgr/xmgr file
+        -table    table.xvg  Input, Opt.  xvgr/xmgr file
+        -tabletf    tabletf.xvg  Input, Opt.  xvgr/xmgr file
+        -tablep  tablep.xvg  Input, Opt.  xvgr/xmgr file
+        -tableb   table.xvg  Input, Opt.  xvgr/xmgr file
+        -rerun    rerun.xtc  Input, Opt.  Trajectory: xtc trr trj gro g96 pdb cpt
+        -tpi        tpi.xvg  Output, Opt. xvgr/xmgr file
+        -tpid   tpidist.xvg  Output, Opt. xvgr/xmgr file
+         -ei        sam.edi  Input, Opt.  ED sampling input
+         -eo      edsam.xvg  Output, Opt. xvgr/xmgr file
+          -j       wham.gct  Input, Opt.  General coupling stuff
+         -jo        bam.gct  Output, Opt. General coupling stuff
+        -ffout      gct.xvg  Output, Opt. xvgr/xmgr file
+        -devout   deviatie.xvg  Output, Opt. xvgr/xmgr file
+        -runav  runaver.xvg  Output, Opt. xvgr/xmgr file
+         -px      pullx.xvg  Output, Opt. xvgr/xmgr file
+         -pf      pullf.xvg  Output, Opt. xvgr/xmgr file
+         -ro   rotation.xvg  Output, Opt. xvgr/xmgr file
+         -ra  rotangles.log  Output, Opt. Log file
+         -rs   rotslabs.log  Output, Opt. Log file
+         -rt  rottorque.log  Output, Opt. Log file
+        -mtx         nm.mtx  Output, Opt. Hessian matrix
+         -dn     dipole.ndx  Output, Opt. Index file
+        -multidir    rundir  Input, Opt., Mult. Run directory
+        -membed  membed.dat  Input, Opt.  Generic data file
+         -mp     membed.top  Input, Opt.  Topology file
+         -mn     membed.ndx  Input, Opt.  Index file
+
+        Option       Type   Value   Description
+        ------------------------------------------------------
+        -[no]h       bool   no      Print help info and quit
+        -[no]version bool   no      Print version info and quit
+        -nice        int    0       Set the nicelevel
+        -deffnm      string         Set the default filename for all file options
+        -xvg         enum   xmgrace  xvg plot formatting: xmgrace, xmgr or none
+        -[no]pd      bool   no      Use particle decompostion
+        -dd          vector 0 0 0   Domain decomposition grid, 0 is optimize
+        -ddorder     enum   interleave  DD node order: interleave, pp_pme or cartesian
+        -npme        int    -1      Number of separate nodes to be used for PME, -1
+                                    is guess
+        -nt          int    0       Total number of threads to start (0 is guess)
+        -ntmpi       int    0       Number of thread-MPI threads to start (0 is guess)
+        -ntomp       int    0       Number of OpenMP threads per MPI process/thread
+                                    to start (0 is guess)
+        -ntomp_pme   int    0       Number of OpenMP threads per MPI process/thread
+                                    to start (0 is -ntomp)
+        -pin         enum   auto    Fix threads (or processes) to specific cores:
+                                    auto, on or off
+        -pinoffset   int    0       The starting logical core number for pinning to
+                                    cores; used to avoid pinning threads from
+                                    different mdrun instances to the same core
+        -pinstride   int    0       Pinning distance in logical cores for threads,
+                                    use 0 to minimize the number of threads per
+                                    physical core
+        -gpu_id      string         List of GPU device id-s to use, specifies the
+                                    per-node PP rank to GPU mapping
+        -[no]ddcheck bool   yes     Check for all bonded interactions with DD
+        -rdd         real   0       The maximum distance for bonded interactions with
+                                    DD (nm), 0 is determine from initial coordinates
+        -rcon        real   0       Maximum distance for P-LINCS (nm), 0 is estimate
+        -dlb         enum   auto    Dynamic load balancing (with DD): auto, no or yes
+        -dds         real   0.8     Minimum allowed dlb scaling of the DD cell size
+        -gcom        int    -1      Global communication frequency
+        -nb          enum   auto    Calculate non-bonded interactions on: auto, cpu,
+                                    gpu or gpu_cpu
+        -[no]tunepme bool   yes     Optimize PME load between PP/PME nodes or GPU/CPU
+        -[no]testverlet bool   no      Test the Verlet non-bonded scheme
+        -[no]v       bool   no      Be loud and noisy
+        -[no]compact bool   yes     Write a compact log file
+        -[no]seppot  bool   no      Write separate V and dVdl terms for each
+                                    interaction type and node to the log file(s)
+        -pforce      real   -1      Print all forces larger than this (kJ/mol nm)
+        -[no]reprod  bool   no      Try to avoid optimizations that affect binary
+                                    reproducibility
+        -cpt         real   15      Checkpoint interval (minutes)
+        -[no]cpnum   bool   no      Keep and number checkpoint files
+        -[no]append  bool   yes     Append to previous output files when continuing
+                                    from checkpoint instead of adding the simulation
+                                    part number to all file names
+        -nsteps      step   -2      Run this number of steps, overrides .mdp file
+                                    option
+        -maxh        real   -1      Terminate after 0.99 times this time (hours)
+        -multi       int    0       Do multiple simulations in parallel
+        -replex      int    0       Attempt replica exchange periodically with this
+                                    period (steps)
+        -nex         int    0       Number of random exchanges to carry out each
+                                    exchange interval (N^3 is one suggestion).  -nex
+                                    zero or not specified gives neighbor replica
+                                    exchange.
+        -reseed      int    -1      Seed for replica exchange, -1 is generate a seed
+        -[no]ionize  bool   no      Do a simulation including the effect of an X-Ray
+                                    bombardment on your system
+
+        Reading file topol.tpr, VERSION 4.6.5 (single precision)
+        Using 2 MPI processes
+        starting mdrun 'DPPC in Water'
+        5000 steps,     10.0 ps.
+
+        Writing final coordinates.
+
+         Average load imbalance: 0.1 %
+         Part of the total run time spent waiting due to load imbalance: 0.0 %
+
+
+                       Core t (s)   Wall t (s)        (%)
+               Time:     1177.360      589.282      199.8
+                         (ns/day)    (hour/ns)
+        Performance:        1.466       16.366
+
+        gcq#191: "Ich Bin Ein Berliner" (J.F. Kennedy)
+
+
+It works!
+
+
