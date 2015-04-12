@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: silly | Thinking Out Loud]]></title>
+  <link href="http://ajdecon.github.com/blog/categories/silly/atom.xml" rel="self"/>
+  <link href="http://ajdecon.github.com/"/>
+  <updated>2015-04-12T13:23:58-06:00</updated>
+  <id>http://ajdecon.github.com/</id>
+  <author>
+    <name><![CDATA[Adam DeConinck]]></name>
+    <email><![CDATA[ajdecon@ajdecon.org]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Tools of choice, spring 2013 edition]]></title>
+    <link href="http://ajdecon.github.com/tools-of-choice/"/>
+    <updated>2013-05-05T12:30:00-06:00</updated>
+    <id>http://ajdecon.github.com/tools-of-choice</id>
+    <content type="html"><![CDATA[<p>This list encompasses 95% of my daily computer usage, and captures
+most of the tools that make my life easier, both at work and
+for general use. I re-do this list every once in a while,
+partly for my future reference and I guess partly for nerd cred. ;-)</p>
+
+<h3>HPC and sysadmin stuff</h3>
+
+<ul>
+<li>Linux provisioning: <a href="http://warewulf.lbl.gov">Warewulf</a> for HPC or
+sometimes <a href="http://www.cobblerd.org/">Cobbler</a>
+
+<ul>
+<li>But also looking into <a href="http://www.openstack.org/">OpenStack</a> for some things</li>
+<li>And of course I use <a href="http://aws.amazon.com/">EC2</a> a lot for when I don't need to own the hardware</li>
+</ul>
+</li>
+<li>Configuration management: <a href="http://www.ansible.cc">Ansible</a> is my current favorite, and
+I occasionally use <a href="http://www.opscode.com/chef">Chef</a></li>
+<li>Parallel SSH: <a href="https://code.google.com/p/pdsh/">pdsh</a></li>
+<li>Cluster resource management: <a href="http://slurm.schedmd.com/">SLURM</a> or sometimes
+<a href="https://github.com/adaptivecomputing/torque">Torque</a></li>
+<li>Monitoring with <a href="http://www.warewulf.lbl.gov">Warewulf</a> (monitor and NHC) and
+<a href="http://www.nagios.org/">Nagios</a></li>
+</ul>
+
+
+<h3>Programming</h3>
+
+<ul>
+<li>For almost all prototyping, and many final projects: <a href="http://www.python.org">Python</a>
+
+<ul>
+<li>Except networking stuff where I care about performance: <a href="http://www.golang.org/">Go</a></li>
+<li>Or sometimes when I need to dig into the guts: <a href="http://en.wikipedia.org/wiki/C_(programming_language">C</a>)</li>
+</ul>
+</li>
+<li>For scientific computing: <a href="http://www.numpy.org/">NumPy</a> and <a href="http://www.scipy.org/">SciPy</a>
+
+<ul>
+<li>Except when I use <a href="http://en.wikipedia.org/wiki/Fortran">Fortran</a></li>
+<li>And <a href="http://www.julialang.org">Julia</a> is also fun</li>
+</ul>
+</li>
+</ul>
+
+
+<h3>General-use tools:</h3>
+
+<ul>
+<li>For web browsing, mostly I use <a href="https://www.google.com/intl/en/chrome/browser/">Chrome</a>
+like everyone else</li>
+<li>Terminal-multiplexing: <a href="http://www.gnu.org/software/screen/">GNU Screen</a></li>
+<li>Command-line mail client: <a href="http://www.mutt.org/">Mutt</a></li>
+<li>IRC: <a href="http://www.irssi.org/">irssi</a></li>
+<li>Command-line twitter: <a href="http://www.floodgap.com/software/ttytter/">TTYtter</a></li>
+<li>Desktop virtualization: <a href="http://www.virtualbox.org/">VirtualBox</a></li>
+</ul>
+
+
+<h3>Time-wasting</h3>
+
+<ul>
+<li><a href="http://www.bay12games.com/dwarves/">Dwarf Fortress</a></li>
+<li><a href="http://www.nethack.org/">Nethack</a></li>
+<li>See also <a href="http://www.google.com/chrome/">Chrome</a> and <a href="http://www.irssi.org/">irssi</a></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>

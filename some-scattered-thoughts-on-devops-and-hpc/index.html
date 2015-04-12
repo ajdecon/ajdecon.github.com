@@ -1,0 +1,245 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Some scattered thoughts on #DevOps and #HPC - Thinking Out Loud</title>
+  <meta name="author" content="Adam DeConinck">
+
+   
+  <meta name="description" content="">
+  
+  <meta name="keywords" content="">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://ajdecon.github.com/some-scattered-thoughts-on-devops-and-hpc">
+  <link href="/favicon.png" rel="icon">
+  <link href='http://fonts.googleapis.com/css?family=Quicksand:300,400' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Thinking Out Loud" type="application/atom+xml">
+  <script src="/js/jquery.js"></script>
+  <script src="/js/bootstrap-collapse.js"></script>
+  <script src="/js/modernizr-2.0.js"></script>
+  <script src="/js/octopress.js" type="text/javascript"></script>
+  <script src="/js/application.js"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-12576607-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <div class="navbar navbar-inverse navbar-static-top">
+  	<div class="navbar-inner">
+  	  <div class="container">
+        <a class="btn btn-navbar" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+          <span class="fui-menu-24"></span>
+        </a>
+  	  	<div class="nav-collapse collapse navbar-responsive-collapse" style="height:0;">
+  	      <ul class="nav">
+    
+        <li ><a href="/">Home</a></li>
+    
+        <li ><a href="/about">About Adam</a></li>
+    
+        <li ><a href="https://www.ajdecon.org/ajdecon-key.txt">GPG key</a></li>
+    
+        <li ><a href="/pubs">Publications</a></li>
+    
+        <li ><a href="/atom.xml">RSS</a></li>
+    
+</ul>
+
+<ul class="nav pull-right">
+    
+    <li><a href="http://github.com/ajdecon" title="Github Profile"><i class="icon-github-sign social-navbar"></i></a></li>
+    
+    
+    
+    <li><a href="http://linkedin.com/in/ajdecon" title="Linkedin Profile"><i class="icon-linkedin-local social-navbar"></i></a></li>
+    
+    
+    <li><a href="http://twitter.com/ajdecon" title="Twitter Profile"><i class="icon-twitter-local social-navbar"></i></a></li>
+    
+    
+    <li><a href="http://plus.google.com/116247823819167414235" title="Google+ Profile"><i class="icon-google-plus-local social-navbar"></i></a></li>
+    
+    
+    
+
+    
+    <li><a href="mailto:ajdecon@ajdecon.org" title="Email"><i class="icon-envelope social-navbar"></i></a></li>
+    
+</ul>
+
+  	    </div>
+  	  </div>
+  	</div>
+  </div>
+  <div class="container" id="main">
+      <div class="row-fluid">
+        <div id="content">
+          <div>
+<article class="hentry" role="article">
+  
+
+  <header>
+  <div class="jumbotron">
+    Some Scattered Thoughts on #DevOps and #HPC
+	<h5>
+
+
+
+
+
+
+
+
+  
+
+
+<i class="icon-calendar-empty"></i> <time datetime="2012-03-10T00:00:00-07:00" pubdate data-updated="true">Mar 10<span>th</span>, 2012</time></h5>
+  </div>
+</header>
+  <div class="row-fluid">
+    <div class="span12">
+      <p>Broadly defined, <a href="http://en.wikipedia.org/wiki/DevOps">DevOps</a> is a movement that advocates a close integration between the areas of software development, system administration and (to a lesser extent) quality assurance. It&#8217;s attracted a lot of attention lately in organizations which do software as a service and other webapp-y things, and as that&#8217;s where all the hot startups are these days. Applied to specific people, the &#8220;DevOps movement&#8221; seems to advocate either giving developers responsibilities traditionally allocated to sysadmins, or at least training the sysadmins to do software development (and, sometimes, unleashing them on the codebase).</p> <p /> <p>As far as I can tell the movement has developed, at least in part, in response to the growing usage of &#8220;Infrastructure as a Service&#8221; clouds for Internet startups and other Web properties. IaaS doesn&#8217;t remove sysadmin responsibilities completely, but it negates the hardware bits and makes the idea of &#8220;programmable infrastructure&#8221; much more attractive. A lot of great tools have come out of DevOps or associated companies: in particular, the <a href="http://www.opscode.com/chef/">Chef</a> and <a href="http://puppetlabs.com/">Puppet</a> configuration management systems are incredibly interesting and potentially very useful in HPC.</p> <p /> <p>It&#8217;s easy to see why I&#8217;d be interested in the whole DevOps thing: while my current responsibilities at <a href="http://www.r-hpc.com/">R-HPC</a> are much more on the sysadmin side of things, the majority of my career in research labs leaves me closer to development, and I definitely try to keep one foot in the door on the development side. So as the whole DevOps movement has developed, I&#8217;ve been trying to think about how it applies to traditional high-performance computing environments, and also what it means for the growing use of &#8220;cloud computing&#8221; for HPC.</p> <p /> <p>On the one hand, it&#8217;s easy to say that the whole DevOps philosophy of integrating the sysadmin and development teams doesn&#8217;t apply very well to traditional sorts of HPC environments. Most of the biggest and most exciting HPC environments out there&#8211;the sort that appear near the top of the <a href="http://top500.org/">Top 500 list</a>&#8211;are academic environments in which the majority of the code is developed by scientists and engineers doing domain-specific research. Good luck doing DevOps there: most of the scientists have very little interest in the infrastructure they&#8217;re running on, making these environments much closer to &#8220;Platform as a Service&#8221; clouds like <a href="http://www.heroku.com/">Heroku</a> or <a href="http://code.google.com/appengine/">AppEngine</a>. It&#8217;s &#8220;MPI as a Service&#8221;!</p> <p /> <p>On the other hand, there&#8217;s a strong argument that HPC has already embraced some of the core features of the DevOps movement. While there&#8217;s still a pretty clear organizational line between sysadmin and scientist at most HPC sites, there&#8217;s a lot more interaction than you typically associate with ops and dev teams in an enterprise. Most HPC sysadmins worth their salt can do some programming, and know more about the sorts of optimizations available on their systems than most of their users. The ops team at an HPC site spends a lot of time interacting with users and even helping to debug code and improve performance. (I know that this is certainly true at R-HPC: while a lot of people do show up with commercial applications, we spend a lot of time on performance optimizations and helping our customers with ancillary code and scripts.)</p> <p /> <p><a href="http://catb.org/jargon/html/O/on-the-gripping-hand.html">On the gripping hand</a>&#8230; &#8220;HPC in the Cloud&#8221; is not going away any time soon. (Which, to give a disclaimer, I&#8217;m obviously counting on at R-HPC.) If I recall correctly, at HPC 360 <a href="https://twitter.com/#!/addisonsnell">Addison Snell</a> gave a talk which put the average size of a parallel job on an HPC cluster at about 32 cores. At that scale, it&#8217;s going to get easier and easier to run typical HPC jobs on &#8220;cloud providers&#8221; such as R-HPC or Amazon&#8217;s EC2. Most people don&#8217;t need a Top 500 system to do their work. And if you&#8217;re working in the cloud, it&#8217;s likely going to mean that you&#8217;ll be using the tools developed for it, such as Chef. So HPC will probably have to engage with the DevOps movement and their tools, and everyone is likely to learn something in that conversation.</p> <p /> <p>I don&#8217;t have any good conclusions, but it continues to be an exciting time for anyone interested in parallel computing, HPC, infrastructure automation, or the Cloud in general. There&#8217;s still a lot to be done, and it&#8217;ll be a lot of fun figuring out how it&#8217;s all going to work.</p>
+
+    </div>
+  </div>
+
+
+
+  <footer>
+    <hr>
+    
+    <div class="row-fluid">
+      
+      <div class="span6">
+        <p class="meta">
+        
+        
+
+
+        </p>
+      </div>
+      
+      <div class="span6 social-sharing">
+        <div class="sharing">
+  <div class="addthis_toolbox addthis_default_style ">
+  
+  
+  <a class="addthis_button_tweet"></a>
+  
+  
+  <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+  
+  <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid="></script>
+</div>
+
+      </div>
+      
+      
+    </div>
+    
+    <div class="row-fluid">
+      <div class="span12">
+        <p class="meta">
+          
+            <a class="basic-alignment left" href="/parallel-word-count-with-julia-an-interesting/" title="Previous Post: Parallel Word Count with Julia, an interesting new language for technical computing">&laquo; Parallel Word Count with Julia, an interesting new language for technical computing</a>
+          
+          
+            <a class="basic-alignment right" href="/posterous-acquired-by-twitter-they-host-this/" title="Next Post: Posterous acquired by Twitter (they host this blog)">Posterous acquired by Twitter (they host this blog) &raquo;</a>
+          
+        </p>
+      </div>
+    </div>
+  </footer>
+</article>
+
+</div>
+
+
+
+        </div>
+      </div>
+      <div class="row-fluid">
+        <footer class="footer-page" role="contentinfo">
+          <p>
+  Copyright &copy; 2015 - Adam DeConinck -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span> - Theme by <a href="http://alexgaribay.com">Alex Garibay</a>
+</p>
+
+
+        </footer>
+      </div>
+  </div>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'ajdecon';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

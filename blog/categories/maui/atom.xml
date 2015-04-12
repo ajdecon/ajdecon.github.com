@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Maui | Thinking Out Loud]]></title>
+  <link href="http://ajdecon.github.com/blog/categories/maui/atom.xml" rel="self"/>
+  <link href="http://ajdecon.github.com/"/>
+  <updated>2015-04-12T13:23:58-06:00</updated>
+  <id>http://ajdecon.github.com/</id>
+  <author>
+    <name><![CDATA[Adam DeConinck]]></name>
+    <email><![CDATA[ajdecon@ajdecon.org]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Non-exclusive scheduling in Torque/Maui]]></title>
+    <link href="http://ajdecon.github.com/non-exclusive-scheduling-in-torquemaui/"/>
+    <updated>2011-07-19T00:00:00-06:00</updated>
+    <id>http://ajdecon.github.com/non-exclusive-scheduling-in-torquemaui</id>
+    <content type="html"><![CDATA[<p> <a href="http://www.clusterresources.com/products/torque-resource-manager.php">Torque (PBS)</a>, the cluster resource manager, defaults to allocating any single compute server to only one job at a time. This makes sense most of the time, especially for parallel jobs which use MPI or another message-passing routine to handle communication between processes on different servers. If a server were shared by multiple jobs, contention for access to the network card could slow down all jobs by quite a lot. However, when the jobs are single-threaded or <a href="http://en.wikipedia.org/wiki/Embarrassingly_parallel">embarrassingly parallel</a>, this can result in a lot of wasted resources: for example, a single-threaded job tying up an eight-core server.</p>
+
+
+<p> <p /> <p> Torque, and the associated scheduler <a href="http://www.clusterresources.com/products/maui-cluster-scheduler.php">Maui</a>, can be configured to allow non-exclusive allocation so that single-threaded jobs can share a compute node. But while it's pretty simple to accomplish (two config settings), it's very hard to find any documentation on how to do it! As I discovered last week. So I'll share my research. </p> <p /> <p>First: make sure that the <code>nodes</code> file in <code>TORQUE_HOME/server_priv/</code> specifies the number of virtual processors on each node. For example,</p> <p /> <blockquote class="posterous_short_quote"><code> <br />node1 np=8 <br />node2 np=8 <br />node3 np=4 <br /></code></blockquote> <p /> <p><code>np</code> can be the physical number of cores, but doesn't have to be. Second, make sure that your <code>MAUI_HOME/maui.cfg</code> includes the following line:</p> <p /> <blockquote class="posterous_short_quote"><code>NODEACCESSPOLICY SHARED</code></blockquote> <p /> <p>That's it! One thing to note, however, is that Torque's allocation policy always starts at the first available slot. So if you submit a nonexclusive job with 2 independent threads, and there are 4 servers available, both threads will still run on the same server. This differs from <a href="http://gridengine.org/blog/">Grid Engine</a>, which defaults to non-exclusive scheduling (and it's a pain to make it exclusive!), but defaults to a round-robin policy.</p> <p /> <p>Trivial, I know, but you would not believe how hard it was to figure it out. This is why documentation is important!</p></p>
+]]></content>
+  </entry>
+  
+</feed>

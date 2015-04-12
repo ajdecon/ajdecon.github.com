@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: HPC | Thinking Out Loud]]></title>
+  <link href="http://ajdecon.github.com/blog/categories/hpc/atom.xml" rel="self"/>
+  <link href="http://ajdecon.github.com/"/>
+  <updated>2015-04-12T13:23:58-06:00</updated>
+  <id>http://ajdecon.github.com/</id>
+  <author>
+    <name><![CDATA[Adam DeConinck]]></name>
+    <email><![CDATA[ajdecon@ajdecon.org]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Building tiny compute clusters for fun and learning]]></title>
+    <link href="http://ajdecon.github.com/building-tiny-compute-clusters-for-fun-and-learning/"/>
+    <updated>2013-07-20T09:54:00-06:00</updated>
+    <id>http://ajdecon.github.com/building-tiny-compute-clusters-for-fun-and-learning</id>
+    <content type="html"><![CDATA[<p><img src="https://s3.amazonaws.com/ajdecon-public/Pi_Lego_detail.jpg" width=600></p>
+
+<p>Just for fun,
+I recently built a small HPC-style computing cluster out of five
+<a href="http://www.raspberrypi.org/">Raspberry Pi</a> servers.  While this kind of
+thing has of course been <a href="http://www.southampton.ac.uk/mediacentre/features/raspberry_pi_supercomputer.shtml">done</a>
+<a href="http://coen.boisestate.edu/ece/raspberry-pi/">before</a>, I wanted to build one
+anyway as a geek toy and a platform for me to play with a few HPC ideas.</p>
+
+<p>I think it actually turned out rather well, and it was a ridiculous amount of
+fun to build. My wife <a href="http://www.twitter.com/Leigh_47">Leigh</a> helped put together
+the Lego rack, and it was a lot of fun to put together. Because I was focusing more on
+duplicating a "real" cluster rather than getting performance, I included all the usual
+cluster services such as a <a href="http://slurm.schedmd.com">SLURM</a> scheduler,
+<a href="http://ganglia.sourceforge.net">Ganglia</a> for monitoring, and using one of the
+Pi's as a non-computing login node. Total <a href="http://gist.github.com/ajdecon/6045818">HPL performance</a>,
+670 MFlops. Oh yeah!</p>
+
+<p>A few folks at <a href="http://www.nvidia.com/">NVIDIA</a>, where I also work on HPC clusters,
+also thought this was a cool project. The Pi cluster thus ended up being featured
+as an "Inner Geek" post on the
+<a href="http://blogs.nvidia.com/blog/2013/07/17/raspberry-pi/">company blog</a>, alongside
+other awesome projects from NVIDIANs such as a
+<a href="http://blogs.nvidia.com/blog/2013/05/23/inner-geek-restoring-my-fathers-meyers-aero-commander/">cool airplane restoration</a>
+and an <a href="http://blogs.nvidia.com/blog/2012/11/28/inner-geek-nvidia-engineer-serves-up-holiday-lights-gangnam-style/">amazing holiday lights display</a>.</p>
+
+<p>If you're curious, I have details on how I put it together in my
+<a href="https://github.com/ajdecon/ansible-pi-cluster">ansible-pi-cluster</a> GitHub
+repository. This includes the <a href="http://www.ansible.cc">Ansible</a> playbooks
+I used to install all the software (though they still need some work), as
+well as some notes on the physical assembly and OS provisioning in the
+<a href="https://github.com/ajdecon/ansible-pi-cluster/blob/master/README.md">README</a>.</p>
+
+<p>I'll admit that the <a href="http://gist.github.com/ajdecon/6045818">performance isn't awesome</a>
+compared to other clusters
+(or even many laptops!), but I like having a cluster I can hold in my hands:</p>
+
+<p><img src="https://s3.amazonaws.com/ajdecon-public/PiWithLegos.jpg" width=600></p>
+
+<p>There are all sorts of other "tiny HPC cluster" projects out there,
+frequently used for teaching, and which have often done some real science.<br/>
+Here's a short roundup of some other tiny clusters I've seen...
+And if you know something else I should include in this post, let me know
+and I'll add it in.</p>
+
+<ul>
+<li><a href="http://www.southampton.ac.uk/~sjc/raspberrypi/">Idris-Pi</a>,
+the original Raspberry Pi + Legos supercomputer from Southampton University.
+This cluster included 64 Raspberry Pi boards, and they also have some
+<a href="http://www.southampton.ac.uk/~sjc/raspberrypi/pi_supercomputer_southampton.htm">instructions</a>
+posted for how they set up the software stack.  There was also a very
+interesting discussion of this cluster on the
+<a href="http://www.beowulf.org/pipermail/beowulf/2012-September/029953.html">Beowulf list</a></li>
+</ul>
+
+
+<iframe width="560" height="315" src="http://ajdecon.github.com//www.youtube.com/embed/Jq5nrHz9I94" frameborder="0" allowfullscreen></iframe>
+
+
+
+
+<br/><br/>
+
+
+<ul>
+<li><a href="http://coen.boisestate.edu/ece/files/2013/05/Creating.a.Raspberry.Pi-Based.Beowulf.Cluster_v2.pdf">RPiCluster</a>
+from Boise State, a 32-node cluster built by <a href="http://www.linkedin.com/in/jkiepert">Joshua Kiepert</a>
+to use for his dissertation research. This link also includes detailed instructions on building
+his cluster.</li>
+</ul>
+
+
+<iframe width="560" height="315" src="http://ajdecon.github.com//www.youtube.com/embed/i_r3z1jYHAc" frameborder="0" allowfullscreen></iframe>
+
+
+
+
+<br/><br/>
+
+
+<ul>
+<li><a href="http://littlefe.net/">LittleFe</a> is an ongoing project focused on building
+small educational HPC clusters which teachers can use in their classes.
+Their web site includes a continually-updated design for a 6-node cluster
+of Intel Atom processors, and their organization also holds build events at
+conferences such as <a href="http://www.supercomp.org/">SuperComputing</a> where
+interested teachers can build clusters they can take home.</li>
+</ul>
+
+
+<iframe width="560" height="315" src="http://ajdecon.github.com//www.youtube.com/embed/ciY4vsij_ak" frameborder="0" allowfullscreen></iframe>
+
+
+<br/><br/>
+
+
+<hr />
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Non-exclusive scheduling in Torque/Maui]]></title>
+    <link href="http://ajdecon.github.com/non-exclusive-scheduling-in-torquemaui/"/>
+    <updated>2011-07-19T00:00:00-06:00</updated>
+    <id>http://ajdecon.github.com/non-exclusive-scheduling-in-torquemaui</id>
+    <content type="html"><![CDATA[<p> <a href="http://www.clusterresources.com/products/torque-resource-manager.php">Torque (PBS)</a>, the cluster resource manager, defaults to allocating any single compute server to only one job at a time. This makes sense most of the time, especially for parallel jobs which use MPI or another message-passing routine to handle communication between processes on different servers. If a server were shared by multiple jobs, contention for access to the network card could slow down all jobs by quite a lot. However, when the jobs are single-threaded or <a href="http://en.wikipedia.org/wiki/Embarrassingly_parallel">embarrassingly parallel</a>, this can result in a lot of wasted resources: for example, a single-threaded job tying up an eight-core server.</p>
+
+
+<p> <p /> <p> Torque, and the associated scheduler <a href="http://www.clusterresources.com/products/maui-cluster-scheduler.php">Maui</a>, can be configured to allow non-exclusive allocation so that single-threaded jobs can share a compute node. But while it's pretty simple to accomplish (two config settings), it's very hard to find any documentation on how to do it! As I discovered last week. So I'll share my research. </p> <p /> <p>First: make sure that the <code>nodes</code> file in <code>TORQUE_HOME/server_priv/</code> specifies the number of virtual processors on each node. For example,</p> <p /> <blockquote class="posterous_short_quote"><code> <br />node1 np=8 <br />node2 np=8 <br />node3 np=4 <br /></code></blockquote> <p /> <p><code>np</code> can be the physical number of cores, but doesn't have to be. Second, make sure that your <code>MAUI_HOME/maui.cfg</code> includes the following line:</p> <p /> <blockquote class="posterous_short_quote"><code>NODEACCESSPOLICY SHARED</code></blockquote> <p /> <p>That's it! One thing to note, however, is that Torque's allocation policy always starts at the first available slot. So if you submit a nonexclusive job with 2 independent threads, and there are 4 servers available, both threads will still run on the same server. This differs from <a href="http://gridengine.org/blog/">Grid Engine</a>, which defaults to non-exclusive scheduling (and it's a pain to make it exclusive!), but defaults to a round-robin policy.</p> <p /> <p>Trivial, I know, but you would not believe how hard it was to figure it out. This is why documentation is important!</p></p>
+]]></content>
+  </entry>
+  
+</feed>

@@ -1,0 +1,623 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Thinking Out Loud</title>
+  <meta name="author" content="Adam DeConinck">
+
+   
+  <meta name="description" content="">
+  
+  <meta name="keywords" content="">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://ajdecon.github.com/blog/page/2">
+  <link href="/favicon.png" rel="icon">
+  <link href='http://fonts.googleapis.com/css?family=Quicksand:300,400' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Thinking Out Loud" type="application/atom+xml">
+  <script src="/js/jquery.js"></script>
+  <script src="/js/bootstrap-collapse.js"></script>
+  <script src="/js/modernizr-2.0.js"></script>
+  <script src="/js/octopress.js" type="text/javascript"></script>
+  <script src="/js/application.js"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-12576607-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <div class="navbar navbar-inverse navbar-static-top">
+  	<div class="navbar-inner">
+  	  <div class="container">
+        <a class="btn btn-navbar" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+          <span class="fui-menu-24"></span>
+        </a>
+  	  	<div class="nav-collapse collapse navbar-responsive-collapse" style="height:0;">
+  	      <ul class="nav">
+    
+        <li ><a href="/">Home</a></li>
+    
+        <li ><a href="/about">About Adam</a></li>
+    
+        <li ><a href="https://www.ajdecon.org/ajdecon-key.txt">GPG key</a></li>
+    
+        <li ><a href="/pubs">Publications</a></li>
+    
+        <li ><a href="/atom.xml">RSS</a></li>
+    
+</ul>
+
+<ul class="nav pull-right">
+    
+    <li><a href="http://github.com/ajdecon" title="Github Profile"><i class="icon-github-sign social-navbar"></i></a></li>
+    
+    
+    
+    <li><a href="http://linkedin.com/in/ajdecon" title="Linkedin Profile"><i class="icon-linkedin-local social-navbar"></i></a></li>
+    
+    
+    <li><a href="http://twitter.com/ajdecon" title="Twitter Profile"><i class="icon-twitter-local social-navbar"></i></a></li>
+    
+    
+    <li><a href="http://plus.google.com/116247823819167414235" title="Google+ Profile"><i class="icon-google-plus-local social-navbar"></i></a></li>
+    
+    
+    
+
+    
+    <li><a href="mailto:ajdecon@ajdecon.org" title="Email"><i class="icon-envelope social-navbar"></i></a></li>
+    
+</ul>
+
+  	    </div>
+  	  </div>
+  	</div>
+  </div>
+  <div class="container" id="main">
+      <div class="row-fluid">
+        <div id="content">
+          <div class="jumbotron">
+  <div class="container">
+    
+      Thinking Out Loud
+    
+    <h3 class="tagline">
+      
+        Occasional thoughts on supercomputers, sysadmin, and other random geekery
+      
+    </h3>
+  </div>
+</div>
+
+
+<div class="blog-index">
+  
+  
+  
+    <article>
+      
+
+  <div class="row-fluid">
+    <div class="span2 post-meta">
+	  <h5 class="date-time">
+
+
+
+
+
+
+
+
+  
+
+
+<i class="icon-calendar-empty"></i> <time datetime="2014-11-22T14:15:00-07:00" pubdate data-updated="true">Nov 22<span>nd</span>, 2014</time></h5>
+          <div class="row-fluid">
+          
+          </div>
+          
+          <div class="row-fluid">
+          
+          <a href="/blog/categories/linkdump/"><span class="badge">linkdump</span></a>
+          
+          </div>
+          
+    </div>
+    <div class="span10 post-container">
+      <h1 class="link"><a href="/good-links-from-the-past-week/">Good links from the past week</a></h1>
+      <p>A few things I read and enjoyed over the past week. No guarantee that they
+were originally posted during that week&#8230; sometimes I&#8217;m a little slow. :)</p>
+
+<h3>Operations and system administration</h3>
+
+<p>(Much of this is from LISA14, which I did not attend, but followed on the Internet)</p>
+
+<ul>
+<li><p><a href="http://www.slideshare.net/brendangregg/linux-performance-analysis-new-tools-and-old-secrets">Linus Performance Analysis: New Tools and Old Secrets</a> &#8211; Brendan Gregg at Netflix</p></li>
+<li><p><a href="https://www.usenix.org/sites/default/files/conference/protected-files/rockwood_lisa14_slides.pdf">I Am Sysadmin (And So Can You!)</a> &#8211; Ben Rockwood at Chef</p></li>
+<li><p><a href="http://www.standalone-sysadmin.com/blog/2014/11/new-technologies-to-study-from-lisa14/">New Technologies to Study from #LISA14</a> &#8211; Matt Simmons</p></li>
+<li><p><a href="http://robhirschfeld.com/2014/11/13/ops-is-ops/">Ops is Ops, except when it ain’t. Breaking down the impedance mismatches between physical and cloud ops.</a> &#8211; Rob Hirschfeld</p></li>
+<li><p><a href="https://code.facebook.com/posts/360346274145943/introducing-data-center-fabric-the-next-generation-facebook-data-center-network">Introducing data center fabric, the next-generation Facebook data center network</a></p></li>
+</ul>
+
+
+<h3>Distributed Systems</h3>
+
+<ul>
+<li><a href="http://brooker.co.za/blog/2014/11/15/exactly-once.html">Exactly-Once Delivery May Not Be What You Want</a> &#8211; <a href="https://twitter.com/MarcJBrooker">Marc Brooker</a></li>
+</ul>
+
+
+<h3>HPC</h3>
+
+<ul>
+<li><p><a href="http://www.hpcwire.com/2014/11/14/coral-signals-new-dawn-exascale-ambitions/">CORAL Signals New Dawn for Exascale Ambitions</a></p></li>
+<li><p><a href="https://www.olcf.ornl.gov/summit/">Summit</a> &#8211; ORNL&#8217;s page on their next big system</p></li>
+</ul>
+
+
+<h3>Random Internet Fun</h3>
+
+<ul>
+<li><a href="http://tabletopaudio.com/">Tabletop Audio</a> &#8211; Ambient sounds for your roleplaying game</li>
+</ul>
+
+
+      
+      
+    </div>
+  </div>
+
+
+
+    </article>
+    
+    <hr>
+    
+  
+  
+    <article>
+      
+
+  <div class="row-fluid">
+    <div class="span2 post-meta">
+	  <h5 class="date-time">
+
+
+
+
+
+
+
+
+  
+
+
+<i class="icon-calendar-empty"></i> <time datetime="2014-11-11T08:10:00-07:00" pubdate data-updated="true">Nov 11<span>th</span>, 2014</time></h5>
+          <div class="row-fluid">
+          
+          </div>
+          
+          <div class="row-fluid">
+          
+          <a href="/blog/categories/linkdump/"><span class="badge">linkdump</span></a>
+          
+          </div>
+          
+    </div>
+    <div class="span10 post-container">
+      <h1 class="link"><a href="/good-links-from-the-past-week/">Good links from the past week</a></h1>
+      <p>Being a list of things I read and enjoyed over the past week.</p>
+
+<h3>HPC</h3>
+
+<ul>
+<li><a href="http://www.nersc.gov/assets/HPCOR/HPCOR-Data-2014.pdf">DOE HPC Operational Review: &#8220;Enabling Data-Driven Scientific Discovery at DOE HPC Facilities&#8221;</a> &#8211; A long read, but interesting if you like thinking about how large HPC centers work</li>
+</ul>
+
+
+<h3>Distributed Systems</h3>
+
+<ul>
+<li><p><a href="http://blog.typeobject.com/a-quick-comparison-of-mesos-and-yarn">A quick comparison of Mesos and Yarn</a> from <a href="https://twitter.com/jonbringhurst">Jon Bringhurst</a> &#8211; Highlights some interesting relative strengths</p></li>
+<li><p><a href="https://www.cs.berkeley.edu/~alig/papers/mesos.pdf">Mesos: A Platform for Fine-Grained Resource Sharing in the Data Center</a> &#8211; The original paper on Mesos, which does a better job of explaining how resource offers and multiple schedulers work than most blog posts on the topic. :-)</p></li>
+<li><p><a href="http://blog.empathybox.com/post/19574936361/getting-real-about-distributed-system-reliability">Getting Real About Distributed System Reliability</a> from <a href="https://twitter.com/jaykreps">Jay Kreps</a></p></li>
+</ul>
+
+
+<h3>Tech culture</h3>
+
+<ul>
+<li><a href="http://bridgetkromhout.com/blog/2014/11/03/the-first-rule-of-devops-club/">The First Rule of DevOps Club</a> from <a href="https://twitter.com/bridgetkromhout">Bridget Kromhout</a> &#8211; Inclusion, it&#8217;s for winners.</li>
+</ul>
+
+
+<h3>Fiction</h3>
+
+<ul>
+<li><p><a href="http://www.amazon.com/Coming-Home-Alex-Benedict-Novel/dp/0425260879">Coming Home</a>, the latest <a href="https://www.goodreads.com/series/42152-alex-benedict">Alex Benedict series</a> novel from <a href="http://www.jackmcdevitt.com/">Jack McDevitt</a></p></li>
+<li><p><a href="http://www.amazon.com/Wings-Kingdom-Cherie-Priest/dp/B001OMHU7Y">Wings to the Kingdom</a> by <a href="http://www.cheriepriest.com/">Cherie Priest</a></p></li>
+<li><p><a href="http://www.strangehorizons.com/2011/20111121/tomorrow-f.shtml">Tomorrow Is Waiting</a> by Holli Mintzer</p></li>
+<li><p><a href="http://www.strangehorizons.com/2014/20141103/1banks-a.shtml">A Few Questions About the Culture: An Interview with Iain Banks</a> &#8211; Not fiction in itself, but commentary on it. Banks is always excellent. Also, you should <a href="http://www.strangehorizons.com/fund_drives/2014/main.shtml">donate to Strange Horizons</a>.</p></li>
+</ul>
+
+
+<h3>Randomness</h3>
+
+<ul>
+<li><a href="https://twitter.com/FozzTexx">Chris Osborn</a> has a real live BBS running on an Apple IIgs: <a href="http://bbs.fozztexx.com/">bbs.fozztexx.com</a></li>
+</ul>
+
+
+      
+      
+    </div>
+  </div>
+
+
+
+    </article>
+    
+    <hr>
+    
+  
+  
+    <article>
+      
+
+  <div class="row-fluid">
+    <div class="span2 post-meta">
+	  <h5 class="date-time">
+
+
+
+
+
+
+
+
+  
+
+
+<i class="icon-calendar-empty"></i> <time datetime="2014-06-05T20:22:00-06:00" pubdate data-updated="true">Jun 5<span>th</span>, 2014</time></h5>
+          <div class="row-fluid">
+          
+          </div>
+          
+          <div class="row-fluid">
+          
+          <a href="/blog/categories/lanl/"><span class="badge">lanl</span></a>
+          
+          <a href="/blog/categories/life/"><span class="badge">life</span></a>
+          
+          <a href="/blog/categories/work/"><span class="badge">work</span></a>
+          
+          </div>
+          
+    </div>
+    <div class="span10 post-container">
+      <h1 class="link"><a href="/heading-to-new-mexico-and-lanl/">Notice of Life Change: Heading to New Mexico and LANL</a></h1>
+      <p>For those who haven&#8217;t heard yet: Leigh and I are moving to Santa Fe! I
+am joining the HPC-3 team at Los Alamos National Lab as a Cluster
+Administrator helping to manage the Lab&#8217;s production HPC systems.
+Leigh will be skating with <a href="http://www.dukecityderby.com/">Duke City Roller Derby</a>&#8230;
+and is also in process on her new job hunt, but we all know roller derby is
+the important thing. ;-)</p>
+
+<p>I really enjoyed my time at NVIDIA and in the Bay Area, and there are many
+people we&#8217;ll miss there&#8230; but I&#8217;m also really excited for my new position
+at the Lab, and Santa Fe looks like it will be an awesome place to live.</p>
+
+<p>Leigh and I loaded the cats in the car this morning to begin
+the long drive to New Mexico, and we will be arriving in Santa Fe this weekend.
+I&#8217;m starting at LANL on June 16. If you&#8217;re in the area of Santa Fe or Los Alamos and want
+to meet up for beer/coffee/etc, let me know!</p>
+
+<hr />
+
+<p><img src="https://s3.amazonaws.com/ajdecon-public/mr_darcy_driving_to_nm.jpg" alt="Mr Darcy navigating" /></p>
+
+<p>When we started the drive this morning, our cat Mr Darcy decided to help navigate&#8230;</p>
+
+      
+      
+    </div>
+  </div>
+
+
+
+    </article>
+    
+    <hr>
+    
+  
+  
+    <article>
+      
+
+  <div class="row-fluid">
+    <div class="span2 post-meta">
+	  <h5 class="date-time">
+
+
+
+
+
+
+
+
+  
+
+
+<i class="icon-calendar-empty"></i> <time datetime="2013-10-20T22:09:00-06:00" pubdate data-updated="true">Oct 20<span>th</span>, 2013</time></h5>
+          <div class="row-fluid">
+          
+          </div>
+          
+          <div class="row-fluid">
+          
+          </div>
+          
+    </div>
+    <div class="span10 post-container">
+      <h1 class="link"><a href="/big-systems-talks/">Big Systems Talks</a></h1>
+      <p>Lately I&#8217;ve been watching a lot of recorded conference talks on YouTube,
+mostly about HPC, distributed systems or DevOps for big deployments.
+Some of these are a lot of fun and extremely interesting, but I don&#8217;t
+really want to clutter this blog with tons of YouTube embeds. So I&#8217;ve
+created a Tumblr called <a href="http://bigsystemstalks.tumblr.com">Big Systems Talks</a>
+where I can share them.</p>
+
+<p>If you&#8217;re interested in these topics, check it out. Right now most of
+the posts are from the Ricon East 2013 conference, which recently uploaded
+a ton of awesome talks to YouTube.</p>
+
+      
+      
+    </div>
+  </div>
+
+
+
+    </article>
+    
+    <hr>
+    
+  
+  
+    <article>
+      
+
+  <div class="row-fluid">
+    <div class="span2 post-meta">
+	  <h5 class="date-time">
+
+
+
+
+
+
+
+
+  
+
+
+<i class="icon-calendar-empty"></i> <time datetime="2013-07-20T09:54:00-06:00" pubdate data-updated="true">Jul 20<span>th</span>, 2013</time></h5>
+          <div class="row-fluid">
+          
+          </div>
+          
+          <div class="row-fluid">
+          
+          <a href="/blog/categories/hpc/"><span class="badge">HPC</span></a>
+          
+          <a href="/blog/categories/raspberry_pi/"><span class="badge">raspberry_pi</span></a>
+          
+          </div>
+          
+    </div>
+    <div class="span10 post-container">
+      <h1 class="link"><a href="/building-tiny-compute-clusters-for-fun-and-learning/">Building tiny compute clusters for fun and learning</a></h1>
+      <p><img src="https://s3.amazonaws.com/ajdecon-public/Pi_Lego_detail.jpg" width=600></p>
+
+<p>Just for fun,
+I recently built a small HPC-style computing cluster out of five
+<a href="http://www.raspberrypi.org/">Raspberry Pi</a> servers.  While this kind of
+thing has of course been <a href="http://www.southampton.ac.uk/mediacentre/features/raspberry_pi_supercomputer.shtml">done</a>
+<a href="http://coen.boisestate.edu/ece/raspberry-pi/">before</a>, I wanted to build one
+anyway as a geek toy and a platform for me to play with a few HPC ideas.</p>
+
+<p>I think it actually turned out rather well, and it was a ridiculous amount of
+fun to build. My wife <a href="http://www.twitter.com/Leigh_47">Leigh</a> helped put together
+the Lego rack, and it was a lot of fun to put together. Because I was focusing more on
+duplicating a &#8220;real&#8221; cluster rather than getting performance, I included all the usual
+cluster services such as a <a href="http://slurm.schedmd.com">SLURM</a> scheduler,
+<a href="http://ganglia.sourceforge.net">Ganglia</a> for monitoring, and using one of the
+Pi&#8217;s as a non-computing login node. Total <a href="http://gist.github.com/ajdecon/6045818">HPL performance</a>,
+670 MFlops. Oh yeah!</p>
+
+<p>A few folks at <a href="http://www.nvidia.com/">NVIDIA</a>, where I also work on HPC clusters,
+also thought this was a cool project. The Pi cluster thus ended up being featured
+as an &#8220;Inner Geek&#8221; post on the
+<a href="http://blogs.nvidia.com/blog/2013/07/17/raspberry-pi/">company blog</a>, alongside
+other awesome projects from NVIDIANs such as a
+<a href="http://blogs.nvidia.com/blog/2013/05/23/inner-geek-restoring-my-fathers-meyers-aero-commander/">cool airplane restoration</a>
+and an <a href="http://blogs.nvidia.com/blog/2012/11/28/inner-geek-nvidia-engineer-serves-up-holiday-lights-gangnam-style/">amazing holiday lights display</a>.</p>
+
+<p>If you&#8217;re curious, I have details on how I put it together in my
+<a href="https://github.com/ajdecon/ansible-pi-cluster">ansible-pi-cluster</a> GitHub
+repository. This includes the <a href="http://www.ansible.cc">Ansible</a> playbooks
+I used to install all the software (though they still need some work), as
+well as some notes on the physical assembly and OS provisioning in the
+<a href="https://github.com/ajdecon/ansible-pi-cluster/blob/master/README.md">README</a>.</p>
+
+<p>I&#8217;ll admit that the <a href="http://gist.github.com/ajdecon/6045818">performance isn&#8217;t awesome</a>
+compared to other clusters
+(or even many laptops!), but I like having a cluster I can hold in my hands:</p>
+
+<p><img src="https://s3.amazonaws.com/ajdecon-public/PiWithLegos.jpg" width=600></p>
+
+<p>There are all sorts of other &#8220;tiny HPC cluster&#8221; projects out there,
+frequently used for teaching, and which have often done some real science.<br/>
+Here&#8217;s a short roundup of some other tiny clusters I&#8217;ve seen&#8230;
+And if you know something else I should include in this post, let me know
+and I&#8217;ll add it in.</p>
+
+<ul>
+<li><a href="http://www.southampton.ac.uk/~sjc/raspberrypi/">Idris-Pi</a>,
+the original Raspberry Pi + Legos supercomputer from Southampton University.
+This cluster included 64 Raspberry Pi boards, and they also have some
+<a href="http://www.southampton.ac.uk/~sjc/raspberrypi/pi_supercomputer_southampton.htm">instructions</a>
+posted for how they set up the software stack.  There was also a very
+interesting discussion of this cluster on the
+<a href="http://www.beowulf.org/pipermail/beowulf/2012-September/029953.html">Beowulf list</a></li>
+</ul>
+
+
+<iframe width="560" height="315" src="//www.youtube.com/embed/Jq5nrHz9I94" frameborder="0" allowfullscreen></iframe>
+
+
+
+
+<br/><br/>
+
+
+<ul>
+<li><a href="http://coen.boisestate.edu/ece/files/2013/05/Creating.a.Raspberry.Pi-Based.Beowulf.Cluster_v2.pdf">RPiCluster</a>
+from Boise State, a 32-node cluster built by <a href="http://www.linkedin.com/in/jkiepert">Joshua Kiepert</a>
+to use for his dissertation research. This link also includes detailed instructions on building
+his cluster.</li>
+</ul>
+
+
+<iframe width="560" height="315" src="//www.youtube.com/embed/i_r3z1jYHAc" frameborder="0" allowfullscreen></iframe>
+
+
+
+
+<br/><br/>
+
+
+<ul>
+<li><a href="http://littlefe.net/">LittleFe</a> is an ongoing project focused on building
+small educational HPC clusters which teachers can use in their classes.
+Their web site includes a continually-updated design for a 6-node cluster
+of Intel Atom processors, and their organization also holds build events at
+conferences such as <a href="http://www.supercomp.org/">SuperComputing</a> where
+interested teachers can build clusters they can take home.</li>
+</ul>
+
+
+<iframe width="560" height="315" src="//www.youtube.com/embed/ciY4vsij_ak" frameborder="0" allowfullscreen></iframe>
+
+
+<br/><br/>
+
+
+<hr />
+
+      
+      
+    </div>
+  </div>
+
+
+
+    </article>
+    
+  
+  <div class="pagination">
+    
+    <a class="prev" href="/blog/page/3/">&larr; Older</a>
+    
+
+    
+    <a class="next" href="/">Newer &rarr;</a>
+    
+  </div>
+</div>
+
+
+        </div>
+      </div>
+      <div class="row-fluid">
+        <footer class="footer-page" role="contentinfo">
+          <p>
+  Copyright &copy; 2015 - Adam DeConinck -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span> - Theme by <a href="http://alexgaribay.com">Alex Garibay</a>
+</p>
+
+
+        </footer>
+      </div>
+  </div>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'ajdecon';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

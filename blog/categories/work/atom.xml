@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: work | Thinking Out Loud]]></title>
+  <link href="http://ajdecon.github.com/blog/categories/work/atom.xml" rel="self"/>
+  <link href="http://ajdecon.github.com/"/>
+  <updated>2015-04-12T13:23:58-06:00</updated>
+  <id>http://ajdecon.github.com/</id>
+  <author>
+    <name><![CDATA[Adam DeConinck]]></name>
+    <email><![CDATA[ajdecon@ajdecon.org]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Notice of Life Change: Heading to New Mexico and LANL]]></title>
+    <link href="http://ajdecon.github.com/heading-to-new-mexico-and-lanl/"/>
+    <updated>2014-06-05T20:22:00-06:00</updated>
+    <id>http://ajdecon.github.com/heading-to-new-mexico-and-lanl</id>
+    <content type="html"><![CDATA[<p>For those who haven't heard yet: Leigh and I are moving to Santa Fe! I
+am joining the HPC-3 team at Los Alamos National Lab as a Cluster
+Administrator helping to manage the Lab's production HPC systems.
+Leigh will be skating with <a href="http://www.dukecityderby.com/">Duke City Roller Derby</a>...
+and is also in process on her new job hunt, but we all know roller derby is
+the important thing. ;-)</p>
+
+<p>I really enjoyed my time at NVIDIA and in the Bay Area, and there are many
+people we'll miss there... but I'm also really excited for my new position
+at the Lab, and Santa Fe looks like it will be an awesome place to live.</p>
+
+<p>Leigh and I loaded the cats in the car this morning to begin
+the long drive to New Mexico, and we will be arriving in Santa Fe this weekend.
+I'm starting at LANL on June 16. If you're in the area of Santa Fe or Los Alamos and want
+to meet up for beer/coffee/etc, let me know!</p>
+
+<hr />
+
+<p><img src="https://s3.amazonaws.com/ajdecon-public/mr_darcy_driving_to_nm.jpg" alt="Mr Darcy navigating" /></p>
+
+<p>When we started the drive this morning, our cat Mr Darcy decided to help navigate...</p>
+]]></content>
+  </entry>
+  
+</feed>

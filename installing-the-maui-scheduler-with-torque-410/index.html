@@ -1,0 +1,383 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Building Torque 4.1.0 and Maui 3.3.1 (using fpm) on EL 6.2 - Thinking Out Loud</title>
+  <meta name="author" content="Adam DeConinck">
+
+   
+  <meta name="description" content="">
+  
+  <meta name="keywords" content="">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://ajdecon.github.com/installing-the-maui-scheduler-with-torque-410">
+  <link href="/favicon.png" rel="icon">
+  <link href='http://fonts.googleapis.com/css?family=Quicksand:300,400' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Thinking Out Loud" type="application/atom+xml">
+  <script src="/js/jquery.js"></script>
+  <script src="/js/bootstrap-collapse.js"></script>
+  <script src="/js/modernizr-2.0.js"></script>
+  <script src="/js/octopress.js" type="text/javascript"></script>
+  <script src="/js/application.js"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-12576607-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <div class="navbar navbar-inverse navbar-static-top">
+  	<div class="navbar-inner">
+  	  <div class="container">
+        <a class="btn btn-navbar" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+          <span class="fui-menu-24"></span>
+        </a>
+  	  	<div class="nav-collapse collapse navbar-responsive-collapse" style="height:0;">
+  	      <ul class="nav">
+    
+        <li ><a href="/">Home</a></li>
+    
+        <li ><a href="/about">About Adam</a></li>
+    
+        <li ><a href="https://www.ajdecon.org/ajdecon-key.txt">GPG key</a></li>
+    
+        <li ><a href="/pubs">Publications</a></li>
+    
+        <li ><a href="/atom.xml">RSS</a></li>
+    
+</ul>
+
+<ul class="nav pull-right">
+    
+    <li><a href="http://github.com/ajdecon" title="Github Profile"><i class="icon-github-sign social-navbar"></i></a></li>
+    
+    
+    
+    <li><a href="http://linkedin.com/in/ajdecon" title="Linkedin Profile"><i class="icon-linkedin-local social-navbar"></i></a></li>
+    
+    
+    <li><a href="http://twitter.com/ajdecon" title="Twitter Profile"><i class="icon-twitter-local social-navbar"></i></a></li>
+    
+    
+    <li><a href="http://plus.google.com/116247823819167414235" title="Google+ Profile"><i class="icon-google-plus-local social-navbar"></i></a></li>
+    
+    
+    
+
+    
+    <li><a href="mailto:ajdecon@ajdecon.org" title="Email"><i class="icon-envelope social-navbar"></i></a></li>
+    
+</ul>
+
+  	    </div>
+  	  </div>
+  	</div>
+  </div>
+  <div class="container" id="main">
+      <div class="row-fluid">
+        <div id="content">
+          <div>
+<article class="hentry" role="article">
+  
+
+  <header>
+  <div class="jumbotron">
+    Building Torque 4.1.0 and Maui 3.3.1 (Using Fpm) on EL 6.2
+	<h5>
+
+
+
+
+
+
+
+
+  
+
+
+<i class="icon-calendar-empty"></i> <time datetime="2012-08-05T00:00:00-06:00" pubdate data-updated="true">Aug 5<span>th</span>, 2012</time></h5>
+  </div>
+</header>
+  <div class="row-fluid">
+    <div class="span12">
+      <p><a href="http://www.adaptivecomputing.com/products/open-source/torque/">Torque</a> is an open-source implementation of the popular PBS resource manager. A large proportion of academic HPC clusters use Torque, and quite a few commercial sites also choose to use it instead of a commercial solution like PBS Professional. If you&#8217;ve submitted an HPC job using the &#8220;qsub&#8221; command, there&#8217;s a pretty good chance you were using Torque.</p>
+<p>However, while Torque is a pretty sophisticated resource manager, its actual scheduler is pretty limited. One big thing it doesn&#8217;t support is advance reservations, so there&#8217;s no way to keep resources free for future jobs. It also doesn&#8217;t support a lot of tuning parameters for scheduling, like &#8220;fair-share&#8221; scheduling.  But it does support the option of letting another program do the scheduling for it, while it keeps track of the underlying resources. And that&#8217;s where Maui comes in.</p>
+<p>I recently had to get a Torque/Maui installation up and running, and with the most recent versions there were a few annoyances to deal with. This includes the fact that Maui doesn&#8217;t include a spec file to build RPMs for Enterprise Linux derivatives, so rather just doing &#8220;make install&#8221; I used <a href="https://github.com/jordansissel/fpm/">fpm</a> to build an RPM myself. My notes on the process follow.</p>
+<p><!--more--></p>
+<h3>Download Torque and Maui</h3>
+<p>Torque and Maui are both distributed by <a href="http://www.adaptivecomputing.com/support/download-center/">Adaptive Computing</a>, who also develop the commercial Moab scheduler. Annoyingly, you have to register an account on their website for download, and Maui is hidden under &#8220;Other Open Source Products&#8221;: they really would rather you buy Moab. But once you&#8217;ve jumped through those hoops, you can download the software.&nbsp;</p>
+<h3>Building Torque RPMs</h3>
+<p>This is the easy part:</p>
+<div class="CodeRay">
+  <div class="code"><pre>[ajdecon@tyr-sl ~]$ rpmbuild -tb torque-4.1.0.tar.gz 
+-snip-
+Wrote: /home/ajdecon/rpmbuild/RPMS/x86_64/torque-4.1.0-1.cri.x86_64.rpm
+Wrote: /home/ajdecon/rpmbuild/RPMS/x86_64/torque-server-4.1.0-1.cri.x86_64.rpm
+Wrote: /home/ajdecon/rpmbuild/RPMS/x86_64/torque-devel-4.1.0-1.cri.x86_64.rpm
+Wrote: /home/ajdecon/rpmbuild/RPMS/x86_64/torque-scheduler-4.1.0-1.cri.x86_64.rpm
+Wrote: /home/ajdecon/rpmbuild/RPMS/x86_64/torque-client-4.1.0-1.cri.x86_64.rpm
+Wrote: /home/ajdecon/rpmbuild/RPMS/x86_64/torque-debuginfo-4.1.0-1.cri.x86_64.rpm
+Executing(%clean): /bin/sh -e /var/tmp/rpm-tmp.qg7cBZ
++ umask 022
++ cd /home/ajdecon/rpmbuild/BUILD
++ cd torque-4.1.0
++ test x/home/ajdecon/rpmbuild/BUILDROOT/torque-4.1.0-1.cri.x86_64 '!=' x/
++ rm -rf /home/ajdecon/rpmbuild/BUILDROOT/torque-4.1.0-1.cri.x86_64
++ exit 0</pre></div>
+</div>
+
+<p>You&#8217;ll need Torque installed to build Maui, so go ahead and install your new RPMs:</p>
+<div class="CodeRay">
+  <div class="code"><pre>[ajdecon@tyr-sl ~]$ sudo yum localinstall ~/rpmbuild/RPMS/x86_64/torque-*rpm
+-snip-
+Installed:
+  torque.x86_64 0:4.1.0-1.cri              torque-client.x86_64 0:4.1.0-1.cri   
+  torque-debuginfo.x86_64 0:4.1.0-1.cri    torque-devel.x86_64 0:4.1.0-1.cri    
+  torque-scheduler.x86_64 0:4.1.0-1.cri    torque-server.x86_64 0:4.1.0-1.cri</pre></div>
+</div>
+
+<h3>Patching Maui</h3>
+<p>Unfortunately, Maui has not yet been updated to build with newer versions of torque:</p>
+<div class="CodeRay">
+  <div class="code"><pre>[ajdecon@tyr-sl maui-3.3.1]$ ./configure --prefix=/usr/local/maui
+...
+[ajdecon@tyr-sl maui-3.3.1]$ make
+...
+MPBSI.c:177: error: conflicting types for ‘get_svrport’
+/usr/include/torque/pbs_ifl.h:684: note: previous declaration of ‘get_svrport’ was here
+MPBSI.c:178: error: conflicting types for ‘openrm’
+/usr/include/torque/pbs_ifl.h:685: note: previous declaration of ‘openrm’ was here
+make[1]: *** [MPBSI.o] Error 1
+make[1]: Leaving directory `/home/ajdecon/maui-3.3.1/src/moab'
+make: *** [all] Error 2</pre></div>
+</div>
+
+<p>Luckily this was noted on the <a href="http://www.clusterresources.com/pipermail/torqueusers/2012-March/014286.html">torqueusers list</a>, and it can be fixed by changing a couple of definitions in Maui&#8217;s src/moab/MPBSI.c to match those in Torque:</p>
+<div class="CodeRay">
+  <div class="code"><pre>[ajdecon@tyr-sl moab]$ diff MPBSI.c.orig MPBSI.c
+177,178c177,178
+&lt; extern int get_svrport(const char *,char *,int);
+&lt; extern int openrm(char *,int);
+---
+&gt; extern unsigned int get_svrport(char *,char *,unsigned int);
+&gt; extern int openrm(char *,unsigned int);</pre></div>
+</div>
+
+<h3>Building Maui</h3>
+<p>Once this patch is in place, you can build:</p>
+<div class="CodeRay">
+  <div class="code"><pre>[ajdecon@tyr-sl maui-3.3.1]$ ./configure --prefix=/usr/local/maui
+[ajdecon@tyr-sl maui-3.3.1]$ make</pre></div>
+</div>
+
+<p>After this you could `make install` and have a functioning server&#8230; but as system administrators, don&#8217;t we all hate software that doesn&#8217;t work with our package managers? Much better to put together an RPM which we can work with more easily later. For this we&#8217;ll use <strong>fpm</strong> (&#8220;Effing Package Management&#8221;).</p>
+<p>fpm supports building packages from &#8220;make install&#8221; if the makefiles support the &#8220;make install DESTDIR=/path/to/install&#8221; syntax, which Maui&#8217;s Makefiles don&#8217;t. But that&#8217;s easy to fix with a little inspection of the Makefiles and a little sed:</p>
+<div class="CodeRay">
+  <div class="code"><pre>[ajdecon@tyr-sl maui-3.3.1]$ sed -i'.bkp' 's/\$(INST_DIR)/\$(DESTDIR)\/\$(INST_DIR)/g' src/*/Makefile
+[ajdecon@tyr-sl maui-3.3.1]$ sed -i'' 's/\$(MSCHED_HOME)/\$(DESTDIR)\/\$(MSCHED_HOME)/g' src/*/Makefile</pre></div>
+</div>
+
+<p>Then we use DESTDIR to install everything into a location in /tmp, which we&#8217;ll use as the basis for our RPM:</p>
+<div class="CodeRay">
+  <div class="code"><pre>[ajdecon@tyr-sl maui-3.3.1]$ DESTDIR=/tmp/maui make install</pre></div>
+</div>
+
+<h3>Setting up the install</h3>
+<p>Unfortunately, we&#8217;re not done yet: Maui&#8217;s `make install` doesn&#8217;t automatically set up init scripts, which it would be nice to do. So we&#8217;ve got a little bit yet to go before we can build our RPM.</p>
+<p>First, we need to copy the etc/ files into their proper locations in the tmp install directory:</p>
+<div class="CodeRay">
+  <div class="code"><pre>[ajdecon@tyr-sl maui-3.3.1]$ mkdir /tmp/maui/etc
+[ajdecon@tyr-sl maui-3.3.1]$ mkdir /tmp/maui/etc/profile.d
+[ajdecon@tyr-sl maui-3.3.1]$ mkdir /tmp/maui/etc/init.d
+[ajdecon@tyr-sl maui-3.3.1]$ cp etc/maui.d /tmp/maui/etc/init.d/
+[ajdecon@tyr-sl maui-3.3.1]$ cp etc/maui.{csh,sh} /tmp/maui/etc/profile.d/</pre></div>
+</div>
+
+<p>Make sure to edit the /tmp/maui/etc/init.d/maui.d file so &#8220;MAUI_PREFIX=/usr/local/maui&#8221;, since that&#8217;s the prefix we&#8217;re using.</p>
+<p>Then, just to be fancy, we&#8217;ll set up some post-install and pre-uninstall scripts to handle the maui.d service.</p>
+<div class="CodeRay">
+  <div class="code"><pre>[ajdecon@tyr-sl maui-3.3.1]$ cat /tmp/maui/post-install.sh 
+#!/bin/bash
+chkconfig --add maiu.d
+chkconfig --level 3456 maui.d on</pre></div>
+</div>
+
+<div class="CodeRay">
+  <div class="code"><pre>[ajdecon@tyr-sl maui-3.3.1]$ cat /tmp/maui/pre-uninstall.sh 
+#!/bin/bash
+chkconfig --del maui.d</pre></div>
+</div>
+
+<h3>Building the RPM</h3>
+<p>Finally, we can build the rpm using fpm!</p>
+<div class="CodeRay">
+  <div class="code"><pre>[ajdecon@tyr-sl maui-3.3.1]$ fpm -s dir -t rpm -n maui -v 3.3.1 -C /tmp/maui \
+-p /tmp/maui-3.3.1-x86_64-fpmbuild.rpm --post-install /tmp/maui/post-install.sh \
+--pre-uninstall /tmp/maui/pre-uninstall.sh etc usr
+Executing(%prep): /bin/sh -e /var/tmp/rpm-tmp.W8v7PU
+Executing(%build): /bin/sh -e /var/tmp/rpm-tmp.rGXX9h
+Executing(%install): /bin/sh -e /var/tmp/rpm-tmp.wJAluF
+Processing files: maui-3.3.1-1.x86_64
+Wrote: /tmp/package-rpm-build20120805-26510-1z6ht3/RPMS/x86_64/maui-3.3.1-1.x86_64.rpm
+Executing(%clean): /bin/sh -e /var/tmp/rpm-tmp.nYdLBS
+Created rpm {&quot;path&quot;:&quot;/tmp/maui-3.3.1-x86_64-fpmbuild.rpm&quot;}</pre></div>
+</div>
+
+<p>If we check the rpm, we&#8217;ll see that all our files are present:</p>
+<div class="CodeRay">
+  <div class="code"><pre>[ajdecon@tyr-sl maui-3.3.1]$ rpm -q --filesbypkg -p /tmp/maui-3.3.1-x86_64-fpmbuild.rpm 
+maui                      /etc/init.d/maui.d
+maui                      /etc/profile.d/maui.csh
+maui                      /etc/profile.d/maui.sh
+maui                      /usr/local/maui/bin/canceljob
+...</pre></div>
+</div>
+
+<p>This RPM can be installed with the command:</p>
+<div class="CodeRay">
+  <div class="code"><pre>sudo yum localinstall /tmp/maui-3.3.1-x86_64-fpmbuild.rpm</pre></div>
+</div>
+
+<p>Of course, setting up and configuring Torque and Maui is a totally separate project. Check out the documentation on Adaptive Computing&#8217;s website. And I may blog on that process another time&#8230;</p>
+
+    </div>
+  </div>
+
+
+
+  <footer>
+    <hr>
+    
+    <div class="row-fluid">
+      
+      <div class="span6">
+        <p class="meta">
+        
+        
+
+
+        </p>
+      </div>
+      
+      <div class="span6 social-sharing">
+        <div class="sharing">
+  <div class="addthis_toolbox addthis_default_style ">
+  
+  
+  <a class="addthis_button_tweet"></a>
+  
+  
+  <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+  
+  <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid="></script>
+</div>
+
+      </div>
+      
+      
+    </div>
+    
+    <div class="row-fluid">
+      <div class="span12">
+        <p class="meta">
+          
+            <a class="basic-alignment left" href="/impressions-of-mac-os-x-a-month-or-so-later/" title="Previous Post: Impressions of Mac OS X, a month or so later">&laquo; Impressions of Mac OS X, a month or so later</a>
+          
+          
+            <a class="basic-alignment right" href="/so-much-to-learn-so-little-time/" title="Next Post: So much to learn, so little time!">So much to learn, so little time! &raquo;</a>
+          
+        </p>
+      </div>
+    </div>
+  </footer>
+</article>
+
+</div>
+
+
+
+        </div>
+      </div>
+      <div class="row-fluid">
+        <footer class="footer-page" role="contentinfo">
+          <p>
+  Copyright &copy; 2015 - Adam DeConinck -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span> - Theme by <a href="http://alexgaribay.com">Alex Garibay</a>
+</p>
+
+
+        </footer>
+      </div>
+  </div>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'ajdecon';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

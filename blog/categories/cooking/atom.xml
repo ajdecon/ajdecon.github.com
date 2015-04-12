@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: cooking | Thinking Out Loud]]></title>
+  <link href="http://ajdecon.github.com/blog/categories/cooking/atom.xml" rel="self"/>
+  <link href="http://ajdecon.github.com/"/>
+  <updated>2015-04-12T13:23:58-06:00</updated>
+  <id>http://ajdecon.github.com/</id>
+  <author>
+    <name><![CDATA[Adam DeConinck]]></name>
+    <email><![CDATA[ajdecon@ajdecon.org]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Making progress on the New Years Resolutions...]]></title>
+    <link href="http://ajdecon.github.com/making-progress-on-the-new-years-resolutions/"/>
+    <updated>2012-01-08T00:00:00-07:00</updated>
+    <id>http://ajdecon.github.com/making-progress-on-the-new-years-resolutions</id>
+    <content type="html"><![CDATA[<p>Three of this year's Resolutions (or at least, strong intentions) have been to exercise more, cook more, and write in this blog more often. Today I made progress in all of these...</p>
+
+
+<p> <br /><ul> <li><b>Exercise</b>: I haven't been as active lately as I'd like, so more exercise seems like a good idea. So I invoked my motivational tool of last resort: I spent a lot of money on it. Specifically, I got a gym membership, which will both the useful enough to help me exercise and expensive enough for me to not want to waste the money.</li> <li><b>Cooking</b>: Partly for the sake of eating better, partly to spend less money eating out, and also to try some tasty new things. So I spent most of the afternoon cooking today, and made...<ul> <li><a href="http://allrecipes.com/recipe/crispy-barbequed-tofu-slices/detail.aspx">Barbequed Tofu Slices</a>: The recipe turned out to be more involved than I expected from a cursory reading, but I managed to make it to the end and produce something edible. Fairly tasty actually, and Leigh quite liked it as well. It's also the first tofu dish I can confidently say I enjoyed, so this probably goes into the "will make again" list.</li> <li><a href="http://www.cookingforengineers.com/recipe/34/Garlic-Roasted-Potatoes">Garlic Roasted Potatoes</a>: Pretty simple, but quite tasty, and went well with the tofu.</li> <li><a href="http://www.cookingforengineers.com/recipe/154/Biscotti">Biscotti</a>: These came out surprisingly well. The Cooking for Engineers recipe includes orange zest, and while I used less than called for in the recipe, you can really taste the orange, as well as the almonds and vanilla. I actually like this enough that, if Leigh and I enjoy these over the next week, I might try to bake more biscotti on a weekly basis with different flavors.</li> </ul> </li><li><b>Blogging</b>: As you see here! Also, I'm working on a short entry explaining a <a href="http://www.opscode.com/chef/">Chef</a> recipe I put together this week for building a basic SLURM+OpenMPI compute cluster on Ubuntu servers.<br />One of the things I'd really like to do this year is get better at technical writing, and writing in general, so the blog will actually serve a useful purpose in helping me practice my writing. Even (or especially!) if no one reads it.</li> </ul></p>
+]]></content>
+  </entry>
+  
+</feed>

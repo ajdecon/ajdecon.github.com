@@ -1,0 +1,255 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Non-exclusive scheduling in Torque/Maui - Thinking Out Loud</title>
+  <meta name="author" content="Adam DeConinck">
+
+   
+  <meta name="description" content="">
+  
+  <meta name="keywords" content="">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://ajdecon.github.com/non-exclusive-scheduling-in-torquemaui">
+  <link href="/favicon.png" rel="icon">
+  <link href='http://fonts.googleapis.com/css?family=Quicksand:300,400' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Thinking Out Loud" type="application/atom+xml">
+  <script src="/js/jquery.js"></script>
+  <script src="/js/bootstrap-collapse.js"></script>
+  <script src="/js/modernizr-2.0.js"></script>
+  <script src="/js/octopress.js" type="text/javascript"></script>
+  <script src="/js/application.js"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-12576607-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <div class="navbar navbar-inverse navbar-static-top">
+  	<div class="navbar-inner">
+  	  <div class="container">
+        <a class="btn btn-navbar" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+          <span class="fui-menu-24"></span>
+        </a>
+  	  	<div class="nav-collapse collapse navbar-responsive-collapse" style="height:0;">
+  	      <ul class="nav">
+    
+        <li ><a href="/">Home</a></li>
+    
+        <li ><a href="/about">About Adam</a></li>
+    
+        <li ><a href="https://www.ajdecon.org/ajdecon-key.txt">GPG key</a></li>
+    
+        <li ><a href="/pubs">Publications</a></li>
+    
+        <li ><a href="/atom.xml">RSS</a></li>
+    
+</ul>
+
+<ul class="nav pull-right">
+    
+    <li><a href="http://github.com/ajdecon" title="Github Profile"><i class="icon-github-sign social-navbar"></i></a></li>
+    
+    
+    
+    <li><a href="http://linkedin.com/in/ajdecon" title="Linkedin Profile"><i class="icon-linkedin-local social-navbar"></i></a></li>
+    
+    
+    <li><a href="http://twitter.com/ajdecon" title="Twitter Profile"><i class="icon-twitter-local social-navbar"></i></a></li>
+    
+    
+    <li><a href="http://plus.google.com/116247823819167414235" title="Google+ Profile"><i class="icon-google-plus-local social-navbar"></i></a></li>
+    
+    
+    
+
+    
+    <li><a href="mailto:ajdecon@ajdecon.org" title="Email"><i class="icon-envelope social-navbar"></i></a></li>
+    
+</ul>
+
+  	    </div>
+  	  </div>
+  	</div>
+  </div>
+  <div class="container" id="main">
+      <div class="row-fluid">
+        <div id="content">
+          <div>
+<article class="hentry" role="article">
+  
+
+  <header>
+  <div class="jumbotron">
+    Non-exclusive Scheduling in Torque/Maui
+	<h5>
+
+
+
+
+
+
+
+
+  
+
+
+<i class="icon-calendar-empty"></i> <time datetime="2011-07-19T00:00:00-06:00" pubdate data-updated="true">Jul 19<span>th</span>, 2011</time></h5>
+  </div>
+</header>
+  <div class="row-fluid">
+    <div class="span12">
+      <p> <a href="http://www.clusterresources.com/products/torque-resource-manager.php">Torque (PBS)</a>, the cluster resource manager, defaults to allocating any single compute server to only one job at a time. This makes sense most of the time, especially for parallel jobs which use MPI or another message-passing routine to handle communication between processes on different servers. If a server were shared by multiple jobs, contention for access to the network card could slow down all jobs by quite a lot. However, when the jobs are single-threaded or <a href="http://en.wikipedia.org/wiki/Embarrassingly_parallel">embarrassingly parallel</a>, this can result in a lot of wasted resources: for example, a single-threaded job tying up an eight-core server.</p> <p /> <p> Torque, and the associated scheduler <a href="http://www.clusterresources.com/products/maui-cluster-scheduler.php">Maui</a>, can be configured to allow non-exclusive allocation so that single-threaded jobs can share a compute node. But while it&#8217;s pretty simple to accomplish (two config settings), it&#8217;s very hard to find any documentation on how to do it! As I discovered last week. So I&#8217;ll share my research. </p> <p /> <p>First: make sure that the <code>nodes</code> file in <code>TORQUE_HOME/server_priv/</code> specifies the number of virtual processors on each node. For example,</p> <p /> <blockquote class="posterous_short_quote"><code> <br />node1 np=8 <br />node2 np=8 <br />node3 np=4 <br /></code></blockquote> <p /> <p><code>np</code> can be the physical number of cores, but doesn&#8217;t have to be. Second, make sure that your <code>MAUI_HOME/maui.cfg</code> includes the following line:</p> <p /> <blockquote class="posterous_short_quote"><code>NODEACCESSPOLICY SHARED</code></blockquote> <p /> <p>That&#8217;s it! One thing to note, however, is that Torque&#8217;s allocation policy always starts at the first available slot. So if you submit a nonexclusive job with 2 independent threads, and there are 4 servers available, both threads will still run on the same server. This differs from <a href="http://gridengine.org/blog/">Grid Engine</a>, which defaults to non-exclusive scheduling (and it&#8217;s a pain to make it exclusive!), but defaults to a round-robin policy.</p> <p /> <p>Trivial, I know, but you would not believe how hard it was to figure it out. This is why documentation is important!</p>
+
+    </div>
+  </div>
+
+
+
+  <footer>
+    <hr>
+    
+    <div class="row-fluid">
+      
+      <div class="span6">
+        <p class="meta">
+        
+        
+
+
+
+  <a href="/blog/categories/hpc/"><span class="badge">HPC</span></a>
+
+  <a href="/blog/categories/maui/"><span class="badge">Maui</span></a>
+
+  <a href="/blog/categories/torque/"><span class="badge">Torque</span></a>
+
+
+
+
+        </p>
+      </div>
+      
+      <div class="span6 social-sharing">
+        <div class="sharing">
+  <div class="addthis_toolbox addthis_default_style ">
+  
+  
+  <a class="addthis_button_tweet"></a>
+  
+  
+  <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+  
+  <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid="></script>
+</div>
+
+      </div>
+      
+      
+    </div>
+    
+    <div class="row-fluid">
+      <div class="span12">
+        <p class="meta">
+          
+            <a class="basic-alignment left" href="/extremely-contrived-gcc-vs-v8-benchmark/" title="Previous Post: Extremely contrived GCC vs V8 benchmark">&laquo; Extremely contrived GCC vs V8 benchmark</a>
+          
+          
+            <a class="basic-alignment right" href="/making-progress-on-the-new-years-resolutions/" title="Next Post: Making progress on the New Years Resolutions...">Making progress on the New Years Resolutions... &raquo;</a>
+          
+        </p>
+      </div>
+    </div>
+  </footer>
+</article>
+
+</div>
+
+
+
+        </div>
+      </div>
+      <div class="row-fluid">
+        <footer class="footer-page" role="contentinfo">
+          <p>
+  Copyright &copy; 2015 - Adam DeConinck -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span> - Theme by <a href="http://alexgaribay.com">Alex Garibay</a>
+</p>
+
+
+        </footer>
+      </div>
+  </div>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'ajdecon';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

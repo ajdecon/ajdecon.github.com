@@ -1,0 +1,2279 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Thinking Out Loud]]></title>
+  <link href="http://ajdecon.github.com/atom.xml" rel="self"/>
+  <link href="http://ajdecon.github.com/"/>
+  <updated>2015-04-12T13:23:58-06:00</updated>
+  <id>http://ajdecon.github.com/</id>
+  <author>
+    <name><![CDATA[Adam DeConinck]]></name>
+    <email><![CDATA[ajdecon@ajdecon.org]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Building and packaging environment modules with EasyBuild and FPM]]></title>
+    <link href="http://ajdecon.github.com/building-scientific-dev-environments-with-easybuild-and-module2pkg/"/>
+    <updated>2015-04-11T11:41:00-06:00</updated>
+    <id>http://ajdecon.github.com/building-scientific-dev-environments-with-easybuild-and-module2pkg</id>
+    <content type="html"><![CDATA[<p>Like any good sysadmin, I strongly prefer to install software using my OS&#8217;s
+built-in package management system. Unfortunately, a lot of the software
+used in scientific high-performance computing doesn&#8217;t make this easy.
+Many popular software projects, including both user applications and common
+libraries, don&#8217;t distribute packages but expect their users to build from source.
+And many of these projects have non-standard, arcane, or just-plain-weird
+build processes.</p>
+
+<p>This post outlines a workflow I&#8217;ve used for building scientific software and
+producing RPMs which can be used to distribute that software in the future.
+I mostly use this workflow mostly for personal projects &#8211; building and testing
+clusters on Amazon EC2, for example.</p>
+
+<p>The core components of this workflow are <a href="https://hpcugent.github.io/easybuild/">EasyBuild</a> &#8211;
+which automates building HPC software projects &#8211; and <a href="https://github.com/jordansissel/fpm">FPM</a> &#8211;
+which makes it easy to build OS packages from a directory.</p>
+
+<!-- more -->
+
+
+<h2>Build server configuration</h2>
+
+<p>For building my packages I typically use a c4.xlarge server on
+<a href="http://aws.amazon.com">Amazon EC2</a>. The c4.xlarge has the advantage of being
+relatively powerful (typically I get 4 Sandy Bridge CPUs when I launch one)
+while also being relatively cheap (spot price is currently hovering around
+$0.032/hr). I run CentOS 6.x on the server as this is typical of the HPC
+environments I generally use.</p>
+
+<p>The following <a href="http://www.ansible.com">Ansible</a> script installs a set of
+basic development tools (the &#8220;@development&#8221; yum group), EasyBuild, and FPM.
+It also pulls down my &#8220;module2pkg&#8221; wrapper script for packaging modules
+with FPM. (More on that later.)</p>
+
+<pre><code>---
+- hosts: builder
+  user: root
+  tasks:
+  - name: install dev and packaging tools
+    yum: name="" state=present
+    with_items:
+    - "@development"
+    - "environment-modules"
+    - "python-pip"
+
+  # Set up module2pkg script
+  - name: install fpm
+    gem: name=fpm state=present
+  - name: pull down module2pkg script
+    git: repo="https://github.com/ajdecon/module2pkg" dest=/opt/module2pkg
+
+  - name: symlink for running module2pkg
+    file: src="http://ajdecon.github.com/opt/module2pkg/module2pkg" dest="/usr/local/bin/module2pkg" state=link
+
+
+  # Set up and configure EasyBuild
+  - name: easybuild user for building software
+    user: name=easybuild createhome=yes state=present
+
+  - name: /opt/easybuild where EB sw will go
+    file: path="/opt/easybuild" owner=easybuild mode=0755 state=directory
+         - name: install easybuild
+    pip: name=easybuild state=present
+
+  - name: ensure easybuild user .config dir exists
+    file: path="/home/easybuild/.config/easybuild" owner=easybuild mode=0755
+          state=directory
+
+  - name: ensure ~easybuild/.config/config.cfg exists
+    file: path="/home/easybuild/.config/easybuild/config.cfg" owner=easybuild
+          mode=0644 state=touch
+
+  - name: configure prefix
+    ini_file: dest="/home/easybuild/.config/easybuild/config.cfg" section="config"
+              option="prefix" value="/opt/easybuild"
+</code></pre>
+
+<h2>Building Modules with EasyBuild</h2>
+
+<p><a href="https://hpcugent.github.io/easybuild/">EasyBuild</a> is a framework for building
+and installing scientific applications on HPC systems. It comes with a huge
+library of build scripts for commonly-used compilers, support libraries, and
+simulations &#8211; all of which can be built and installed just by running the
+appropriate EasyBuild command.</p>
+
+<p>(This is hugely useful because many of these applications have <em>horrible</em>
+build processes. While many can be built with a regular &#8220;configure; make; make
+install&#8221; workflow, many others include custom build scripts or have a long
+list of required-but-arcane build options.)</p>
+
+<p>EasyBuild also generates Module files for each software package it builds, which
+is very convenient in HPC environments where we may have many users who want to
+easily use different versions of each software package. (For example, it&#8217;s not
+uncommon to have strict dependencies on specific compiler or MPI versions &#8211; so
+a good HPC platform should make it easy to use those versions.)</p>
+
+<p>EasyBuild resolves dependencies, and can be run with a &#8220;dry run&#8221; option which will show you what
+software it will build to support any given application. For example, this is the output
+when you request a dry run for running a particular recipe for
+<a href="http://www.gromacs.org/">GROMACS</a>:</p>
+
+<pre><code>    [easybuild@ip-10-0-0-88 ~]$ eb GROMACS-4.6.5-gmpolf-1.4.8-hybrid.eb --robot --dry-run
+    == temporary log file in case of crash /tmp/eb-2U1YxO/easybuild-jmFjre.log
+    Dry run: printing build status of easyconfigs and dependencies
+     * [ ] /usr/easybuild/easyconfigs/g/GCC/GCC-4.8.1.eb (module: GCC/4.8.1)
+     * [ ] /usr/easybuild/easyconfigs/m/MPICH/MPICH-3.0.4-GCC-4.8.1.eb (module: MPICH/3.0.4-GCC-4.8.1)
+     * [ ] /usr/easybuild/easyconfigs/g/gmpich/gmpich-1.4.8.eb (module: gmpich/1.4.8)
+     * [ ] /usr/easybuild/easyconfigs/o/OpenBLAS/OpenBLAS-0.2.6-gmpich-1.4.8-LAPACK-3.4.2.eb (module: OpenBLAS/0.2.6-gmpich-1.4.8-LAPACK-3.4.2)
+     * [ ] /usr/easybuild/easyconfigs/f/FFTW/FFTW-3.3.3-gmpich-1.4.8.eb (module: FFTW/3.3.3-gmpich-1.4.8)
+     * [ ] /usr/easybuild/easyconfigs/s/ScaLAPACK/ScaLAPACK-2.0.2-gmpich-1.4.8-OpenBLAS-0.2.6-LAPACK-3.4.2.eb (module: ScaLAPACK/2.0.2-gmpich-1.4.8-OpenBLAS-0.2.6-LAPACK-3.4.2)
+     * [ ] /usr/easybuild/easyconfigs/g/gmpolf/gmpolf-1.4.8.eb (module: gmpolf/1.4.8)
+     * [ ] /usr/easybuild/easyconfigs/n/ncurses/ncurses-5.9-gmpolf-1.4.8.eb (module: ncurses/5.9-gmpolf-1.4.8)
+     * [ ] /usr/easybuild/easyconfigs/c/CMake/CMake-2.8.12-gmpolf-1.4.8.eb (module: CMake/2.8.12-gmpolf-1.4.8)
+     * [ ] /usr/easybuild/easyconfigs/g/GROMACS/GROMACS-4.6.5-gmpolf-1.4.8-hybrid.eb (module: GROMACS/4.6.5-gmpolf-1.4.8-hybrid)
+    == temporary log file /tmp/eb-2U1YxO/easybuild-jmFjre.log has been removed.
+    == temporary directory /tmp/eb-2U1YxO has been removed.
+</code></pre>
+
+<p>EasyBuild will first build all the modules which GROMACS depends on, all the way
+down to the compiler stack. This may seem a little unnecessary &#8211; after all, doesn&#8217;t
+the system come with a perfectly good compiler? However, it provides an easy way to
+decouple your HPC software stack from the underlying OS, so that you can perform
+OS upgrades for security or other issues while having less of an impact on your
+users&#8217; software. It also means that you can build those lower level components
+with options which are useful for HPC, but which your system vendor may not
+have used in their stock build.</p>
+
+<p>(A note on EC2: When you launch a particular
+instance type, like c4.xlarge, you may get Sandy Bridge CPUs&#8230; or you may get
+Westmeres or Ivy Bridges. The CPUs may also not actually support all the options
+that they should: I initially tried to build software with EasyBuild&#8217;s default
+optimization levels which include <code>-march=native</code> and got &#8220;instruction not
+supported&#8221; errors for some of the AVX instructions. Given that I am going to be
+building RPMs anyway, I want them to be as general
+as possible. So when building on EC2, I typically use the EasyBuild option
+<code>--optarch=''</code> to turn off CPU-specific optimizations.)</p>
+
+<p>Now execute without the dry run:</p>
+
+<pre><code>    [easybuild@ip-10-0-0-88 ~]$ eb GROMACS-4.6.5-gmpolf-1.4.8-hybrid.eb --robot --optarch=''
+</code></pre>
+
+<p>And wait a long time, as we&#8217;re starting with GCC:</p>
+
+<pre><code>    == temporary log file in case of crash /tmp/eb-AGI9Yh/easybuild-DLAzfR.log
+    == resolving dependencies ...
+    == processing EasyBuild easyconfig /usr/easybuild/easyconfigs/g/GCC/GCC-4.8.1.eb
+    == building and installing GCC/4.8.1...
+    == fetching files...
+    == creating build dir, resetting environment...
+    == unpacking...
+    == patching...
+    == preparing...
+    == configuring...
+    == building...
+</code></pre>
+
+<p>Once everything has finished building, we can see the new software
+available in Modules:</p>
+
+<pre><code>    [easybuild@ip-10-0-0-88 ~]$ module use /opt/easybuild/modules/all/
+    [easybuild@ip-10-0-0-88 ~]$ module av
+
+    ---------------------------------------------------- /opt/easybuild/modules/all/ -----------------------------------------------------
+    CMake/2.8.10.2-gmpolf-1.4.8                              ScaLAPACK/2.0.2-gmpich-1.4.8-OpenBLAS-0.2.6-LAPACK-3.4.2
+    CMake/2.8.12-gmpolf-1.4.8                                bzip2/1.0.6-gmpolf-1.4.8
+    FFTW/3.3.3-gmpich-1.4.8                                  gettext/0.18.2-gmpolf-1.4.8
+    GCC/4.8.1                                                gmpich/1.4.8
+    GLib/2.34.3-gmpolf-1.4.8                                 gmpolf/1.4.8
+    GROMACS/4.6.5-gmpolf-1.4.8-hybrid                        libffi/3.0.13-gmpolf-1.4.8
+    HPL/2.1-gmpolf-1.4.8                                     libreadline/6.2-gmpolf-1.4.8
+    MPICH/3.0.4-GCC-4.8.1                                    ncurses/5.9-gmpolf-1.4.8
+    OpenBLAS/0.2.6-gmpich-1.4.8-LAPACK-3.4.2                 zlib/1.2.7-gmpolf-1.4.8
+    Python/2.7.3-gmpolf-1.4.8
+
+    --------------------------------------------------- /usr/share/Modules/modulefiles ---------------------------------------------------
+    dot         module-git  module-info modules     null        use.own
+</code></pre>
+
+<h2>Packaging the Modules with FPM</h2>
+
+<p><a href="https://github.com/jordansissel/fpm">FPM</a> is a wonderful tool which
+makes it very easy to build Linux packages such as RPMs and DEBs. While I&#8217;ll
+sometimes still go to the trouble of writing a real RPM SPEC file if I&#8217;m putting
+together a maintainable build process, for ad-hoc work I will always prefer to
+use FPM.</p>
+
+<p>For working with Modules, I&#8217;ve written a simple helper script called
+<a href="https://github.com/ajdecon/module2pkg">module2pkg</a> which makes it a little
+easier to build RPMs when you already have Modules. When you give it the name of a
+Module, it</p>
+
+<ol>
+<li>Reads the Modulefile to get the Module&#8217;s root directory</li>
+<li>Resolves the dependencies of that Module recursively, by checking to see which modules it
+either loads or lists as prerequisites</li>
+<li>Runs FPM to package each Module in the dependency tree, including specifying its dependencies</li>
+</ol>
+
+
+<p>(EasyBuild is actually working on <a href="https://github.com/hpcugent/easybuild-framework/pull/1224">integrating fpm support</a>
+for building packages, at which point I will mostly be able to retire module2pkg.
+The only advantage of my approach is that it depends only on the Modulefiles themselves,
+so it can be used to package hand-compiled Modules as well as those
+built by EasyBuild.)</p>
+
+<p>module2pkg also includes an option for adding a prefix to each package name &#8211;
+in this case &#8220;eb&#8221;. This lets me package things like GCC without worrying about
+any potential conflict with the system packages.</p>
+
+<p>Note that module2pkg prints out the fpm command it uses for each module.</p>
+
+<pre><code>    [root@ip-10-0-0-88 ~]# module2pkg -p eb HPL/2.1-gmpolf-1.4.8
+    fpm -s dir -t rpm -n eb-GCC -v 4.8.1 -p eb-GCC-VERSION_ARCH.rpm -C / /opt/easybuild/software/GCC/4.8.1 /opt/easybuild/modules/all/GCC/4.8.1
+    no value for epoch is set, defaulting to nil {:level=&gt;:warn}
+    no value for epoch is set, defaulting to nil {:level=&gt;:warn}
+    Created package {:path=&gt;"eb-GCC-4.8.1_x86_64.rpm"}
+    fpm -s dir -t rpm -n eb-MPICH -v 3.0.4-GCC-4.8.1 -p eb-MPICH-VERSION_ARCH.rpm -d "eb-GCC = 4.8.1" -C / /opt/easybuild/software/MPICH/3.0.4-GCC-4.8.1 /opt/easybuild/modules/all/MPICH/3.0.4-GCC-4.8.1
+    Package version '3.0.4-GCC-4.8.1' includes dashes, converting to underscores {:level=&gt;:warn}
+    no value for epoch is set, defaulting to nil {:level=&gt;:warn}
+    no value for epoch is set, defaulting to nil {:level=&gt;:warn}
+    Created package {:path=&gt;"eb-MPICH-3.0.4_GCC_4.8.1_x86_64.rpm"}
+    fpm -s dir -t rpm -n eb-OpenBLAS -v 0.2.6-gmpich-1.4.8-LAPACK-3.4.2 -p eb-OpenBLAS-VERSION_ARCH.rpm -d "eb-MPICH = 3.0.4-GCC-4.8.1" -d "eb-gmpich = 1.4.8" -d "eb-GCC = 4.8.1" -C / /opt/easybuild/software/OpenBLAS/0.2.6-gmpich-1.4.8-LAPACK-3.4.2 /opt/easybuild/modules/all/OpenBLAS/0.2.6-gmpich-1.4.8-LAPACK-3.4.2
+    Package version '0.2.6-gmpich-1.4.8-LAPACK-3.4.2' includes dashes, converting to underscores {:level=&gt;:warn}
+    no value for epoch is set, defaulting to nil {:level=&gt;:warn}
+    no value for epoch is set, defaulting to nil {:level=&gt;:warn}
+    Created package {:path=&gt;"eb-OpenBLAS-0.2.6_gmpich_1.4.8_LAPACK_3.4.2_x86_64.rpm"}
+    fpm -s dir -t rpm -n eb-gmpich -v 1.4.8 -p eb-gmpich-VERSION_ARCH.rpm -d "eb-MPICH = 3.0.4-GCC-4.8.1" -d "eb-GCC = 4.8.1" -C / /opt/easybuild/software/gmpich/1.4.8 /opt/easybuild/modules/all/gmpich/1.4.8
+    no value for epoch is set, defaulting to nil {:level=&gt;:warn}
+    no value for epoch is set, defaulting to nil {:level=&gt;:warn}
+    Created package {:path=&gt;"eb-gmpich-1.4.8_x86_64.rpm"}
+    fpm -s dir -t rpm -n eb-ScaLAPACK -v 2.0.2-gmpich-1.4.8-OpenBLAS-0.2.6-LAPACK-3.4.2 -p eb-ScaLAPACK-VERSION_ARCH.rpm -d "eb-MPICH = 3.0.4-GCC-4.8.1" -d "eb-OpenBLAS = 0.2.6-gmpich-1.4.8-LAPACK-3.4.2" -d "eb-GCC = 4.8.1" -d "eb-gmpich = 1.4.8" -C / /opt/easybuild/software/ScaLAPACK/2.0.2-gmpich-1.4.8-OpenBLAS-0.2.6-LAPACK-3.4.2 /opt/easybuild/modules/all/ScaLAPACK/2.0.2-gmpich-1.4.8-OpenBLAS-0.2.6-LAPACK-3.4.2
+    Package version '2.0.2-gmpich-1.4.8-OpenBLAS-0.2.6-LAPACK-3.4.2' includes dashes, converting to underscores {:level=&gt;:warn}
+    no value for epoch is set, defaulting to nil {:level=&gt;:warn}
+    no value for epoch is set, defaulting to nil {:level=&gt;:warn}
+    Created package {:path=&gt;"eb-ScaLAPACK-2.0.2_gmpich_1.4.8_OpenBLAS_0.2.6_LAPACK_3.4.2_x86_64.rpm"}
+    fpm -s dir -t rpm -n eb-HPL -v 2.1-gmpolf-1.4.8 -p eb-HPL-VERSION_ARCH.rpm -d "eb-FFTW = 3.3.3-gmpich-1.4.8" -d "eb-gmpolf = 1.4.8" -d "eb-OpenBLAS = 0.2.6-gmpich-1.4.8-LAPACK-3.4.2" -d "eb-ScaLAPACK = 2.0.2-gmpich-1.4.8-OpenBLAS-0.2.6-LAPACK-3.4.2" -d "eb-gmpich = 1.4.8" -d "eb-MPICH = 3.0.4-GCC-4.8.1" -d "eb-GCC = 4.8.1" -C / /opt/easybuild/software/HPL/2.1-gmpolf-1.4.8 /opt/easybuild/modules/all/HPL/2.1-gmpolf-1.4.8
+    Package version '2.1-gmpolf-1.4.8' includes dashes, converting to underscores {:level=&gt;:warn}
+    no value for epoch is set, defaulting to nil {:level=&gt;:warn}
+    no value for epoch is set, defaulting to nil {:level=&gt;:warn}
+    Created package {:path=&gt;"eb-HPL-2.1_gmpolf_1.4.8_x86_64.rpm"}
+    fpm -s dir -t rpm -n eb-FFTW -v 3.3.3-gmpich-1.4.8 -p eb-FFTW-VERSION_ARCH.rpm -d "eb-MPICH = 3.0.4-GCC-4.8.1" -d "eb-gmpich = 1.4.8" -d "eb-GCC = 4.8.1" -C / /opt/easybuild/software/FFTW/3.3.3-gmpich-1.4.8 /opt/easybuild/modules/all/FFTW/3.3.3-gmpich-1.4.8
+    Package version '3.3.3-gmpich-1.4.8' includes dashes, converting to underscores {:level=&gt;:warn}
+    no value for epoch is set, defaulting to nil {:level=&gt;:warn}
+    no value for epoch is set, defaulting to nil {:level=&gt;:warn}
+    Created package {:path=&gt;"eb-FFTW-3.3.3_gmpich_1.4.8_x86_64.rpm"}
+    fpm -s dir -t rpm -n eb-gmpolf -v 1.4.8 -p eb-gmpolf-VERSION_ARCH.rpm -d "eb-FFTW = 3.3.3-gmpich-1.4.8" -d "eb-OpenBLAS = 0.2.6-gmpich-1.4.8-LAPACK-3.4.2" -d "eb-ScaLAPACK = 2.0.2-gmpich-1.4.8-OpenBLAS-0.2.6-LAPACK-3.4.2" -d "eb-gmpich = 1.4.8" -d "eb-MPICH = 3.0.4-GCC-4.8.1" -d "eb-GCC = 4.8.1" -C / /opt/easybuild/software/gmpolf/1.4.8 /opt/easybuild/modules/all/gmpolf/1.4.8
+    no value for epoch is set, defaulting to nil {:level=&gt;:warn}
+    no value for epoch is set, defaulting to nil {:level=&gt;:warn}
+    Created package {:path=&gt;"eb-gmpolf-1.4.8_x86_64.rpm"}
+
+    [root@ip-10-0-0-88 ~]# ls *rpm
+    eb-FFTW-3.3.3_gmpich_1.4.8_x86_64.rpm  eb-HPL-2.1_gmpolf_1.4.8_x86_64.rpm
+    eb-GCC-4.8.1_x86_64.rpm                eb-MPICH-3.0.4_GCC_4.8.1_x86_64.rpm
+    eb-gmpich-1.4.8_x86_64.rpm             eb-OpenBLAS-0.2.6_gmpich_1.4.8_LAPACK_3.4.2_x86_64.rpm
+    eb-gmpolf-1.4.8_x86_64.rpm             eb-ScaLAPACK-2.0.2_gmpich_1.4.8_OpenBLAS_0.2.6_LAPACK_3.4.2_x86_64.rpm
+</code></pre>
+
+<h2>Installing the resulting packages</h2>
+
+<p>To demonstrate that the new packages actually work, you can spin up a new server and
+show you can install them. In this case, let&#8217;s install GROMACS:</p>
+
+<pre><code>    Running Transaction
+      Installing : eb-GCC-4.8.1-1.x86_64                                                                                              1/8
+      Installing : eb-MPICH-3.0.4_GCC_4.8.1-1.x86_64                                                                                  2/8
+      Installing : eb-gmpich-1.4.8-1.x86_64                                                                                           3/8
+      Installing : eb-OpenBLAS-0.2.6_gmpich_1.4.8_LAPACK_3.4.2-1.x86_64                                                               4/8
+      Installing : eb-ScaLAPACK-2.0.2_gmpich_1.4.8_OpenBLAS_0.2.6_LAPACK_3.4.2-1.x86_64                                               5/8
+      Installing : eb-FFTW-3.3.3_gmpich_1.4.8-1.x86_64                                                                                6/8
+      Installing : eb-gmpolf-1.4.8-1.x86_64                                                                                           7/8
+      Installing : eb-GROMACS-4.6.5_gmpolf_1.4.8_hybrid-1.x86_64                                                                      8/8
+      Verifying  : eb-MPICH-3.0.4_GCC_4.8.1-1.x86_64                                                                                  1/8
+      Verifying  : eb-ScaLAPACK-2.0.2_gmpich_1.4.8_OpenBLAS_0.2.6_LAPACK_3.4.2-1.x86_64                                               2/8
+      Verifying  : eb-GROMACS-4.6.5_gmpolf_1.4.8_hybrid-1.x86_64                                                                      3/8
+      Verifying  : eb-FFTW-3.3.3_gmpich_1.4.8-1.x86_64                                                                                4/8
+      Verifying  : eb-OpenBLAS-0.2.6_gmpich_1.4.8_LAPACK_3.4.2-1.x86_64                                                               5/8
+      Verifying  : eb-gmpich-1.4.8-1.x86_64                                                                                           6/8
+      Verifying  : eb-GCC-4.8.1-1.x86_64                                                                                              7/8
+      Verifying  : eb-gmpolf-1.4.8-1.x86_64                                                                                           8/8
+
+    Installed:
+      eb-GROMACS.x86_64 0:4.6.5_gmpolf_1.4.8_hybrid-1
+
+    Dependency Installed:
+      eb-FFTW.x86_64 0:3.3.3_gmpich_1.4.8-1                                     eb-GCC.x86_64 0:4.8.1-1
+      eb-MPICH.x86_64 0:3.0.4_GCC_4.8.1-1                                       eb-OpenBLAS.x86_64 0:0.2.6_gmpich_1.4.8_LAPACK_3.4.2-1
+      eb-ScaLAPACK.x86_64 0:2.0.2_gmpich_1.4.8_OpenBLAS_0.2.6_LAPACK_3.4.2-1    eb-gmpich.x86_64 0:1.4.8-1
+      eb-gmpolf.x86_64 0:1.4.8-1
+
+    Complete!
+</code></pre>
+
+<p>And then, as a test, run one of the GROMACS benchmarks:</p>
+
+<pre><code>    [easybuild@ip-10-0-0-75 d.dppc]$ mpirun -np 2 mdrun_mpi
+                             :-)  G  R  O  M  A  C  S  (-:
+
+                           Great Red Owns Many ACres of Sand
+
+                                :-)  VERSION 4.6.5  (-:
+
+            Contributions from Mark Abraham, Emile Apol, Rossen Apostolov,
+               Herman J.C. Berendsen, Aldert van Buuren, Pär Bjelkmar,
+         Rudi van Drunen, Anton Feenstra, Gerrit Groenhof, Christoph Junghans,
+            Peter Kasson, Carsten Kutzner, Per Larsson, Pieter Meulenhoff,
+               Teemu Murtola, Szilard Pall, Sander Pronk, Roland Schulz,
+                    Michael Shirts, Alfons Sijbers, Peter Tieleman,
+
+                   Berk Hess, David van der Spoel, and Erik Lindahl.
+
+           Copyright (c) 1991-2000, University of Groningen, The Netherlands.
+             Copyright (c) 2001-2012,2013, The GROMACS development team at
+            Uppsala University &amp; The Royal Institute of Technology, Sweden.
+                check out http://www.gromacs.org for more information.
+
+             This program is free software; you can redistribute it and/or
+           modify it under the terms of the GNU Lesser General Public License
+            as published by the Free Software Foundation; either version 2.1
+                 of the License, or (at your option) any later version.
+
+                                  :-)  mdrun_mpi  (-:
+
+    Option     Filename  Type         Description
+    ------------------------------------------------------------
+      -s      topol.tpr  Input        Run input file: tpr tpb tpa
+      -o       traj.trr  Output       Full precision trajectory: trr trj cpt
+      -x       traj.xtc  Output, Opt. Compressed trajectory (portable xdr format)
+    -cpi      state.cpt  Input, Opt.  Checkpoint file
+    -cpo      state.cpt  Output, Opt. Checkpoint file
+      -c    confout.gro  Output       Structure file: gro g96 pdb etc.
+      -e       ener.edr  Output       Energy file
+      -g         md.log  Output       Log file
+    -dhdl      dhdl.xvg  Output, Opt. xvgr/xmgr file
+    -field    field.xvg  Output, Opt. xvgr/xmgr file
+    -table    table.xvg  Input, Opt.  xvgr/xmgr file
+    -tabletf    tabletf.xvg  Input, Opt.  xvgr/xmgr file
+    -tablep  tablep.xvg  Input, Opt.  xvgr/xmgr file
+    -tableb   table.xvg  Input, Opt.  xvgr/xmgr file
+    -rerun    rerun.xtc  Input, Opt.  Trajectory: xtc trr trj gro g96 pdb cpt
+    -tpi        tpi.xvg  Output, Opt. xvgr/xmgr file
+    -tpid   tpidist.xvg  Output, Opt. xvgr/xmgr file
+     -ei        sam.edi  Input, Opt.  ED sampling input
+     -eo      edsam.xvg  Output, Opt. xvgr/xmgr file
+      -j       wham.gct  Input, Opt.  General coupling stuff
+     -jo        bam.gct  Output, Opt. General coupling stuff
+    -ffout      gct.xvg  Output, Opt. xvgr/xmgr file
+    -devout   deviatie.xvg  Output, Opt. xvgr/xmgr file
+    -runav  runaver.xvg  Output, Opt. xvgr/xmgr file
+     -px      pullx.xvg  Output, Opt. xvgr/xmgr file
+     -pf      pullf.xvg  Output, Opt. xvgr/xmgr file
+     -ro   rotation.xvg  Output, Opt. xvgr/xmgr file
+     -ra  rotangles.log  Output, Opt. Log file
+     -rs   rotslabs.log  Output, Opt. Log file
+     -rt  rottorque.log  Output, Opt. Log file
+    -mtx         nm.mtx  Output, Opt. Hessian matrix
+     -dn     dipole.ndx  Output, Opt. Index file
+    -multidir    rundir  Input, Opt., Mult. Run directory
+    -membed  membed.dat  Input, Opt.  Generic data file
+     -mp     membed.top  Input, Opt.  Topology file
+     -mn     membed.ndx  Input, Opt.  Index file
+
+    Option       Type   Value   Description
+    ------------------------------------------------------
+    -[no]h       bool   no      Print help info and quit
+    -[no]version bool   no      Print version info and quit
+    -nice        int    0       Set the nicelevel
+    -deffnm      string         Set the default filename for all file options
+    -xvg         enum   xmgrace  xvg plot formatting: xmgrace, xmgr or none
+    -[no]pd      bool   no      Use particle decompostion
+    -dd          vector 0 0 0   Domain decomposition grid, 0 is optimize
+    -ddorder     enum   interleave  DD node order: interleave, pp_pme or cartesian
+    -npme        int    -1      Number of separate nodes to be used for PME, -1
+                                is guess
+    -nt          int    0       Total number of threads to start (0 is guess)
+    -ntmpi       int    0       Number of thread-MPI threads to start (0 is guess)
+    -ntomp       int    0       Number of OpenMP threads per MPI process/thread
+                                to start (0 is guess)
+    -ntomp_pme   int    0       Number of OpenMP threads per MPI process/thread
+                                to start (0 is -ntomp)
+    -pin         enum   auto    Fix threads (or processes) to specific cores:
+                                auto, on or off
+    -pinoffset   int    0       The starting logical core number for pinning to
+                                cores; used to avoid pinning threads from
+                                different mdrun instances to the same core
+    -pinstride   int    0       Pinning distance in logical cores for threads,
+                                use 0 to minimize the number of threads per
+                                physical core
+    -gpu_id      string         List of GPU device id-s to use, specifies the
+                                per-node PP rank to GPU mapping
+    -[no]ddcheck bool   yes     Check for all bonded interactions with DD
+    -rdd         real   0       The maximum distance for bonded interactions with
+                                DD (nm), 0 is determine from initial coordinates
+    -rcon        real   0       Maximum distance for P-LINCS (nm), 0 is estimate
+    -dlb         enum   auto    Dynamic load balancing (with DD): auto, no or yes
+    -dds         real   0.8     Minimum allowed dlb scaling of the DD cell size
+    -gcom        int    -1      Global communication frequency
+    -nb          enum   auto    Calculate non-bonded interactions on: auto, cpu,
+                                gpu or gpu_cpu
+    -[no]tunepme bool   yes     Optimize PME load between PP/PME nodes or GPU/CPU
+    -[no]testverlet bool   no      Test the Verlet non-bonded scheme
+    -[no]v       bool   no      Be loud and noisy
+    -[no]compact bool   yes     Write a compact log file
+    -[no]seppot  bool   no      Write separate V and dVdl terms for each
+                                interaction type and node to the log file(s)
+    -pforce      real   -1      Print all forces larger than this (kJ/mol nm)
+    -[no]reprod  bool   no      Try to avoid optimizations that affect binary
+                                reproducibility
+    -cpt         real   15      Checkpoint interval (minutes)
+    -[no]cpnum   bool   no      Keep and number checkpoint files
+    -[no]append  bool   yes     Append to previous output files when continuing
+                                from checkpoint instead of adding the simulation
+                                part number to all file names
+    -nsteps      step   -2      Run this number of steps, overrides .mdp file
+                                option
+    -maxh        real   -1      Terminate after 0.99 times this time (hours)
+    -multi       int    0       Do multiple simulations in parallel
+    -replex      int    0       Attempt replica exchange periodically with this
+                                period (steps)
+    -nex         int    0       Number of random exchanges to carry out each
+                                exchange interval (N^3 is one suggestion).  -nex
+                                zero or not specified gives neighbor replica
+                                exchange.
+    -reseed      int    -1      Seed for replica exchange, -1 is generate a seed
+    -[no]ionize  bool   no      Do a simulation including the effect of an X-Ray
+                                bombardment on your system
+
+    Reading file topol.tpr, VERSION 4.6.5 (single precision)
+    Using 2 MPI processes
+    starting mdrun 'DPPC in Water'
+    5000 steps,     10.0 ps.
+
+    Writing final coordinates.
+
+     Average load imbalance: 0.1 %
+     Part of the total run time spent waiting due to load imbalance: 0.0 %
+
+
+                   Core t (s)   Wall t (s)        (%)
+           Time:     1177.360      589.282      199.8
+                     (ns/day)    (hour/ns)
+    Performance:        1.466       16.366
+
+    gcq#191: "Ich Bin Ein Berliner" (J.F. Kennedy)
+</code></pre>
+
+<p>It works!</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Linkdump 2015-01-11]]></title>
+    <link href="http://ajdecon.github.com/linkdump-2015-01-11/"/>
+    <updated>2015-01-11T12:00:00-07:00</updated>
+    <id>http://ajdecon.github.com/linkdump-2015-01-11</id>
+    <content type="html"><![CDATA[<h3>HPC</h3>
+
+<ul>
+<li><p><a href="http://www.failureasaservice.com/2015/01/using-infiniband-with-matlab-parallel.html">Using Infiniband with MATLAB Parallel Computing Toolbox </a> by <a href="https://www.twitter.com/brockpalen">Brock Palen</a></p></li>
+<li><p><a href="http://cliffmass.blogspot.com/2015/01/a-major-advance-for-numerical-weather.html">A Major Advance for Numerical Weather Prediction in the U.S. </a> by <a href="http://cliffmass.blogspot.com/">Cliff Mass</a></p></li>
+<li><p><a href="https://www.tacc.utexas.edu/icert-reu">TACC&#8217;s summer internships in HPC</a></p></li>
+<li><p><a href="http://insidehpc.com/2014/12/video-accelerating-ornls-applications-exascale/">Accelerating ORNL’s Applications to the Exascale</a> (video)</p></li>
+</ul>
+
+
+<h3>Distributed systems</h3>
+
+<ul>
+<li><a href="http://googlecloudplatform.blogspot.com/2015/01/in-coming-weeks-we-will-be-publishing.html">An introduction to containers, Kubernetes, and the trajectory of modern cloud computing</a> from Google&#8217;s
+<a href="http://googlecloudplatform.blogspot.com/">Cloud Platform Blog</a></li>
+</ul>
+
+
+<h3>Happy news</h3>
+
+<ul>
+<li><a href="http://mashable.com/2015/01/06/intel-diversity-initiative/">Intel takes on diversity and inclusion in tech with $300M initiative</a></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Some thoughts on Uncommon in Common]]></title>
+    <link href="http://ajdecon.github.com/some-thoughts-on-uncommon-in-common/"/>
+    <updated>2015-01-11T10:13:00-07:00</updated>
+    <id>http://ajdecon.github.com/some-thoughts-on-uncommon-in-common</id>
+    <content type="html"><![CDATA[<p>I&#8217;m fascinated by the concept of the <a href="http://theslowweb.com/">Slow Web Movement</a>.
+I understand it as the idea that our online lives should follow the pace of
+our offline lives, rather than the reverse. That instead of receiving a
+constant stream of notifications and responding to them instantly,
+we should interact with our online networks only a few times a day, or at
+least only as often and as deep as they fit into our daily lives in the world.</p>
+
+<p>God knows I&#8217;m guilty of letting my online life get the best of me; an otherwise
+quiet day, in which I maybe plan to read a book and do the dishes, might see
+me getting caught up in a Twitter argument or watching an argumentative
+comment thread. And then I wonder why I&#8217;m so keyed up at the end of the day.
+So I&#8217;m greatly interested in websites which actively aim to avoid this trap &#8211;
+which aim for occasional meaningful engagement rather than addiction.</p>
+
+<p>The most interesting Slow Web site I&#8217;ve found so far is
+<a href="https://uncommon.cc/">Uncommon in Common</a> (often just referred to
+as &#8220;Uncommon&#8221;). This is a site which aims to act as
+a &#8220;front porch for the Internet&#8221;, and their <a href="https://uncommon.cc/about">about page</a>
+is almost a manifesto for the Slow Web:</p>
+
+<blockquote><p>We are building a sustainable community supported by the people who love it. There is an annual membership fee, but no advertising. Every part of the experience is designed to encourage thoughtful sharing and meaningful interaction.</p>
+
+<p>We stand against the cocktail of validation and addiction that many sites use to entice us. What if we took all of the accumulated knowledge about how to increase page views and engagement, everything designed to tether us to our screens, and did the opposite? What if there was a place that believed that your time and attention are incredibly valuable and should never be squandered? Uncommon is a trampoline, not a rabbit hole.</p></blockquote>
+
+<p>Uncommon seems to mainly consist of two parts.
+First, there&#8217;s a free monthly email newsletter called the <a href="https://uncommon.cc/story">dispatch</a>
+which typically includes an essay, some links to articles which the authors found
+thought-provoking, reader responses to a question like
+<em>&#8220;What&#8217;s the best thing you read this year?&#8221;</em>, and a prompt for next month&#8217;s
+newsletter.</p>
+
+<p>Second, there&#8217;s the <a href="https://uncommon.cc/join">Uncommon web site</a>, for which an account costs
+$24 per year. The site feels a little like a social network, but there&#8217;s no news
+feed, no friendship or follow mechanism, no way to comment on others&#8217; posts.
+Instead, there&#8217;s just a set of user profiles where they list their favorite things,
+and a home page which shows you a random profile or user Favorite as a way to get
+you to think about new things. You&#8217;re limited to ten Favorites with long descriptions
+(though you can post as many &#8220;Uncommonly Good&#8221; things with no descriptions as
+you like near the bottom of the page), so there&#8217;s no urge to keep updating your
+profile every day with new content. And all user profiles are visible only to those
+with accounts.</p>
+
+<p>On the whole I rather think I like this approach to a social network, and since
+I signed up I&#8217;ve found that visiting Uncommon once or twice a day functions as
+a &#8220;moment of calm&#8221; rather than the constant low-level tension I get from Facebook
+or Twitter. I only feel the need to visit for a couple of minutes now and then,
+but doing so generally makes me smile, rather than getting me excited or angry
+or annoyed. The contrast feels rather like the feeling I got when I moved to
+Santa Fe from the Bay Area; the people are more relaxed, the pace is slower,
+and no one is trying to sell you anything.</p>
+
+<p>I will say that I&#8217;ve generally felt more engaged by the monthly Dispatch
+than by the site itself, and I think they do a very good job with it. The
+essay is generally interesting, I read most of the links, and I&#8217;ve occasionally
+felt inspired to reply to one of the prompts.</p>
+
+<p>There are a couple of negatives. On the site design end of things,
+I wish there were a way to contact a
+person through their profile page; right now, the only way I can directly talk
+to someone on the site is to click their web site link (if they have one) and
+go hunting for an email address. In a community that bills itself as a
+&#8220;front porch of the Internet&#8221;, it seems like it should be easier to start a
+conversation.</p>
+
+<p>The other qualm I have about Uncommon is how focussed it is on the positive, and
+on sharing &#8220;things&#8221; which make you happy.
+Now this is clearly part of the site&#8217;s mission, and on the one hand I definitely
+like it; there are plenty of other spaces on the Internet to argue. But
+it there are plenty of people who don&#8217;t really have the space in their
+lives to focus on the postivie right now, and who would be left out
+of this kind of community. And I definitely have friends who would find the
+whole concept insufferable at best.</p>
+
+<p>Still, I have to say I&#8217;ve greatly enjoyed Uncommon In Common so far; and while I&#8217;m not
+about to give up the fast pace of Twitter or stop checking my email as
+frequently, I think there&#8217;s room for a slower-paced community in my life too.
+It&#8217;s still early days for Uncommon, so I&#8217;m sure there will be plenty of changes;
+but I actually have some confidence that this is one site which won&#8217;t try to
+&#8220;increase engagement&#8221; at all costs.</p>
+
+<p>And if you&#8217;d like to find me on Uncommon I am, as everywhere else,
+<a href="http://www.uncommon.cc/ajdecon">ajdecon</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Linkdump 2014-12-28]]></title>
+    <link href="http://ajdecon.github.com/linkdump-2014-12-28/"/>
+    <updated>2014-12-28T12:59:00-07:00</updated>
+    <id>http://ajdecon.github.com/linkdump-2014-12-28</id>
+    <content type="html"><![CDATA[<p>Been a while since I did one of these, so here&#8217;s a list of some of the
+interesting links I find in my Pinboard bookmarks from this December.</p>
+
+<h3>Computing</h3>
+
+<ul>
+<li><a href="http://www.knewton.com/tech/blog/2014/12/eureka-shouldnt-use-zookeeper-service-discovery/">Eureka! Why You Shouldn’t Use ZooKeeper for Service Discovery</a> - knewton developer blog</li>
+<li><a href="http://techblog.netflix.com/2014/12/introducing-atlas-netflixs-primary.html">Introducing Atlas: Netflix&#8217;s Primary Telemetry Platform </a> - Netflix Tech Blog</li>
+<li><a href="http://blog.fastmail.com/2014/12/23/jmap-a-better-way-to-email/">JMAP - A better way to email</a> - Fastmail blog</li>
+<li><a href="http://dcg.ethz.ch/lectures/podc_allstars/lecture/podc.pdf">Principles of Distributed Computing</a> - A good book I saw linked to several times this month, by Roger Wattenhofer</li>
+<li><a href="http://voltdb.com/blog/how-docker-simplifies-distributed-systems-development-voltdb">How Docker Simplifies Distributed Systems Development at VoltDB</a> - VoltDB blog</li>
+<li><a href="http://nuitka.net/">Nuitka</a> - A Python compiler</li>
+<li><a href="http://www.evanmiller.org/please-offer-an-excel-export-option.html">Please Offer An Excel Export Option</a> - Evan Miller</li>
+<li><a href="http://sysadvent.blogspot.com/2014/12/day-13-managing-repositories-with-pulp.html">Managing Repositories with Pulp</a> - <a href="https://twitter.com/rothgar">Justin Garrison</a> on the Sysadvent blog</li>
+<li><a href="https://titanous.com/posts/docker-insecurity">Docker Image Insecurity</a> - <a href="https://twitter.com/titanous">Jonathan Rudenberg</a></li>
+<li><a href="https://www.youtube.com/watch?v=wvIca1KLDYg">Ross Anderson talks about practical tradecraft for journalists</a> - from The Logan Symposium</li>
+</ul>
+
+
+<h3>Physics</h3>
+
+<ul>
+<li><a href="http://www.nature.com/ncomms/2014/141219/ncomms6814/full/ncomms6814.html">Equivalence of wave–particle duality to entropic uncertainty</a></li>
+</ul>
+
+
+<h3>Books and Fun</h3>
+
+<ul>
+<li><a href="https://www.goodreads.com/book/show/19288259-dear-committee-members">Dear Committee Members, by Julie Schumacher</a> - A fun epistolary novel about an emattled English professor at a small research university. Mostly letters of recommendation.</li>
+<li><a href="http://www.amazon.com/Legion-Skin-Deep-Brandon-Sanderson/dp/1596066903">Legion: Skin Deep</a> - by Brandon Sanderson</li>
+<li><a href="http://www.amazon.com/Box-Shipping-Container-Smaller-Economy/dp/0691136408/ref=sr_1_1?ie=UTF8&amp;qid=1419797840&amp;sr=8-1&amp;keywords=the+box">The Box: How the Shipping Container Made the World Smaller and the World Economy Bigger</a> - by Mark Levinson</li>
+<li><a href="http://www.amazon.com/Peripheral-William-Gibson-ebook/dp/B00INIXKV2/ref=sr_1_1?ie=UTF8&amp;qid=1419797934&amp;sr=8-1&amp;keywords=peripheral">The Peripheral</a> - by William Gibson</li>
+<li><p><a href="http://www.amazon.com/The-Black-Company-Chronicles/dp/0812521390">The Black Company</a> - by Glen Cook (re-read this month)</p></li>
+<li><p><a href="https://www.kickstarter.com/projects/craftygames/mistborn-allomancy-dice">Mistborn Allomancy Dice</a> - A Kickstarter project</p></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Good links from the past week - 11/22]]></title>
+    <link href="http://ajdecon.github.com/good-links-from-the-past-week-11-22/"/>
+    <updated>2014-11-22T14:15:00-07:00</updated>
+    <id>http://ajdecon.github.com/good-links-from-the-past-week-11-22</id>
+    <content type="html"><![CDATA[<p>A few things I read and enjoyed over the past week. No guarantee that they
+were originally posted during that week&#8230; sometimes I&#8217;m a little slow. :)</p>
+
+<h3>Operations and system administration</h3>
+
+<p>(Much of this is from LISA14, which I did not attend, but followed on the Internet)</p>
+
+<ul>
+<li><p><a href="http://www.slideshare.net/brendangregg/linux-performance-analysis-new-tools-and-old-secrets">Linus Performance Analysis: New Tools and Old Secrets</a> &#8211; Brendan Gregg at Netflix</p></li>
+<li><p><a href="https://www.usenix.org/sites/default/files/conference/protected-files/rockwood_lisa14_slides.pdf">I Am Sysadmin (And So Can You!)</a> &#8211; Ben Rockwood at Chef</p></li>
+<li><p><a href="http://www.standalone-sysadmin.com/blog/2014/11/new-technologies-to-study-from-lisa14/">New Technologies to Study from #LISA14</a> &#8211; Matt Simmons</p></li>
+<li><p><a href="http://robhirschfeld.com/2014/11/13/ops-is-ops/">Ops is Ops, except when it ain’t. Breaking down the impedance mismatches between physical and cloud ops.</a> &#8211; Rob Hirschfeld</p></li>
+<li><p><a href="https://code.facebook.com/posts/360346274145943/introducing-data-center-fabric-the-next-generation-facebook-data-center-network">Introducing data center fabric, the next-generation Facebook data center network</a></p></li>
+</ul>
+
+
+<h3>Distributed Systems</h3>
+
+<ul>
+<li><a href="http://brooker.co.za/blog/2014/11/15/exactly-once.html">Exactly-Once Delivery May Not Be What You Want</a> &#8211; <a href="https://twitter.com/MarcJBrooker">Marc Brooker</a></li>
+</ul>
+
+
+<h3>HPC</h3>
+
+<ul>
+<li><p><a href="http://www.hpcwire.com/2014/11/14/coral-signals-new-dawn-exascale-ambitions/">CORAL Signals New Dawn for Exascale Ambitions</a></p></li>
+<li><p><a href="https://www.olcf.ornl.gov/summit/">Summit</a> &#8211; ORNL&#8217;s page on their next big system</p></li>
+</ul>
+
+
+<h3>Random Internet Fun</h3>
+
+<ul>
+<li><a href="http://tabletopaudio.com/">Tabletop Audio</a> &#8211; Ambient sounds for your roleplaying game</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Good links from the past week]]></title>
+    <link href="http://ajdecon.github.com/good-links-from-the-past-week/"/>
+    <updated>2014-11-22T14:15:00-07:00</updated>
+    <id>http://ajdecon.github.com/good-links-from-the-past-week</id>
+    <content type="html"><![CDATA[<p>A few things I read and enjoyed over the past week. No guarantee that they
+were originally posted during that week&#8230; sometimes I&#8217;m a little slow. :)</p>
+
+<h3>Operations and system administration</h3>
+
+<p>(Much of this is from LISA14, which I did not attend, but followed on the Internet)</p>
+
+<ul>
+<li><p><a href="http://www.slideshare.net/brendangregg/linux-performance-analysis-new-tools-and-old-secrets">Linus Performance Analysis: New Tools and Old Secrets</a> &#8211; Brendan Gregg at Netflix</p></li>
+<li><p><a href="https://www.usenix.org/sites/default/files/conference/protected-files/rockwood_lisa14_slides.pdf">I Am Sysadmin (And So Can You!)</a> &#8211; Ben Rockwood at Chef</p></li>
+<li><p><a href="http://www.standalone-sysadmin.com/blog/2014/11/new-technologies-to-study-from-lisa14/">New Technologies to Study from #LISA14</a> &#8211; Matt Simmons</p></li>
+<li><p><a href="http://robhirschfeld.com/2014/11/13/ops-is-ops/">Ops is Ops, except when it ain’t. Breaking down the impedance mismatches between physical and cloud ops.</a> &#8211; Rob Hirschfeld</p></li>
+<li><p><a href="https://code.facebook.com/posts/360346274145943/introducing-data-center-fabric-the-next-generation-facebook-data-center-network">Introducing data center fabric, the next-generation Facebook data center network</a></p></li>
+</ul>
+
+
+<h3>Distributed Systems</h3>
+
+<ul>
+<li><a href="http://brooker.co.za/blog/2014/11/15/exactly-once.html">Exactly-Once Delivery May Not Be What You Want</a> &#8211; <a href="https://twitter.com/MarcJBrooker">Marc Brooker</a></li>
+</ul>
+
+
+<h3>HPC</h3>
+
+<ul>
+<li><p><a href="http://www.hpcwire.com/2014/11/14/coral-signals-new-dawn-exascale-ambitions/">CORAL Signals New Dawn for Exascale Ambitions</a></p></li>
+<li><p><a href="https://www.olcf.ornl.gov/summit/">Summit</a> &#8211; ORNL&#8217;s page on their next big system</p></li>
+</ul>
+
+
+<h3>Random Internet Fun</h3>
+
+<ul>
+<li><a href="http://tabletopaudio.com/">Tabletop Audio</a> &#8211; Ambient sounds for your roleplaying game</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Good links from the past week]]></title>
+    <link href="http://ajdecon.github.com/good-links-from-the-past-week/"/>
+    <updated>2014-11-11T08:10:00-07:00</updated>
+    <id>http://ajdecon.github.com/good-links-from-the-past-week</id>
+    <content type="html"><![CDATA[<p>Being a list of things I read and enjoyed over the past week.</p>
+
+<h3>HPC</h3>
+
+<ul>
+<li><a href="http://www.nersc.gov/assets/HPCOR/HPCOR-Data-2014.pdf">DOE HPC Operational Review: &#8220;Enabling Data-Driven Scientific Discovery at DOE HPC Facilities&#8221;</a> &#8211; A long read, but interesting if you like thinking about how large HPC centers work</li>
+</ul>
+
+
+<h3>Distributed Systems</h3>
+
+<ul>
+<li><p><a href="http://blog.typeobject.com/a-quick-comparison-of-mesos-and-yarn">A quick comparison of Mesos and Yarn</a> from <a href="https://twitter.com/jonbringhurst">Jon Bringhurst</a> &#8211; Highlights some interesting relative strengths</p></li>
+<li><p><a href="https://www.cs.berkeley.edu/~alig/papers/mesos.pdf">Mesos: A Platform for Fine-Grained Resource Sharing in the Data Center</a> &#8211; The original paper on Mesos, which does a better job of explaining how resource offers and multiple schedulers work than most blog posts on the topic. :-)</p></li>
+<li><p><a href="http://blog.empathybox.com/post/19574936361/getting-real-about-distributed-system-reliability">Getting Real About Distributed System Reliability</a> from <a href="https://twitter.com/jaykreps">Jay Kreps</a></p></li>
+</ul>
+
+
+<h3>Tech culture</h3>
+
+<ul>
+<li><a href="http://bridgetkromhout.com/blog/2014/11/03/the-first-rule-of-devops-club/">The First Rule of DevOps Club</a> from <a href="https://twitter.com/bridgetkromhout">Bridget Kromhout</a> &#8211; Inclusion, it&#8217;s for winners.</li>
+</ul>
+
+
+<h3>Fiction</h3>
+
+<ul>
+<li><p><a href="http://www.amazon.com/Coming-Home-Alex-Benedict-Novel/dp/0425260879">Coming Home</a>, the latest <a href="https://www.goodreads.com/series/42152-alex-benedict">Alex Benedict series</a> novel from <a href="http://www.jackmcdevitt.com/">Jack McDevitt</a></p></li>
+<li><p><a href="http://www.amazon.com/Wings-Kingdom-Cherie-Priest/dp/B001OMHU7Y">Wings to the Kingdom</a> by <a href="http://www.cheriepriest.com/">Cherie Priest</a></p></li>
+<li><p><a href="http://www.strangehorizons.com/2011/20111121/tomorrow-f.shtml">Tomorrow Is Waiting</a> by Holli Mintzer</p></li>
+<li><p><a href="http://www.strangehorizons.com/2014/20141103/1banks-a.shtml">A Few Questions About the Culture: An Interview with Iain Banks</a> &#8211; Not fiction in itself, but commentary on it. Banks is always excellent. Also, you should <a href="http://www.strangehorizons.com/fund_drives/2014/main.shtml">donate to Strange Horizons</a>.</p></li>
+</ul>
+
+
+<h3>Randomness</h3>
+
+<ul>
+<li><a href="https://twitter.com/FozzTexx">Chris Osborn</a> has a real live BBS running on an Apple IIgs: <a href="http://bbs.fozztexx.com/">bbs.fozztexx.com</a></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Notice of Life Change: Heading to New Mexico and LANL]]></title>
+    <link href="http://ajdecon.github.com/heading-to-new-mexico-and-lanl/"/>
+    <updated>2014-06-05T20:22:00-06:00</updated>
+    <id>http://ajdecon.github.com/heading-to-new-mexico-and-lanl</id>
+    <content type="html"><![CDATA[<p>For those who haven&#8217;t heard yet: Leigh and I are moving to Santa Fe! I
+am joining the HPC-3 team at Los Alamos National Lab as a Cluster
+Administrator helping to manage the Lab&#8217;s production HPC systems.
+Leigh will be skating with <a href="http://www.dukecityderby.com/">Duke City Roller Derby</a>&#8230;
+and is also in process on her new job hunt, but we all know roller derby is
+the important thing. ;-)</p>
+
+<p>I really enjoyed my time at NVIDIA and in the Bay Area, and there are many
+people we&#8217;ll miss there&#8230; but I&#8217;m also really excited for my new position
+at the Lab, and Santa Fe looks like it will be an awesome place to live.</p>
+
+<p>Leigh and I loaded the cats in the car this morning to begin
+the long drive to New Mexico, and we will be arriving in Santa Fe this weekend.
+I&#8217;m starting at LANL on June 16. If you&#8217;re in the area of Santa Fe or Los Alamos and want
+to meet up for beer/coffee/etc, let me know!</p>
+
+<hr />
+
+<p><img src="https://s3.amazonaws.com/ajdecon-public/mr_darcy_driving_to_nm.jpg" alt="Mr Darcy navigating" /></p>
+
+<p>When we started the drive this morning, our cat Mr Darcy decided to help navigate&#8230;</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Big Systems Talks]]></title>
+    <link href="http://ajdecon.github.com/big-systems-talks/"/>
+    <updated>2013-10-20T22:09:00-06:00</updated>
+    <id>http://ajdecon.github.com/big-systems-talks</id>
+    <content type="html"><![CDATA[<p>Lately I&#8217;ve been watching a lot of recorded conference talks on YouTube,
+mostly about HPC, distributed systems or DevOps for big deployments.
+Some of these are a lot of fun and extremely interesting, but I don&#8217;t
+really want to clutter this blog with tons of YouTube embeds. So I&#8217;ve
+created a Tumblr called <a href="http://bigsystemstalks.tumblr.com">Big Systems Talks</a>
+where I can share them.</p>
+
+<p>If you&#8217;re interested in these topics, check it out. Right now most of
+the posts are from the Ricon East 2013 conference, which recently uploaded
+a ton of awesome talks to YouTube.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Building tiny compute clusters for fun and learning]]></title>
+    <link href="http://ajdecon.github.com/building-tiny-compute-clusters-for-fun-and-learning/"/>
+    <updated>2013-07-20T09:54:00-06:00</updated>
+    <id>http://ajdecon.github.com/building-tiny-compute-clusters-for-fun-and-learning</id>
+    <content type="html"><![CDATA[<p><img src="https://s3.amazonaws.com/ajdecon-public/Pi_Lego_detail.jpg" width=600></p>
+
+<p>Just for fun,
+I recently built a small HPC-style computing cluster out of five
+<a href="http://www.raspberrypi.org/">Raspberry Pi</a> servers.  While this kind of
+thing has of course been <a href="http://www.southampton.ac.uk/mediacentre/features/raspberry_pi_supercomputer.shtml">done</a>
+<a href="http://coen.boisestate.edu/ece/raspberry-pi/">before</a>, I wanted to build one
+anyway as a geek toy and a platform for me to play with a few HPC ideas.</p>
+
+<p>I think it actually turned out rather well, and it was a ridiculous amount of
+fun to build. My wife <a href="http://www.twitter.com/Leigh_47">Leigh</a> helped put together
+the Lego rack, and it was a lot of fun to put together. Because I was focusing more on
+duplicating a &#8220;real&#8221; cluster rather than getting performance, I included all the usual
+cluster services such as a <a href="http://slurm.schedmd.com">SLURM</a> scheduler,
+<a href="http://ganglia.sourceforge.net">Ganglia</a> for monitoring, and using one of the
+Pi&#8217;s as a non-computing login node. Total <a href="http://gist.github.com/ajdecon/6045818">HPL performance</a>,
+670 MFlops. Oh yeah!</p>
+
+<p>A few folks at <a href="http://www.nvidia.com/">NVIDIA</a>, where I also work on HPC clusters,
+also thought this was a cool project. The Pi cluster thus ended up being featured
+as an &#8220;Inner Geek&#8221; post on the
+<a href="http://blogs.nvidia.com/blog/2013/07/17/raspberry-pi/">company blog</a>, alongside
+other awesome projects from NVIDIANs such as a
+<a href="http://blogs.nvidia.com/blog/2013/05/23/inner-geek-restoring-my-fathers-meyers-aero-commander/">cool airplane restoration</a>
+and an <a href="http://blogs.nvidia.com/blog/2012/11/28/inner-geek-nvidia-engineer-serves-up-holiday-lights-gangnam-style/">amazing holiday lights display</a>.</p>
+
+<p>If you&#8217;re curious, I have details on how I put it together in my
+<a href="https://github.com/ajdecon/ansible-pi-cluster">ansible-pi-cluster</a> GitHub
+repository. This includes the <a href="http://www.ansible.cc">Ansible</a> playbooks
+I used to install all the software (though they still need some work), as
+well as some notes on the physical assembly and OS provisioning in the
+<a href="https://github.com/ajdecon/ansible-pi-cluster/blob/master/README.md">README</a>.</p>
+
+<p>I&#8217;ll admit that the <a href="http://gist.github.com/ajdecon/6045818">performance isn&#8217;t awesome</a>
+compared to other clusters
+(or even many laptops!), but I like having a cluster I can hold in my hands:</p>
+
+<p><img src="https://s3.amazonaws.com/ajdecon-public/PiWithLegos.jpg" width=600></p>
+
+<p>There are all sorts of other &#8220;tiny HPC cluster&#8221; projects out there,
+frequently used for teaching, and which have often done some real science.<br/>
+Here&#8217;s a short roundup of some other tiny clusters I&#8217;ve seen&#8230;
+And if you know something else I should include in this post, let me know
+and I&#8217;ll add it in.</p>
+
+<ul>
+<li><a href="http://www.southampton.ac.uk/~sjc/raspberrypi/">Idris-Pi</a>,
+the original Raspberry Pi + Legos supercomputer from Southampton University.
+This cluster included 64 Raspberry Pi boards, and they also have some
+<a href="http://www.southampton.ac.uk/~sjc/raspberrypi/pi_supercomputer_southampton.htm">instructions</a>
+posted for how they set up the software stack.  There was also a very
+interesting discussion of this cluster on the
+<a href="http://www.beowulf.org/pipermail/beowulf/2012-September/029953.html">Beowulf list</a></li>
+</ul>
+
+
+<iframe width="560" height="315" src="http://ajdecon.github.com//www.youtube.com/embed/Jq5nrHz9I94" frameborder="0" allowfullscreen></iframe>
+
+
+
+
+<br/><br/>
+
+
+<ul>
+<li><a href="http://coen.boisestate.edu/ece/files/2013/05/Creating.a.Raspberry.Pi-Based.Beowulf.Cluster_v2.pdf">RPiCluster</a>
+from Boise State, a 32-node cluster built by <a href="http://www.linkedin.com/in/jkiepert">Joshua Kiepert</a>
+to use for his dissertation research. This link also includes detailed instructions on building
+his cluster.</li>
+</ul>
+
+
+<iframe width="560" height="315" src="http://ajdecon.github.com//www.youtube.com/embed/i_r3z1jYHAc" frameborder="0" allowfullscreen></iframe>
+
+
+
+
+<br/><br/>
+
+
+<ul>
+<li><a href="http://littlefe.net/">LittleFe</a> is an ongoing project focused on building
+small educational HPC clusters which teachers can use in their classes.
+Their web site includes a continually-updated design for a 6-node cluster
+of Intel Atom processors, and their organization also holds build events at
+conferences such as <a href="http://www.supercomp.org/">SuperComputing</a> where
+interested teachers can build clusters they can take home.</li>
+</ul>
+
+
+<iframe width="560" height="315" src="http://ajdecon.github.com//www.youtube.com/embed/ciY4vsij_ak" frameborder="0" allowfullscreen></iframe>
+
+
+<br/><br/>
+
+
+<hr />
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Tools of choice, spring 2013 edition]]></title>
+    <link href="http://ajdecon.github.com/tools-of-choice/"/>
+    <updated>2013-05-05T12:30:00-06:00</updated>
+    <id>http://ajdecon.github.com/tools-of-choice</id>
+    <content type="html"><![CDATA[<p>This list encompasses 95% of my daily computer usage, and captures
+most of the tools that make my life easier, both at work and
+for general use. I re-do this list every once in a while,
+partly for my future reference and I guess partly for nerd cred. ;-)</p>
+
+<h3>HPC and sysadmin stuff</h3>
+
+<ul>
+<li>Linux provisioning: <a href="http://warewulf.lbl.gov">Warewulf</a> for HPC or
+sometimes <a href="http://www.cobblerd.org/">Cobbler</a>
+
+<ul>
+<li>But also looking into <a href="http://www.openstack.org/">OpenStack</a> for some things</li>
+<li>And of course I use <a href="http://aws.amazon.com/">EC2</a> a lot for when I don&#8217;t need to own the hardware</li>
+</ul>
+</li>
+<li>Configuration management: <a href="http://www.ansible.cc">Ansible</a> is my current favorite, and
+I occasionally use <a href="http://www.opscode.com/chef">Chef</a></li>
+<li>Parallel SSH: <a href="https://code.google.com/p/pdsh/">pdsh</a></li>
+<li>Cluster resource management: <a href="http://slurm.schedmd.com/">SLURM</a> or sometimes
+<a href="https://github.com/adaptivecomputing/torque">Torque</a></li>
+<li>Monitoring with <a href="http://www.warewulf.lbl.gov">Warewulf</a> (monitor and NHC) and
+<a href="http://www.nagios.org/">Nagios</a></li>
+</ul>
+
+
+<h3>Programming</h3>
+
+<ul>
+<li>For almost all prototyping, and many final projects: <a href="http://www.python.org">Python</a>
+
+<ul>
+<li>Except networking stuff where I care about performance: <a href="http://www.golang.org/">Go</a></li>
+<li>Or sometimes when I need to dig into the guts: <a href="http://en.wikipedia.org/wiki/C_(programming_language">C</a>)</li>
+</ul>
+</li>
+<li>For scientific computing: <a href="http://www.numpy.org/">NumPy</a> and <a href="http://www.scipy.org/">SciPy</a>
+
+<ul>
+<li>Except when I use <a href="http://en.wikipedia.org/wiki/Fortran">Fortran</a></li>
+<li>And <a href="http://www.julialang.org">Julia</a> is also fun</li>
+</ul>
+</li>
+</ul>
+
+
+<h3>General-use tools:</h3>
+
+<ul>
+<li>For web browsing, mostly I use <a href="https://www.google.com/intl/en/chrome/browser/">Chrome</a>
+like everyone else</li>
+<li>Terminal-multiplexing: <a href="http://www.gnu.org/software/screen/">GNU Screen</a></li>
+<li>Command-line mail client: <a href="http://www.mutt.org/">Mutt</a></li>
+<li>IRC: <a href="http://www.irssi.org/">irssi</a></li>
+<li>Command-line twitter: <a href="http://www.floodgap.com/software/ttytter/">TTYtter</a></li>
+<li>Desktop virtualization: <a href="http://www.virtualbox.org/">VirtualBox</a></li>
+</ul>
+
+
+<h3>Time-wasting</h3>
+
+<ul>
+<li><a href="http://www.bay12games.com/dwarves/">Dwarf Fortress</a></li>
+<li><a href="http://www.nethack.org/">Nethack</a></li>
+<li>See also <a href="http://www.google.com/chrome/">Chrome</a> and <a href="http://www.irssi.org/">irssi</a></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Book Review: YOU]]></title>
+    <link href="http://ajdecon.github.com/book-review-you/"/>
+    <updated>2013-04-27T12:56:00-06:00</updated>
+    <id>http://ajdecon.github.com/book-review-you</id>
+    <content type="html"><![CDATA[<p><a href="http://www.goodreads.com/book/show/15790854-you">YOU</a>, by Austin Grossman,
+is a novel about video games, growing up with your high school friends,
+and figuring out what the hell you
+really want to do with the rest of your life.</p>
+
+<p>Our lead character is Russell, a 28-year-old English major who has wandered
+through several possible careers with no particular attachment or aptitude for
+any of them, and at the beginning of the novel he is interviewing with a video
+game studio. Black Arts, the studio in question, was founded by a
+couple of his friends from high school; but while Russell was peripherally
+involved in building the first version of the studio&#8217;s game engine
+(as part of a group project back in school), he hasn&#8217;t been involved for a long
+time and barely squeaks in as an entry-level designer.</p>
+
+<p>All of Black Arts games follow the same four characters, a pretty standard
+four-person D&amp;D-style adventuring party including a warrior named Brennan,
+a thief named Prendar, a wizard named Lorac,
+and a female warrior named Leira. Starting with
+a high fantasy series called <em>Realms of Gold</em>, these four characters are
+then re-purposed and
+re-used for anything from espionage to science fiction to golf
+and go-cart games.</p>
+
+<p>The adventuring party roughly mirrors the original
+four-person group that built the game back in high school: Simon, the
+enigmatic genius (and wizard), now deceased; Darren, Simon&#8217;s partner in
+co-founding Black Arts (and warrior); Lisa, a brilliant programmer in her own
+right, but disconnected from the world (similar to Leira);
+and Russell, who seems to me less a thief than someone who just doesn&#8217;t know
+what do do with his life.</p>
+
+<p>While the novel follows Russell and the Black Arts team through the development
+of the next installment in their <em>Realms of Gold</em> series, and through
+various adventures in the realm of making video games, this really is
+the story of those four characters: a group of misfits who banded together in
+high school, then found their own paths after graduation after they
+discovered they were going to be stuck living in the real world after all.
+The story makes frequent use of flashbacks to high school, a computer summer
+camp, college, and other moments which help us learn about how these four
+grew up together and then grew apart.</p>
+
+<p>I enjoyed this novel immensely (and finished it within 24 hours of purchasing
+it!),
+but it had its ups and downs. Much of the story felt a little &#8220;dream-like&#8221;:
+large parts of the novel either consisted of flashbacks to Russel&#8217;s past,
+imagined flashbacks about what Simon or Lisa might have been feeling at the
+same time, or conversations between Russell and the actual adventurers from
+the Black Arts games.</p>
+
+<p>In a way, this worked &#8211; a lot of the story
+took place hacking on games at two in the morning, and I know from personal
+experience that things do feel a little dream-like during those moments &#8211; but
+it made up so much of the novel that it lost a bit of its immediacy. Perhaps
+because of this, Russell felt so detached from the outcome of his company&#8217;s
+struggles that it became hard to care much as the reader.</p>
+
+<p>However, all that is really a minor quibble.
+The story of Black Arts was a lot of fun to read,
+and offers much to the reader who knows
+games. It&#8217;s set in the late 90&#8217;s, a pretty good time for video games in my
+opinion, and there are all sorts of great nostalgia references for anyone who
+grew up playing video games around that time. I also enjoy Grossman&#8217;s writing
+style quite a lot, both here and in his superhero novel <em>Soon I Will Be
+Invincible</em>.</p>
+
+<p>Call it 8/10.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[My normal reading list (RSS)]]></title>
+    <link href="http://ajdecon.github.com/my-normal-reading-list-rss/"/>
+    <updated>2013-01-19T22:56:00-07:00</updated>
+    <id>http://ajdecon.github.com/my-normal-reading-list-rss</id>
+    <content type="html"><![CDATA[<p>Since I&#8217;ve been harrassing people on Twitter for things to read lately, I
+figured it was only fair to share what lives in my feed reader these days.
+It also gave me the perfect excuse to clean it up, removing 20-30 feeds which
+I decided I could live without. (Yes, this is the cleaned-up list!)</p>
+
+<p>If you want it in OPML for importing into your own reader, here&#8217;s the
+<a href="http://ajdecon-public.s3.amazonaws.com/subscriptions.xml">xml file</a>.</p>
+
+<!-- more -->
+
+
+<h3>HPC and Scientific Computing</h3>
+
+<ul>
+<li>[<a href="http://www.ellipsix.net/feeds/posts.atom">RSS</a>] <a href="http://www.ellipsix.net/feeds/posts.atom"><div xmlns="http://www.w3.org/1999/xhtml">Ellipsix Informatics</div></a></li>
+<li>[<a href="http://feeds.feedburner.com/CiscoBlogHighPerformanceComputingNetworking">RSS</a>] <a href="http://blogs.cisco.com">Cisco Blog » High Performance Computing Networking</a></li>
+<li>[<a href="http://www.clustermonkey.net/component/option,com_rss/feed,ATOM0.3/no_html,1/">RSS</a>] <a href="http://www.clustermonkey.net/">Cluster Monkey</a></li>
+<li>[<a href="http://www.drdobbs.com/go-parallel/rss/all">RSS</a>] <a href="http://www.drdobbs.com/">Dr. Dobb&#8217;s Go Parallel RSS</a></li>
+<li>[<a href="http://blog.sheptechllc.com/feeds/posts/default">RSS</a>] <a href="http://blog.sheptechllc.com/">FaaS - Failure as a Service</a></li>
+<li>[<a href="http://www.hpcnotes.com/feeds/posts/default">RSS</a>] <a href="http://www.hpcnotes.com/">High Performance Computing - HPC Notes</a></li>
+<li>[<a href="http://www.hpcinthecloud.com/rss/hpccloud/">RSS</a>] <a href="http://www.hpcinthecloud.com/">HPC in the Cloud</a></li>
+<li>[<a href="http://www.hpcinthecloud.com/offthewire/index.rss2">RSS</a>] <a href="http://www.hpcinthecloud.com/offthewire">HPC in the Cloud: Cloud Computing News and Information</a></li>
+<li>[<a href="http://www.hpcinthecloud.com/features/index.rss2">RSS</a>] <a href="http://www.hpcinthecloud.com/features">HPC in the Cloud: Featured Articles on Cloud Computing</a></li>
+<li>[<a href="http://hpcprogrammer.com/rss.xml">RSS</a>] <a href="http://hpcprogrammer.com">HPC Programmer</a></li>
+<li>[<a href="http://www.hpcwire.com/news/index.rss2">RSS</a>] <a href="http://www.hpcwire.com/news">HPCwire: HPC News for Supercomputing Professionals</a></li>
+<li>[<a href="http://blog.jcuff.net/feeds/posts/default">RSS</a>] <a href="http://blog.jcuff.net/">http://blog dot jamesdotcuff dot net</a></li>
+<li>[<a href="http://feeds.feedburner.com/InsideBigdata">RSS</a>] <a href="http://inside-bigdata.com">Inside Bigdata</a></li>
+<li>[<a href="http://feeds.feedburner.com/Insidehpc">RSS</a>] <a href="http://insidehpc.com">insideHPC</a></li>
+<li>[<a href="http://hpc.sagepub.com/rss/ahead.xml">RSS</a>] <a href="http://hpc.sagepub.com">International Journal of High Performance Computing Applications RSS feed &#8211; OnlineFirst Articles</a></li>
+<li>[<a href="http://marchamilton.wordpress.com/feed/">RSS</a>] <a href="http://marchamilton.wordpress.com">Marc Hamilton&#8217;s Blog</a></li>
+<li>[<a href="http://micro.jcuff.net/rss.xml">RSS</a>] <a href="http://micro.jcuff.net">James Cuff</a></li>
+<li>[<a href="http://developer.nvidia.com/blog/feed/2">RSS</a>] <a href="https://developer.nvidia.com/">NVIDIA Developer Blog</a></li>
+<li>[<a href="http://developer.nvidia.com/blog/feed/3">RSS</a>] <a href="https://developer.nvidia.com/">NVIDIA Developer Blog</a></li>
+<li>[<a href="http://blogs.scalablelogic.com/feeds/posts/default">RSS</a>] <a href="http://blogs.scalablelogic.com/">Open Source Grid Engine Blog</a></li>
+
+<li>[<a href="http://www.rce-cast.com/rss20">RSS</a>] <a href="http://www.rce-cast.com/">RCE an HPC Podcast</a></li>
+<li>[<a href="http://scalability.org/?feed=rss2">RSS</a>] <a href="http://scalability.org">scalability.org</a></li>
+<li>[<a href="http://www.streamcomputing.eu/feed/">RSS</a>] <a href="http://streamcomputing.eu">StreamComputing</a></li>
+<li>[<a href="http://technicaldiscovery.blogspot.com/feeds/posts/default">RSS</a>] <a href="http://technicaldiscovery.blogspot.com/">Technical Discovery</a></li>
+<li>[<a href="http://feeds.feedburner.com/JuliaLang">RSS</a>] <a href="http://julialang.org/blog">The Julia Blog</a></li>
+<li>[<a href="http://blog.nag.com/feeds/posts/default">RSS</a>] <a href="http://blog.nag.com/">The NAG Blog</a></li>
+<li>[<a href="http://techblog.netflix.com/rss.xml">RSS</a>] <a href="http://techblog.netflix.com/">The Netflix Tech Blog</a></li>
+<li>[<a href="http://www.johndcook.com/blog/feed/">RSS</a>] <a href="http://www.johndcook.com/blog">The Endeavour</a></li>
+
+</ul>
+
+
+<h3>Science, Academia, Stats and related</h3>
+
+<ul>
+<li>[<a href="http://cosmicvariance.com/feed/">RSS</a>] <a href="http://blogs.discovermagazine.com/cosmicvariance">*Cosmic Variance*</a></li>
+<li>[<a href="http://www.datawrangling.com/feed/">RSS</a>] <a href="http://www.datawrangling.com">Data Wrangling</a></li>
+<li>[<a href="http://feeds.feedburner.com/Datavisualization">RSS</a>] <a href="http://datavisualization.ch">Datavisualization.ch</a></li>
+<li>[<a href="http://rss.sciam.com/doing-good-science/feed">RSS</a>] <a href="http://blogs.scientificamerican.com/doing-good-science">Doing Good Science</a></li>
+<li>[<a href="http://scienceblogs.com/dotphysics/index.xml">RSS</a>] <a href="http://scienceblogs.com/dotphysics">Dot Physics</a></li>
+<li>[<a href="http://scientopia.org/blogs/drugmonkey/feed/">RSS</a>] <a href="http://scientopia.org/blogs/drugmonkey">DrugMonkey</a></li>
+<li>[<a href="http://blog.regehr.org/feed">RSS</a>] <a href="http://blog.regehr.org">Embedded in Academia</a></li>
+<li>[<a href="http://fuckyeahfluiddynamics.tumblr.com/rss">RSS</a>] <a href="http://fuckyeahfluiddynamics.tumblr.com/">Fuck Yeah Fluid Dynamics</a></li>
+<li>[<a href="http://scientopia.org/blogs/galacticinteractions/feed/rss/">RSS</a>] <a href="http://scientopia.org/blogs/galacticinteractions">Galactic Interactions</a></li>
+<li>[<a href="http://feeds.feedburner.com/GettingGeneticsDone">RSS</a>] <a href="http://gettinggeneticsdone.blogspot.com/">Getting Genetics Done</a></li>
+<li>[<a href="http://feeds.feedburner.com/ItsTheRheoThing">RSS</a>] <a href="http://www.rheothing.com/">It&#8217;s the Rheo Thing</a></li>
+<li>[<a href="http://learningcurves.blogspot.com/feeds/posts/default">RSS</a>] <a href="http://learningcurves.blogspot.com/">Learning Curves</a></li>
+<li>[<a href="http://ivory.idyll.org/blog/feeds/all.atom.xml">RSS</a>] <a href="http://ivory.idyll.org/blog">Living in an Ivory Basement</a></li>
+<li>[<a href="http://www.nature.com/nmat/journal/vaop/ncurrent/rss.rdf">RSS</a>] <a href="http://www.nature.com/nmat/current_issue/">Nature Materials</a></li>
+<li>[<a href="http://missmse.blogspot.com/feeds/posts/default">RSS</a>] <a href="http://missmse.blogspot.com/">Periodic Boundary Conditions</a></li>
+<li>[<a href="http://www.phdcomics.com/gradfeed.php">RSS</a>] <a href="http://www.phdcomics.com">PHD Comics</a></li>
+<li>[<a href="http://physicsandphysicists.blogspot.com/feeds/posts/default">RSS</a>] <a href="http://physicsandphysicists.blogspot.com/">Physics and Physicists</a></li>
+<li>[<a href="http://pointersgonewild.wordpress.com/feed/">RSS</a>] <a href="http://pointersgonewild.wordpress.com">Pointers Gone Wild</a></li>
+<li>[<a href="http://chronicle.com/blognetwork/researchcentered/feed/">RSS</a>] <a href="http://chronicle.com/blognetwork/researchcentered">Research Centered</a></li>
+<li>[<a href="https://researchcentered.wordpress.com/feed/">RSS</a>] <a href="https://researchcentered.wordpress.com">Research Centered</a></li>
+<li>[<a href="http://www.rsc.org/publishing/journals/rssfeed.asp?FeedType=LatestArticles&JournalCode=LC">RSS</a>] <a href="http://pubs.rsc.org/en/Journals/Journal/LC">RSC - Lab Chip latest articles</a></li>
+<li>[<a href="http://www.preposterousuniverse.com/blog/feed/">RSS</a>] <a href="http://www.preposterousuniverse.com/blog">Sean Carroll</a></li>
+<li>[<a href="http://www.stat.columbia.edu/~cook/movabletype/mlm/atom.xml">RSS</a>] <a href="http://andrewgelman.com">Statistical Modeling, Causal Inference, and Social Science</a></li>
+<li>[<a href="http://feeds.feedburner.com/scienceblogs/uncertainprinciples">RSS</a>] <a href="http://scienceblogs.com/principles/">Uncertain Principles</a></li>
+<li>[<a href="http://www.wired.com/wiredscience/feed/">RSS</a>] <a href="http://www.wired.com/wiredscience">Wired Science</a></li>
+<li>[<a href="http://feeds2.feedburner.com/wsj/numbersguy/feed">RSS</a>] <a href="http://blogs.wsj.com/numbersguy">WSJ.com: The Numbers Guy</a></li>
+</ul>
+
+
+<h3>Security and Crypto</h3>
+
+<ul>
+<li>[<a href="http://www.daemonology.net/blog/index.rss">RSS</a>] <a href="http://www.daemonology.net/blog/">Daemonic Dispatches</a></li>
+<li>[<a href="http://dankaminsky.com/feed/">RSS</a>] <a href="http://dankaminsky.com">Dan Kaminsky&#8217;s Blog</a></li>
+<li>[<a href="http://www.lightbluetouchpaper.org/feed/">RSS</a>] <a href="http://www.lightbluetouchpaper.org">Light Blue Touchpaper</a></li>
+<li>[<a href="http://www.crypto.com/blog/rss10.xml">RSS</a>] <a href="http://www.crypto.com/blog">Matt Blaze&#8217;s Exhaustive Search</a></li>
+<li>[<a href="http://feeds.feedburner.com/schneier/fulltext">RSS</a>] <a href="http://www.schneier.com/blog/">Schneier on Security</a></li>
+<li>[<a href="http://security.blogoverflow.com/feed/">RSS</a>] <a href="http://security.blogoverflow.com">Stack Exchange Security Blog</a></li>
+<li>[<a href="http://blog.cryptographyengineering.com/feeds/posts/default">RSS</a>] <a href="http://blog.cryptographyengineering.com/">A Few Thoughts on Cryptographic Engineering</a></li>
+<li>[<a href="http://www.wired.com/threatlevel/feed/">RSS</a>] <a href="http://www.wired.com/threatlevel">Threat Level</a></li>
+
+</ul>
+
+
+<h3>Other Computing</h3>
+
+<ul>
+
+
+<li>[<a href="http://www.anandtech.com/rss/">RSS</a>] <a href="http://www.anandtech.com">AnandTech</a></li>
+<li>[<a href="http://feeds.arstechnica.com/arstechnica/index">RSS</a>] <a href="http://arstechnica.com">Ars Technica</a></li>
+<li>[<a href="http://blog.stackoverflow.com/feed/">RSS</a>] <a href="http://blog.stackoverflow.com">Blog - Stack Overflow</a></li>
+<li>[<a href="http://blog.serverfault.com/feed/">RSS</a>] <a href="http://blog.serverfault.com">blog.serverfault.com</a></li>
+<li>[<a href="http://pl.atyp.us/wordpress/index.php/feed/">RSS</a>] <a href="http://pl.atyp.us/wordpress">Canned Platypus</a></li>
+<li>[<a href="http://codemonkey.ravelry.com/feed/">RSS</a>] <a href="http://codemonkey.ravelry.com">Code Monkey Island</a></li>
+<li>[<a href="http://feeds.feedburner.com/codinghorror">RSS</a>] <a href="http://www.codinghorror.com/blog/">Coding Horror</a></li>
+<li>[<a href="http://cuddletech.com/blog/?feed=rss2">RSS</a>] <a href="http://cuddletech.com/blog">Cuddletech</a></li>
+<li>[<a href="http://devops.com/feed/">RSS</a>] <a href="http://devops.com">DevOps.com</a></li>
+<li>[<a href="http://blog.kamilkisiel.net/feed">RSS</a>] <a href="http://blog.kamilkisiel.net">Fast, Stable, Cheap - Pick One</a></li>
+<li>[<a href="http://feeds.feedburner.com/FutureChips">RSS</a>] <a href="http://www.futurechips.org">Future Chips</a></li>
+<li>[<a href="http://www.kalzumeus.com/feed/">RSS</a>] <a href="http://www.kalzumeus.com">MicroISV on a Shoestring</a></li>
+<li>[<a href="http://feeds.feedburner.com/oreilly/radar/atom">RSS</a>] <a href="http://radar.oreilly.com">O&#8217;Reilly Radar - Insight, analysis, and research about emerging technologies.</a></li>
+
+<li>[<a href="http://wesmckinney.com/blog/?feed=rss2">RSS</a>] <a href="http://wesmckinney.com/blog">Quant Pythonista</a></li>
+<li>[<a href="http://feeds.feedburner.com/Researchintel">RSS</a>] <a href="http://blogs.intel.com/research/">Research@Intel</a></li>
+<li>[<a href="http://robhirschfeld.com/feed/">RSS</a>] <a href="http://robhirschfeld.com">Rob Hirschfeld&#8217;s Blog</a></li>
+<li>[<a href="http://theagileadmin.com/feed/">RSS</a>] <a href="http://theagileadmin.com">the agile admin</a></li>
+<li>[<a href="http://blogs.msdn.com/oldnewthing/rss.xml">RSS</a>] <a href="http://blogs.msdn.com/b/oldnewthing/">The Old New Thing</a></li>
+
+</ul>
+
+
+<h3>Webcomics</h3>
+
+<ul>
+
+<li>[<a href="http://www.giantitp.com/comics/comics.rss">RSS</a>] <a href="http://www.giantitp.com/Comics.html">Comics at GiantITP.com</a></li>
+<li>[<a href="http://www.somethingpositive.net/somethingpositive1.xml">RSS</a>] <a href="http://www.somethingpositive.net/">Comics: Somethingpositive</a></li>
+<li>[<a href="http://www.dumbingofage.com/feed/rss/">RSS</a>] <a href="http://www.dumbingofage.com">Dumbing of Age</a></li>
+<li>[<a href="http://www.girlgeniusonline.com/ggmain.rss">RSS</a>] <a href="http://www.girlgeniusonline.com/">Girl Genius</a></li>
+<li>[<a href="http://feeds.feedburner.com/Girls_With_Slingshots">RSS</a>] <a href="http://www.girlswithslingshots.com">Girls With Slingshots</a></li>
+<li>[<a href="http://www.erfworld.com/feed/">RSS</a>] <a href="http://www.erfworld.com">ErfWorld</a></li>
+<li>[<a href="http://littleleaguecomic.tumblr.com/rss">RSS</a>] <a href="http://littleleaguecomic.tumblr.com/">Little League</a></li>
+<li>[<a href="http://www.questionablecontent.net/QCRSS.xml">RSS</a>] <a href="http://www.questionablecontent.net">QC RSS</a></li>
+<li>[<a href="http://saintforrent.com/rss.php">RSS</a>] <a href="http://www.saintforrent.com/">Saint for Rent</a></li>
+<li>[<a href="http://somethingpositive.net/sp.xml">RSS</a>] <a href="http://www.somethingpositive.net">Something Positive by R.K. Milholland</a></li>
+<li>[<a href="http://xkcd.com/atom.xml">RSS</a>] <a href="http://xkcd.com/">xkcd.com</a></li>
+<li>[<a href="http://studiofoglio.livejournal.com/data/atom">RSS</a>] <a href="http://studiofoglio.livejournal.com/">Studio Foglio News</a></li>
+
+</ul>
+
+
+<h3>Science Fiction and Authors Thereof</h3>
+
+<ul>
+<li>[<a href="http://www.antipope.org/charlie/blog-static/index.xml">RSS</a>] <a href="http://www.antipope.org/charlie/blog-static/">Charlie&#8217;s Diary</a></li>
+<li>[<a href="http://austingrossman.blogspot.com/feeds/posts/default">RSS</a>] <a href="http://austingrossman.blogspot.com/">Ice Station Impossible!</a></li>
+
+<li>[<a href="http://feeds.gawker.com/io9/full">RSS</a>] <a href="http://io9.com">io9</a></li>
+<li>[<a href="http://jimhines.livejournal.com/data/rss">RSS</a>] <a href="http://jimhines.livejournal.com/">Jim C. Hines</a></li>
+
+<li>[<a href="http://jl8comic.tumblr.com/rss">RSS</a>] <a href="http://jl8comic.tumblr.com/">Remains of a Not-So-Distant Civilization</a></li>
+
+<li>[<a href="http://feeds.feedburner.com/TobiasBuckell">RSS</a>] <a href="http://www.tobiasbuckell.com">Tobias Buckell Online</a></li>
+<li>[<a href="http://www.tor.com/index.php?option=com_content&view=all&format=feed&type=rss&content=frontpage">RSS</a>] <a href="http://www.tor.com/">tor.com</a></li>
+<li>[<a href="http://feeds.feedburner.com/Sfsignal">RSS</a>] <a href="http://www.sfsignal.com">SF Signal</a></li>
+<li>[<a href="http://www.thewaythefutureblogs.com/feed/">RSS</a>] <a href="http://www.thewaythefutureblogs.com">The Way the Future Blogs</a></li>
+<li>[<a href="http://whatever.scalzi.com/feed/atom/">RSS</a>] <a href="http://whatever.scalzi.com/">Whatever</a></li>
+
+</ul>
+
+
+<h3>Misc</h3>
+
+<ul>
+<li>[<a href="http://www.wired.com/beyond_the_beyond/feed/">RSS</a>] <a href="http://www.wired.com/beyond_the_beyond">Beyond The Beyond - | Wired.com</a></li>
+<li>[<a href="http://feeds.boingboing.net/boingboing/iBag">RSS</a>] <a href="http://boingboing.net">Boing Boing</a></li>
+<li>[<a href="http://feeds2.feedburner.com/ChartPorn">RSS</a>] <a href="http://chartporn.org">Chart Porn</a></li>
+<li>[<a href="http://sivers.org/en.atom">RSS</a>] <a href="http://sivers.org/">Derek Sivers</a></li>
+<li>[<a href="http://kajafoglio.livejournal.com/data/rss">RSS</a>] <a href="http://kajafoglio.livejournal.com/">Diary of a Cartoon Girl</a></li>
+
+<li>[<a href="http://www.fencing.net/feed/">RSS</a>] <a href="http://www.fencing.net">Fencing.Net</a></li>
+<li>[<a href="http://greatlakesimages.blogspot.com/feeds/posts/default?alt=rss">RSS</a>] <a href="http://greatlakesimages.blogspot.com/">Great Lakes Images</a></li>
+
+<li>[<a href="http://feeds.feedburner.com/LettersOfNote">RSS</a>] <a href="http://www.lettersofnote.com/">Letters of Note</a></li>
+<li>[<a href="http://nielsenhayden.com/makinglight/index.rdf">RSS</a>] <a href="http://nielsenhayden.com/makinglight/">Making Light</a></li>
+<li>[<a href="http://blag.xkcd.com/feed/">RSS</a>] <a href="http://blog.xkcd.com">xkcd blog</a></li>
+<li>[<a href="http://www.thegameaisle.com/feed/">RSS</a>] <a href="http://www.thegameaisle.com">The Game Aisle: Game Reviews</a></li>
+<li>[<a href="http://feeds.feedburner.com/longnow">RSS</a>] <a href="http://blog.longnow.org">The Long Now Blog</a></li>
+<li>[<a href="http://w00tstock.net/wp-content/plugins/gigs-calendar/rss.php">RSS</a>] <a href="http://w00tstock.net/shows/">w00tstock - Upcoming Gigs feed</a></li>
+
+
+</ul>
+
+
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Because I've been quiet lately...]]></title>
+    <link href="http://ajdecon.github.com/because-ive-been-quiet-lately-dot-dot-dot/"/>
+    <updated>2013-01-16T20:02:00-07:00</updated>
+    <id>http://ajdecon.github.com/because-ive-been-quiet-lately-dot-dot-dot</id>
+    <content type="html"><![CDATA[<p>Here&#8217;s a picture of a cat.</p>
+
+<p><img src="https://s3.amazonaws.com/ajdecon-public/mrd-20130105.jpg" width=300
+ alt="Picture of our Persian cat" /></p>
+
+<p>More seriously: I haven&#8217;t had much time or energy to devote to writing longer-form
+content for this blog lately, which is really what it&#8217;s good for. I&#8217;ve been
+posting much more frequently to
+<a href="http://www.twitter.com/ajdecon">Twitter</a> and
+<a href="https://plus.google.com/116247823819167414235/posts">Google+</a>. It&#8217;s
+(usually) shorter, and a lot of it is interesting &#8211; especially if you&#8217;re
+here for the HPC and not the cat posts. :)</p>
+
+<p>I&#8217;ve also been sharing code more frequently on <a href="http://www.github.com/ajdecon">Github</a>
+lately, mostly small tools and scripts to make life easier when doing sysadmin
+on a cluster.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Living in the future]]></title>
+    <link href="http://ajdecon.github.com/living-in-the-future/"/>
+    <updated>2013-01-06T01:52:00-07:00</updated>
+    <id>http://ajdecon.github.com/living-in-the-future</id>
+    <content type="html"><![CDATA[<p>In the past few hours, I have&#8230;</p>
+
+<ul>
+<li><p>Made casual jokes with a friend thousands of miles away, at virtually
+no expense.</p></li>
+<li><p>Worked on a class I&#8217;m taking, for free, from a university at a
+similar distance.</p></li>
+<li><p>Watched a short video, obscure and decades old, on a whim.</p></li>
+<li><p>Exchanged useful technical information with a stranger who may live
+on the other side of the world, or next door.</p></li>
+<li><p>Searched virtually all the world&#8217;s information for one trivial
+fact to make my life slightly easier.</p></li>
+<li><p>Used a computer, hundreds of times more powerful than those used to
+run the moon mission or simulate the atomic bomb, just to look at cute
+pictures of cats.</p></li>
+</ul>
+
+
+<p>And I did all of this while sitting outside, at a bar, while enjoying
+a tasty beer which was imported at low expense from the other side
+of the world.</p>
+
+<p>Fifty years ago, most of these ideas would have been ludicrous. A hundred
+years ago, they would have been <em>unimaginable</em>.</p>
+
+<p>We take all of this for granted. It&#8217;s worth recognizing, every once in a
+while, that despite all our problems, we live in an age of wonders.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Some notes on the HPC cluster software stack]]></title>
+    <link href="http://ajdecon.github.com/the-hpc-cluster-software-stack/"/>
+    <updated>2012-11-03T18:48:00-06:00</updated>
+    <id>http://ajdecon.github.com/the-hpc-cluster-software-stack</id>
+    <content type="html"><![CDATA[<p><strong>Updates:</strong></p>
+
+<ul>
+<li>2012-04-23: Added notes on <a href="#automate">build automation</a>.</li>
+<li>2014-12-15: Updates to <a href="#configuration">configuration management</a>,
+<a href="#modules">modules</a> and <a href="#adhoc">ad-hoc tools</a>.</li>
+</ul>
+
+
+<hr />
+
+<p><strong>In this post, I&#8217;m mostly organizing a set of notes I&#8217;ve been using to help
+people put together small high-performance computing clusters.</strong></p>
+
+<p>For each category I&#8217;ll try to summarize
+what that layer accomplishes for the cluster as a whole
+and give a few examples of software packages which fit into
+that layer. I&#8217;m not going to try to come up with an exhaustive list for each
+category, but instead talk about some packages which I&#8217;ve worked with
+personally and indicate a few favorites. I&#8217;ll also mostly be
+limiting myself to the Linux HPC world, deploying onto commodity hardware
+(not a pre-built solution like a Cray), and mostly talking about open-source
+solutions (because I&#8217;m often giving advice to poor graduate students).</p>
+
+<p>The levels of the software stack I discuss include:</p>
+
+<ul>
+<li><a href="#provisioning">Provisioning System</a></li>
+<li><a href="#configuration">Configuration Management</a>
+
+<ul>
+<li>with some notes on <a href="#adhoc">ad-hoc tools</a> that are useful</li>
+</ul>
+</li>
+<li><a href="#mpi">Message passing libraries</a>
+
+<ul>
+<li>with some notes on <a href="#modules">library management</a> with environment-modules</li>
+<li>and on <a href="#automate">automating software builds</a></li>
+</ul>
+</li>
+<li><a href="#scheduling">Job scheduler</a></li>
+<li><a href="#filesystem">Shared filesystems</a></li>
+<li><a href="#monitoring">Monitoring</a></li>
+</ul>
+
+
+<!-- more -->
+
+
+<h3><a id="provisioning"></a>Provisioning system</h3>
+
+<p>An HPC cluster typically includes a few different types of computers:</p>
+
+<ul>
+<li>A master node, which runs any scheduler, monitoring, or other
+&#8220;infrastructure&#8221; software you have in place.</li>
+<li>One or more compute nodes which accomplish the actual computation.</li>
+<li>(optional) One or more separate fileserver nodes which export a shared
+filesystem.</li>
+<li>(optional) One or more separate login nodes, which users log into to
+submit their jobs.</li>
+<li>(optional) Other service nodes, which sometimes break out the functions of
+a master node into multiple servers in a large cluster.</li>
+</ul>
+
+
+<p>Now you could manually install an operating system on each of these
+servers, put together each server&#8217;s software stack, and carefully configure
+each one&#8230; but for anything more than two or three compute nodes, this becomes
+really unpleasant. So you typically want to have some method
+to automatically deploy a pre-configured system image to one or more identical
+nodes.</p>
+
+<p>If you&#8217;re using a cloud service like Amazon&#8217;s
+<a href="http://aws.amazon.com/ec2/">Elastic Compute Cloud</a>, the provisioning system is
+provided with the service. For example, Amazon lets you boot up a VM from
+an image provided by Amazon or the community, make changes, and then save your
+modified system to a new image you can re-deploy to mutliple new VMs.</p>
+
+<p>If you&#8217;re deploying onto hardware you own, there are a number of software packages
+which can automate OS deployment for you. A few of the ones I&#8217;ve used to set up
+HPC systems are:</p>
+
+<ul>
+<li><p><a href="http://en.wikipedia.org/wiki/Kickstart_(Linux">Kickstart</a> is a method for
+automating the installation of a Linux system using a file which specifies the
+system configuration and a list of packages to be installed. You boot the system
+with an installer for your Linux distribution of choice, and the installer
+follows the instructions in the kickstart file rather than
+making you manually step through the install. Kickstart was designed for Red Hat
+clones, but can be used for <a href="http://www.linuxuser.co.uk/tutorials/unattended-ubuntu-installations">Ubuntu</a>
+and other distros as well.</p>
+
+<p>  The major advantage of using Kickstart is that it&#8217;s just an installation file,
+and can be used whether your install DVD is a physical DVD, an ISO distributed
+over the network, or whatever. A lot of provisioning systems require booting
+over the network using <a href="http://en.wikipedia.org/wiki/Preboot_Execution_Environment">PXE</a>,
+which works for most servers but is occasionally unavailable on older or
+desktop computers.</p></li>
+<li><p><a href="http://cobbler.github.com/">Cobbler</a> is a companion project to Kickstart, and
+makes it easier to manage Kickstart images and boot them over a network. It also
+includes a handy tool called koan which makes it possible to do network re-installs
+even if you can&#8217;t do automated PXE boots.</p></li>
+<li><p><a href="http://warewulf.lbl.gov/trac">Warewulf</a> is a cluster management system which is
+designed for HPC. It provides a number of tools for building and deploying
+provisioning images, managing network configuration, and provides a basic configuration
+management system (see below).</p>
+
+<p>  Like xCAT and some other HPC-focused tools, it
+allows both &#8220;stateful&#8221; provisioning (where Linux is installed to the local disk), and
+&#8220;stateless&#8221; provisioning where the entire OS is simply loaded in RAM. This has the
+advantage of making it easy to change cluster configurations quickly because
+re-provisioning is much faster than writing the image to disk; but it means that
+in stateless mode, the nodes can&#8217;t reboot unless the master is available to
+re-provision them.</p>
+
+<p>  In the most recent releases, Warewulf also includes a package called
+&#8220;warewulf-cluster&#8221; which sets up some sane defaults for managing users, NFS, etc.
+and &#8220;warewulf-icr&#8221;, which is cerified under the
+<a href="http://software.intel.com/en-us/cluster-ready">Intel Cluster Ready</a> program.</p></li>
+<li><p><a href="http://www.openstack.org/">OpenStack</a> is a tool for creating private
+&#8220;cloud&#8221;-style systems, in which virtual machines are provisioned onto a
+pool of hardware and managed in a self-service manner by the users. I have
+qualms about using cloud-style provisioning systems for HPC because of
+the virtualization penalty and limited support for Infiniband, but
+OpenStack has a big community and provides some very good tools for
+image and node management.</p></li>
+<li><p><a href="http://www.platform.com/">Platform HPC</a> is a proprietary HPC cluster
+management system which aims to build clusters in a &#8220;turn-key&#8221; fashion.
+It does a pretty good job of this, provisioning stateful nodes using
+a Kickstart-based system, and automates the configuration of networking.
+It also integrates well with Platform&#8217;s scheduler (LSF), provides some
+monitoring, and functions well as an all-around management system.</p></li>
+</ul>
+
+
+<p>Some other common provisioning systems designed for HPC
+include <a href="http://xcat.sourceforge.net/">xCAT</a> and <a href="http://www.brightcomputing.com/Bright-Cluster-Manager.php">Bright Cluster
+Manager</a> (proprietary).</p>
+
+<p><strong>My tool of choice:</strong> Warewulf, because it&#8217;s free, flexible, and it fits my
+own mental model of clusters better than most other tools. I&#8217;ve also done
+a small amount of development for the project, so I&#8217;m very familiar with the code.</p>
+
+<h3><a id="configuration"></a>Configuration management</h3>
+
+<p>Provisioning &#8220;golden images&#8221; is a good way to deploy a large cluster of
+identical systems, but it&#8217;s not the most flexible system: if all you have is a
+set of images, you either need to re-provision whenever you want to make a change
+(leading to downtime), or you need to make changes manually in-situ and carefully
+sync everything back into the image.</p>
+
+<p>Configuration management systems
+are used to bridge this gap, by providing an automated solution
+for deploying configuration files and scripted installations after the nodes
+are provisioned. Changing the configuration doesn&#8217;t require a full OS
+re-deployment or a reboot, just re-running the configuration manager.</p>
+
+<p>How much of your configuration you want to keep in a provisioning image vs
+a configuration management system is a matter of choice. Some people
+try to put everything in their OS image to simplify deployments, where others
+provision pristine images straight from the Linux distribution and install their
+entire HPC configuration using a configuration management system.</p>
+
+<p>My own usual approach
+is somewhere between these extremes: I tend to provision system images which include
+all the software packages I want installed, but then configure the resulting
+images at boot time using a configuration manager.
+This lets me re-use the provisioning image whenever I
+want to set up a new cluster (because there&#8217;s no cluster-specific configuration in
+the image), but means my configuration manager doesn&#8217;t get bogged down
+doing software installs whenever I spin up.</p>
+
+<p>Some configuration management systems I&#8217;ve used include:</p>
+
+<ul>
+<li><p><a href="http://warewulf.lbl.gov/trac/wiki/Provision/Files">Warewulf file provisioning</a>:
+On Warewulf-provisioned clusters, I use the &#8220;file provisioning&#8221; system to sync
+configuration files to compute nodes. It&#8217;s an extremely lightweight system: the
+files and their metadata are stored in a database on the master node, includes
+a basic templating language, and the files are served over HTTP. The nodes don&#8217;t
+have any kind of specialized daemon on them to keep in sync: instead, there&#8217;s just
+a basic script that&#8217;s run by a cron job to download updated files using wget every
+five minutes.</p>
+
+<p>  The limitation of this system is that it can&#8217;t do everything a larger
+configuration manager can do. File provisioning isn&#8217;t really useful for
+provisioning software packages or managing service daemons, it just does
+what it says on the tin: provisions files. I find it usually works extremely
+well with systems like compute nodes, but it can be limiting when you need a
+more flexible system.</p></li>
+<li><p><a href="http://puppetlabs.com/">Puppet</a> is a configuration management system which
+defines a domain-specific languange (DSL) for describing the configuration of
+a server. For example, to install and configure the Torque scheduler client on
+a compute node, a snippet might look like this:</p>
+
+<pre><code>  class torque_mom {
+      package { "torque-client":
+          ensure =&gt; installed
+      }
+
+      file { "mom_config":
+          path =&gt; "/var/spool/torque/mom_priv/config",
+          ensure =&gt; file,
+          require =&gt; Package['torque-client'],
+          source =&gt; 'puppet://modules/torque_mom/config'
+      }
+
+      service { "pbs_mom":
+          name =&gt; "pbs_mom",
+          ensure =&gt; running,
+          enable =&gt; true,
+          subscribe =&gt; File["mom_config"]
+      }
+  }
+</code></pre>
+
+<p>  This manifest would then be read by the puppetd daemon on each node,
+  which would apply the described configuration to the server.
+  Puppet manifests can be run in any order, so you have to specify dependencies
+  manually where they exist. This helps ensure that the manifest is
+  <a href="http://en.wikipedia.org/wiki/Idempotence">idempotent</a>, meaning that you can
+  run the same manifest multiple times and the final state will always be the
+  same. This is helpful for maintaining a consistent system, because if a
+  node gets in a weird state you can just re-run the puppet manifests to
+  restore it to a good state.</p></li>
+<li><p><a href="http://www.opscode.com/chef/">Opscode Chef</a> uses a DSL as well, but this DSL
+is really some specialized syntax added to the Ruby language. Chef recipes are
+distributed to client nodes and run as Ruby scripts, but let you define
+configuration files, software resources, and services like this:</p>
+
+<pre><code>  package "torque-client" do
+      action :install
+  end
+
+  cookbook_file "mom_config" do
+      source "mom_config"
+      action :create
+      path "/var/spool/torque/mom_priv/config"
+  end
+
+  service "pbs_mom" do
+      supports :status =&gt; true, :restart =&gt; true
+      action [:enable, :start]
+  end
+</code></pre>
+
+<p>  It looks a lot like Puppet, but you can use the rest of the Ruby language too:
+  loops, conditionals, etc. It also doesn&#8217;t do any re-ordering or dependency
+  management: all the recipes run from top to bottom, in order of their filenames.
+  This makes it easier to think through how a given recipe execute, but makes
+  ensuring idempotence trickier.</p></li>
+<li><p><em>(Update: 2014-12-15)</em> <a href="http://www.ansible.com">Ansible</a> is one of the newer kids on the block
+when it comes to configuration management, but it&#8217;s already achieved a lot
+of popularity and has some strong advantages over some of the older systems.
+In particular, it brings with it a much simpler syntax, and has minimal
+external dependencies &#8211; basically just Python and the Ansible package
+itself.</p>
+
+<p>  A simple Ansible playbook for deploying a Torque client would look
+  something like this:</p>
+
+<pre><code>  ---
+  - hosts: all
+    user: root
+    tasks:
+      - yum:
+          name="torque-client"
+          state=installed
+      - copy:
+          src="mom_config"
+          dest="/var/spool/torque/mom_priv/config"
+      - service:
+          name="pbs_mom"
+          state=started
+          enabled=yes
+</code></pre>
+
+<p>  The documentation generally recommends running Ansible in a
+  &#8220;push&#8221; mode, where a single controller node runs the actual Ansible
+  software and remotely executes the configuration process on each
+  client via SSH. This has some advantages, including the fact that
+  each of your client nodes doesn&#8217;t need to have any Ansible software
+  installed at all &#8211; only Python. However I&#8217;ve found that this process
+  doesn&#8217;t scale very well to extremely large clusters, and that it makes
+  it a bit more difficult to automatically re-run the configuration at
+  set times to make sure the desired state is in place.</p>
+
+<p>  Instead, when I&#8217;ve built clusters with Ansible, I&#8217;ve usually set up
+  a &#8220;pull&#8221; process where each node periodically downloads my configuration
+  scripts in a cron job, and the Ansible plays themselves are set up to
+  run on &#8220;localhost&#8221; for each node. This takes a little more work, and it
+  means that each node has to already have Ansible installed, but provides
+  a workflow I find more natural. The actual sync process needs to be set
+  up separately, but can be as simple as putting a &#8220;wget&#8221; or &#8220;git pull&#8221;
+  command in your cron job.</p></li>
+</ul>
+
+
+<p>There are a bunch of other configuration management systems out there,
+including <a href="http://cfengine.com">Cfengine</a> and <a href="http://www.saltstack.com/">SaltStack</a>.
+Each system has its own syntax, advantages and disadvantages&#8230; but the most important
+thing is that your configuration is well-defined and can be easily deployed.</p>
+
+<p><strong>My tool of choice</strong>: If I&#8217;m using Warewulf I will typically use file
+provisioning for basic configuration, simply because integrating into
+the provisioning system makes life a lot easier. For any complex configuration,
+or for different environments, I typically use Ansible these days.</p>
+
+<h4><a id="adhoc"></a>Ad-hoc management tools</h4>
+
+<p>Another category worth noting here is &#8220;ad-hoc&#8221; cluster
+management tools: systems which
+are more about carrying out operations on a large number of nodes
+simultaneously, than about ensuring a consistent system state. Two useful tools
+I&#8217;ve encountered are:</p>
+
+<ul>
+<li><p><a href="http://code.google.com/p/pdsh/">pdsh</a>: the Parallel Distributed Shell, all it
+does is execute ssh commands in parallel on a large number of nodes. This is
+really useful for doing quick on-the-fly operations on a cluster. For example,
+running <code>pdsh -w node[000-999] "touch /tmp/file"</code> will create a file called
+&#8220;/tmp/file&#8221; on all thousand nodes in a cluster. It&#8217;s just that simple.</p></li>
+<li><p><a href="http://docs.fabfile.org/en/1.4.3/">Fabric</a> is a Python library which accomplishes
+similar operations as pdsh, basically doing ssh in a loop. The difference is that
+you typically write a python script to accomplish a series of operations, like so:</p>
+
+<pre><code>  from fabric.api import local
+
+  def prepare_deploy():
+      local("./manage.py test my_app")
+      local("git add -p &amp;&amp; git commit")
+      local("git push")
+</code></pre>
+
+<p>  (borrowed from the Fabric tutorial). Running <code>fab prepare_deploy</code> would then run the relevant
+  commands on all the nodes supplied, either on the command line or in a config file.</p></li>
+<li><p><em>(Update: 2014-12-15)</em>
+<a href="https://cea-hpc.github.io/clustershell/">ClusterShell</a> is a new favorite
+of mine which combines some of the advantages of pdsh and Fabric. It provides
+a Python library for performing shell commands in parallel, on both
+local and remote nodes, as well as a command line tool <code>clush</code> which replaces
+pdsh and adds a few bells and whistles. The documentation actually claims
+better performance than pdsh, and I certainly haven&#8217;t experienced a performance
+hig when using pdsh.</p>
+
+<p>  Here&#8217;s an example of using the ClusterShell library to execute a command
+  on a group of nodes, adapted from the documentation:</p>
+
+<pre><code>  from ClusterShell.Task import task_self
+
+  # set up the task
+  task = task_self
+  task.shell("/usr/bin/uptime", nodes="compute0[01,30-90]")
+  task.resume()
+
+  # Print the results
+  for buf, nodes in task.iter_buffers():
+      print nodes, buf
+</code></pre>
+
+<p>  And then the clush tool works just like pdsh:</p>
+
+<pre><code>  clush -w compute[001-050] /usr/bin/uptime
+</code></pre>
+
+<p>  A few of the extras that clush provides over pdsh include colorized
+  output, a built-in option <code>-b</code> which acts like <code>dshbak</code>, and a tool
+  called <code>nodeset</code> for manipulating pdsh-style node lists (i.e.
+  <code>login0[1-5,7],compute[100-155]</code>).</p></li>
+</ul>
+
+
+<h3><a id="mpi"></a> Message passing libraries</h3>
+
+<p>In cluster computing, the class of libraries that gets the most attention is
+generally the <a href="http://en.wikipedia.org/wiki/Message_Passing_Interface">Message Passing Interface</a>
+(MPI). MPI is a standardized interface which simplifies inter-process communication
+for parallel applications. Many popular scientific applications depend on MPI,
+especially applications like parallel physics or chemistry simulations which
+require many processes to collaborate on a single time-stepped simulation.</p>
+
+<p>In case you haven&#8217;t seen much MPI code, here&#8217;s
+a simple example of an MPI prorgram which includes communication between
+processes, where each process sends a greeting message to the rank-0 process:</p>
+
+<pre><code>    #include &lt;stdio.h&gt;
+    #include &lt;mpi.h&gt;
+    #include &lt;string.h&gt;
+
+    int main(int argc, char* argv[]) {
+        int rank, count, source, dest;
+        int tag = 0;
+        char message[100];
+        MPI_Status status;
+
+        MPI_Init(&amp;argc, &amp;argv);
+        MPI_Comm_rank(MPI_COMM_WORLD, &amp;rank);
+        MPI_Comm_size(MPI_COMM_WORLD, &amp;count);
+
+        if (rank != 0) {
+            sprintf(message, "Greetings from process %d!",my_rank);
+            dest = 0;
+            MPI_Send(message, strlen(message)+1, MPI_CHAR, dest, tag, MPI_COMM_WORLD);
+        } else {
+            for (source = 1; source &lt; count; source++) {
+                MPI_Recv(message,100,MPI_CHAR,source,tag,MPI_COMM_WORLD, &amp;status);
+                printf("%s\n",message);
+            }
+        }
+        MPI_Finalize();
+    }
+</code></pre>
+
+<p>This program can be run across multiple systems, on whatever interconnect you like,
+without thinking about any of the networking involved: MPI abstracts the communication
+details away from you, leaving you to focus on the (already difficult) problem of
+parallel computing. Just run <code>mpirun -np &lt;number-of-processes&gt; -hostfile &lt;list-of-hosts&gt; ./a.out</code>.
+(Syntax can vary by implementation.) It provides a lot of useful constructs not just for sending and
+receiving messages, but providing barriers for synchronization, topologies
+for thinking about your processes in terms of your problem decomposition, etc.</p>
+
+<p><em>It&#8217;s worth noting that MPI programs depend on the assumption of a reliable network,
+and typically don&#8217;t have any resiliancy against major network or node failures.
+This means that if any node fails, the job dies. Most HPC scheduling systems
+therefore adopt the same model.</em></p>
+
+<p>However, &#8220;MPI&#8221; isn&#8217;t a software package: it&#8217;s a standard defined by committee, and
+there are multiple competing implementations of this standard, both
+open-source and proprietary. These implementations
+often specialize for certain hardware, or for different types of performance. A
+few MPI implementations worth knowing about include:</p>
+
+<ul>
+<li><a href="http://www.open-mpi.org/">OpenMPI</a>: One of the most popular MPIs out there, it
+is open-source, integrates with many different job schedulers, and supports most
+different cluster interconnects with good performance.</li>
+<li><a href="http://www.mcs.anl.gov/research/projects/mpich2/">MPICH2</a>: Developed by
+Argonne National Lab, MPICH2 is almost as widely used as OpenMPI. Its usage
+model is a little different than OpenMPI, but is also well-supported by
+most schedulers.</li>
+<li><a href="http://mvapich.cse.ohio-state.edu/overview/mvapich2/">MVAPICH2</a> is an MPI
+based on MPICH2, specialized for use with the high-performance
+Infiniband interconnect. Recently it has also included integration with CUDA
+for doing direct memory copies of data in GPU memory for NVIDIA GPUs.</li>
+<li><a href="http://software.intel.com/en-us/intel-mpi-library">Intel MPI</a> integrates well with the Intel
+compilers and offers generally high performance. The newest versions also have
+support for Intel&#8217;s new Xeon Phi accelerators.</li>
+</ul>
+
+
+<p>There are many other implementations, including a lot of specialized and proprietary
+implementations: the ones above are just the ones I&#8217;m most familiar with.</p>
+
+<p>Choosing an MPI is complicated by whether you are writing your own software
+or using an open-source or licensed application; what hardware you will be using,
+especially what interconnect you are using; which HPC scheduler you&#8217;re using, if any;
+and many other factors. My advice is to use the MPI recommended by your software vendor,
+which works with your hardware, or just using your favorite.</p>
+
+<h3><a id="modules"></a>Library management: Environment Modules</h3>
+
+<p>On many clusters, including almost all shared systems, you can&#8217;t choose just one
+implementation of common libraries such as MPI, BLAS, LAPACK, etc. You might
+also want to have multiple versions of the same compilers or tools available,
+for application compatibility and performance tests. For example, I work with a couple
+of applications which only work with older versions of OpenMPI, but I still want to use
+the new versions on the same cluster.</p>
+
+<p>However, it&#8217;s often
+hard to keep multiple versions of the same software around on Linux, as they tend
+to want to own the same files. One solution to this problem is the
+<a href="http://modules.sourceforge.net/">environment modules</a>
+system.</p>
+
+<p>When using environment modules, you typically install each software package into
+a non-standard location. For example, instead of letting each of your MPI implementations
+install into the standard Linux locations (<code>/usr/bin</code>, <code>/usr/lib</code>, etc), you install each
+one into a self-contained folder. For example, we might install OpenMPI 1.6.2 into
+<code>/opt/openmpi-1.6.2</code>.</p>
+
+<p>We then define a <em>modulefile</em> for each software package. The modulefile defines changes
+to the user&#8217;s environment variables which are required to use the software package
+in question. For our OpenMPI package, the modulefile might look something like
+this:</p>
+
+<pre><code>    #%Module
+    set     root            /opt/openmpi-1.6.2
+    prepend-path    PATH                    $root/bin
+    prepend-path    LD_LIBRARY_PATH         $root/lib
+    prepend-path    C_INCLUDE_PATH          $root/include
+    prepend-path    MANPATH                 $root/share/man
+    conflict mpi
+</code></pre>
+
+<p>Let&#8217;s go line-by-line. The first line declare this to be a module-file; the next
+line defines a &#8220;root&#8221; variable which shows where the software is installed. The next
+four lines use the &#8220;prepend-path&#8221; command to add the OpenMPI bin, library, include, and
+man directories to the relevant environment variables as the first entry; and the &#8220;conflict
+mpi&#8221; line notes that this modulefile conflicts with other mpi modulefiles.
+We then put this file in the modulefiles directory (/usr/share/Modules/modulefiles) as
+<code>mpi/openmpi/1.6.2</code>.</p>
+
+<p>On my personal development system, I have this and other modules installed to manage my
+software. If I type &#8220;module avail&#8221;, I see the following output:</p>
+
+<pre><code>    [ajdecon@exp ~]$ module avail
+
+    ----------------------------------------------------------- /usr/share/Modules/modulefiles -----------------------------------------------------------
+    dot                     module-info             mpi/openmpi/1.6.2       python/2.7.3            use.own
+    gcc/4.7.2               modules                 mpi/openmpi/1.7-current python/3.2.3
+    module-cvs              mpi/mpich2/1.4.1        null                    ruby/1.9.3-p194
+</code></pre>
+
+<p>So you can see that I have multiple conflicting MPI and Python versions installed, as well as some
+other software. Then, when I load my OpenMPI 1.6.2 module, it changes my PATH to make sure I
+point to the right files:</p>
+
+<pre><code>    [ajdecon@exp ~]$ echo $PATH
+    /usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/home/ajdecon/bin
+    [ajdecon@exp ~]$ module load mpi/openmpi/1.6.2 
+    [ajdecon@exp ~]$ echo $PATH
+    /opt/openmpi-1.6.2/bin:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/home/ajdecon/bin
+</code></pre>
+
+<p><em>(Update: 2014-12-15)</em> There is also an alternative implementation of Modules called
+<a href="https://www.tacc.utexas.edu/research-development/tacc-projects/lmod">Lmod</a> which
+has been gaining popularity recently. Lmod duplicates the functionality of
+the regular implementation of Modules, but also provides some really cool
+additional features. One of these is support for module files written
+in Lua, a programming language which makes it easier to write more complex
+dynamic modules than the original Tcl-based language. It also provides support
+for <strong>hierarchical modules</strong>, which enable you to show the user only those
+application modules which can be used with the currently-loaded compiler
+and library modules.</p>
+
+<h3><a id="automate"></a>Automating software builds (added 2013-04-23)</h3>
+
+<p>When you start building a large number of libraries of different versions
+around, you may encounter an ugly truth: the build process for many scientific
+and HPC packages sucks.</p>
+
+<p>Many scientific applications have complex custom build
+processes which deviate from the simple <code>./configure &amp;&amp; make &amp;&amp; make install</code>
+you might wish for, and it can be difficult to get all the dependencies sorted
+out properly. And even when you do get them built, many applications and
+libraries are updated frequently with new features you want, making the
+software build challenge an ongoing issue.</p>
+
+<p>For these reasons, many HPC sites make use of some method for automating the
+process of building and updating software which is distributed as source.
+Keeping a large library of home-grown scripts is not uncommon, and Oak Ridge
+National Lab has a system called <a href="http://www.olcf.ornl.gov/center-projects/swtools/">SWTools</a>
+which is used in a number of places.</p>
+
+<p>My current favorite tool for this problem is called <a href="https://github.com/hpcugent/easybuild">EasyBuild</a>.
+EasyBuild provides a convenient framework for automating most software build
+processes via Python, as well as a fairly large library of existing recipes
+for a variety of common applications. If it knows how to build the dependencies
+of a given package, it will build those too&#8230; And it will automatically generate
+Module files with the right dependencies set up as well, to make your new
+software easy to use.</p>
+
+<p>Even more interesting (for those of us with demanding users), EasyBuild
+works just as well in a user&#8217;s home directory as it does installing in a
+system location, and it will cheerfully create a local repository of software
+installs complete with generated Module files. Handy for both the users and the
+admins!</p>
+
+<p>For more details I suggest checking out the <a href="https://github.com/hpcugent/easybuild/wiki">EasyBuild wiki</a>
+on GitHub.</p>
+
+<h3><a id="scheduling"></a>Cluster scheduler</h3>
+
+<p>HPC clusters are often expensive systems, and it&#8217;s important to make efficient use
+of them. This is especially true on a shared system where multiple users are
+competing for the same resources. HPC cluster schedulers generally implement
+a queuing system, where the compute nodes are divided into one or more queues
+and jobs are submitted to the scheduler. These jobs are then run automatically
+by the scheduler when the required resource become available.</p>
+
+<p>In most schedulers, this sort of automation is accomplished using the concept
+of a job script. Each user writes a simple (or not-so-simple) program, usually
+a shell script, automates the process of running their job. This script often
+contains directives to the scheduler which describe what resources are
+required. It is this program which is run by the scheduler when the job reaches
+the head of the queue.</p>
+
+<p>For example, a script for the PBS scheduler to run an MPI program which requires
+a temporary data directory might look like this:</p>
+
+<pre><code>    #!/bin/bash
+    #PBS -l nodes=4:ppn=12
+    #PBS -l walltime=02:00:00
+    mkdir /tmp/data
+    cd $HOME/myprogram
+    mpirun -np 48 ./myprogram --datadir=/tmp/data
+</code></pre>
+
+<p>This script includes directives to the scheduler saying that it needs 4 nodes with
+12 processors per node and that it will need 2 hours to run. It creates its data directory,
+changes to the directory where the binary is located, and launches a 48-process MPI
+program.  In most schedulers, there is some mechanism for the STDOUT and STDERR
+of the job to be captured and saved for the user, usually as files in the user&#8217;s
+home directory identified by job number.</p>
+
+<p>HPC schedulers also generally provide some facilities for managing the compute
+nodes they will use to run: reporting on the CPU and memory activity, identifying
+which nodes have GPUs installed, and other resource management features. They
+also usually have the concept of &#8220;offlining&#8221; or &#8220;draining&#8221; a node, marking
+an individual compute node so that it will be assigned no new jobs. This allows
+the system administrator to let a node finish any existing jobs, then do
+maintenance on the node without worrying about disturbing new users.</p>
+
+<p>A few common HPC schedulers you might use on a cluster are:</p>
+
+<ul>
+<li><p><a href="http://www.adaptivecomputing.com/products/open-source/torque/">Torque</a>: Based on
+the old OpenPBS scheduler, Torque is a common open-source HPC resource manager
+developed by Adaptive Computing. It provides various facilities for node
+management and a simple &#8220;first-in first-out&#8221; scheduler. Torque also has
+extremely good integration with many MPI implementations, so that an MPI
+program can get its host-list directly from the scheduler with no
+incantations by the user.</p>
+
+<ul>
+<li>Adaptive Computing also develops the open-source <a href="http://www.clusterresources.com/products/maui-cluster-scheduler.php">Maui</a>
+and commercial <a href="http://www.adaptivecomputing.com/products/hpc-products/moab-hpc-basic-edition/">Moab</a>
+schedulers. These schedulers &#8220;sit on top&#8221; of a resource manager like Torque,
+providing more advanced options for scheduling user jobs. These products
+can be used to implement quality-of-service options for specific users;
+implement &#8220;fair-share&#8221; scheduling in which users who have not had any
+recent allocations get higher priority; and many other options.
+I tend to put together a lot of clusters which run Torque with Maui
+as the scheduler, but Moab has even more advanced features (and is
+updated more often).</li>
+</ul>
+</li>
+<li><p><a href="http://en.wikipedia.org/wiki/Oracle_Grid_Engine">Grid Engine</a> is a
+popular scheduler with a complicated past. Originally developed by Sun
+Microsystems, it is went with the rest of Sun&#8217;s IP to Oracle&#8230; except
+that it was also an open-source project, which was forked to the name
+<a href="http://gridscheduler.sourceforge.net/">Open Grid Scheduler</a> when the
+community became dissatisfied with Oracle&#8217;s stewardship. Meanwhile
+<a href="http://www.univa.com/products/grid-engine">Univa</a> hired many of Sun&#8217;s
+original Grid Engine developers and established their own commercial
+fork, and this inspired <a href="https://arc.liv.ac.uk/trac/SGE">Son of Grid Engine</a>,
+yet another open source fork.</p>
+
+<p>  Confused yet?</p>
+
+<p>  For all its complicated history, Grid Engine is a high-quality and popular
+  HPC scheduling system. It&#8217;s a little trickier to configure than Torque
+  (in my opinion) and manages its queues differently, but it fundamentally
+  manages the same problems. It also provides better quality-of-service
+  and prioritization options than the built-in Torque scheduler, though I
+  don&#8217;t think it quite matches Maui or Moab.</p>
+
+<p>  Another noteworthy detail about Grid Engine is that it&#8217;s the scheduler
+  of choice for the <a href="http://star.mit.edu/cluster/">MIT StarCluster</a> project,
+  which provides easy automation for setting up an HPC cluster on Amazon&#8217;s
+  EC2 service. If you want to run on EC2, you could do worse than to just
+  run StarCluster.</p></li>
+<li><p><a href="http://www.schedmd.com/slurmdocs/slurm.html">SLURM</a> is another open-source
+resource manager, originally developed by Lawrence Livermore National Lab. It&#8217;s
+an extremely scalable solution, able to run on truly huge supercomputing clusters,
+and has a lot of useful new ideas on resource management. It&#8217;s also a lot easier to
+configure than Torque or GridEngine (in my opinion), but has less in the way of
+easy MPI integration, mostly because it&#8217;s newer. SLURM&#8217;s built-in
+scheduler is also FIFO like Torque, but can also integrate with Maui or Moab for
+more complex quality-of-service rules.</p></li>
+</ul>
+
+
+<p>Some other schedulers which are in common use include
+<a href="http://www.platform.com/workload-management/high-performance-computing">Platform LSF</a> and
+<a href="http://www.pbsworks.com/Product.aspx?id=1&amp;AspxAutoDetectCookieSupport=1">PBS Professional</a> by
+PBS Works.</p>
+
+<p><strong>My tool of choice</strong>: As a sysadmin I typically prefer using SLURM because of its ease of cofiguration,
+but PBS-based systems like Torque are much more common and most users are more
+familiar with them at this time.</p>
+
+<h3><a id="filesystem"></a>Shared filesystem</h3>
+
+<p>Most HPC clusters make use of shared network filesystems. These are typically used for user
+home directories, shared software, and sometimes for fast shared &#8220;scratch&#8221; filesystems for
+temporary job files. A shared filesystem is often the most brittle part of an HPC
+cluster, as these systems tend to fail more often than schedulers or MPI communication,
+but are so useful it&#8217;s probably still worth it.</p>
+
+<p>Most small HPC clusters should just use <a href="http://en.wikipedia.org/wiki/Network_File_System">NFS</a>:
+it provides decent performance and
+reliability, is built in to most Linux distributions, and is very easy to set up.
+My advice in most cases is to set up your cluster with NFS first and benchmark
+applications. If you can get away with it, stop here: it all becomes much more complicated
+from there.</p>
+
+<p>However, the name of the game is &#8220;high performance&#8221;, and many applications become I/O
+bound if run with a slow NFS server; so there are several parallel
+filesystems used on HPC clusters to eliminate I/O as a performance blocker.</p>
+
+<p>The only one I&#8217;m really familiar with is <a href="http://wiki.lustre.org/index.php/Main_Page">Lustre</a>,
+a shared filesystem which
+achieves high-performance by striping across disks attached to multiple I/O nodes.
+With a fast network, this improves performance both by increasing the number of disks
+any file is striped across, and by sharing the load across multiple network connections
+on multiple nodes. Lustre achieves this high performance in part by working at the level
+of the Linux kernel, and requires a patched kernel for the I/O nodes.</p>
+
+<p>One interesting feature of Lustre is that it actually allows the user to
+set up how any given file or directory is striped across the I/O nodes,
+so the particular I/O patterns can be tuned for any given job or application.</p>
+
+<p>Lustre, like Grid Engine, is an old Sun Microsystems project that has since
+been somewhat neglected by Oracle. Much of the interesting work on Lustre
+has recently been done by a startup called <a href="http://www.whamcloud.com/">WhamCloud</a>,
+who also sell some useful management tools for Lustre filesystems.</p>
+
+<p>Other parallel filesystems include <a href="http://www.pvfs.org/">PVFS2</a>, IBM&#8217;s
+<a href="http://www-03.ibm.com/systems/software/gpfs/">GPFS</a>, and
+<a href="http://www.gluster.org/">GlusterFS</a>.</p>
+
+<p><strong>My tool of choice:</strong> NFS if I can get away with it, otherwise Lustre.</p>
+
+<h3><a id="monitoring"></a>Monitoring system</h3>
+
+<p>My tools of choice for monitoring HPC clusters include:</p>
+
+<ul>
+<li><p><a href="http://ganglia.sourceforge.net/">Ganglia</a> for real-time monitoring of
+cluster usage. Ganglia monitors just about everything: CPU, memory, networking, GPUs,
+and many other metrics. If a process is running away with too many resources, you
+can probably see it in Ganglia.</p></li>
+<li><p><a href="http://www.nagios.org/">Nagios</a> for notifications of problems like down nodes,
+full filesytems, dangerous loads, etc. Nagios can be tricky to learn to configure,
+but is extremely extensible and gan monitor just about anything with a little work.</p></li>
+</ul>
+
+
+<h3>My preferred cluster stack</h3>
+
+<p>Just to summarize at the end: here is my own preferred stack, subject to change
+based on the needs of the particular situation.</p>
+
+<ul>
+<li><strong>Warewulf</strong> for provisioning</li>
+<li><strong>Warewulf</strong> and <strong>Ansible</strong> for configuration management</li>
+<li><strong>OpenMPI</strong> for MPI, or whatever your app works best with</li>
+<li><strong>Environment modules (Lmod)</strong> for managing different libraries and compilers</li>
+<li><strong>EasyBuild</strong> for automating software builds</li>
+<li><strong>SLURM</strong> for job scheduling</li>
+<li><strong>NFS</strong> for a simple shared filesystem, or <strong>Lustre</strong> if I need the performance</li>
+<li><strong>Ganglia</strong> and <strong>Nagios</strong> for monitoring.</li>
+</ul>
+
+
+<p>But the right answer is to always benchmark, profile, and talk to your users!</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Where do we come from? The dark side of the moon!]]></title>
+    <link href="http://ajdecon.github.com/where-do-we-come-from-the-dark-side-of-the-moon-a-review-of-iron-sky/"/>
+    <updated>2012-10-29T05:20:00-06:00</updated>
+    <id>http://ajdecon.github.com/where-do-we-come-from-the-dark-side-of-the-moon-a-review-of-iron-sky</id>
+    <content type="html"><![CDATA[<p>Months ago I came across a movie trailer which I had to share with everyone I knew.
+I was convinced that this movie could be nothing but concentrated awesome. It
+looked like it had everything an excellent action movie needs&#8230;
+witty dialogue, funny moments, space battles, huge explosions,
+and of course&#8230; Nazis.</p>
+
+<iframe width="560" height="315" src="http://www.youtube.com/embed/Py_IndUbcxc" frameborder="0" allowfullscreen></iframe>
+
+
+
+
+<!-- more -->
+
+
+<p>Unfortunately, <a href="http://www.ironsky.net/">Iron Sky</a> was one of those movies that couldn&#8217;t quite live up
+to its own trailer. I still quite enjoyed it, but it definitely falls into the &#8220;indie cult B-movie&#8221;
+category, and it isn&#8217;t a particularly re-watchable example of the genre.</p>
+
+<p>To recap the concept briefly: In 1945, to escape their defeat, the Nazi Party of Germany established
+a moon base where they would regroup and eventually retake the Earth. In 2018, a returning American
+mission to the Moon, under the presidency of someone who looks suspiciously like Sarah Palin,
+discovers the Nazi base. A captured American astronaut, a recon mission to Earth, and an eventual
+all-out space war follow, with all sorts of hilarity and fun action sequences.</p>
+
+<p>I love the concept, as silly movies go; and since the filmmakers are primarily Finnish,
+it escapes being a simple &#8220;America wins!&#8221; movie. But the writing was honestly just&#8230; not great.
+A few of the performances were enjoyable, including <a href="http://www.imdb.com/name/nm1087430/">Julia Dietze</a>
+as Renate Richter, but most of them were mediocre and forgettable.</p>
+
+<p>I will say, however, that the production value was amazing. The space sequences looked as good
+as most recent blockbuster science fiction movies, the world was well-imagined, and there were
+so many awesome little details. I am not the sort of person to gush about costuming in a movie,
+but I thought just about everything in the Nazi moon base looked perfect. Whoever the
+production designers were for this movie obviously had a lot of fun, and did an amazing job.
+It&#8217;s only the writers and the actors who disappointed me. :-)</p>
+
+<p>Verdict? Definitely worth watching, but only once. Rent it from Amazon, don&#8217;t buy it.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Whedon on Romney: A candidate who isn't afraid to bring about the zombie apocalypse]]></title>
+    <link href="http://ajdecon.github.com/whedon-on-romney-a-candidate-who-isnt-afraid-to-bring-about-the-zombie-apocalypse/"/>
+    <updated>2012-10-29T05:08:00-06:00</updated>
+    <id>http://ajdecon.github.com/whedon-on-romney-a-candidate-who-isnt-afraid-to-bring-about-the-zombie-apocalypse</id>
+    <content type="html"><![CDATA[<iframe width="560" height="315" src="http://www.youtube.com/embed/6TiXUF9xbTo" frameborder="0" allowfullscreen></iframe>
+
+
+<p>I typically try to keep this blog a politics-free zone, as I think MPI, Fortran, science fiction, and zombies are all
+much more interesting topics to talk about.</p>
+
+<p>Thankfully, we&#8217;ve got some zombies right here for you&#8230;</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Cloud services worth paying for]]></title>
+    <link href="http://ajdecon.github.com/cloud-services-worth-paying-for/"/>
+    <updated>2012-10-27T06:00:00-06:00</updated>
+    <id>http://ajdecon.github.com/cloud-services-worth-paying-for</id>
+    <content type="html"><![CDATA[<p>Despite being generally suspicious of any branding relating to &#8220;the cloud&#8221;, I actually do use
+a variety of Internet-based services to accomplish many of my computing tasks. Even more than
+that, I pay for many of them!</p>
+
+<p>Here&#8217;s a list of cloud services I find valuable enough to actually spend money on them. This
+entry will likely get updated as I find new services and/or remember any of them
+that I&#8217;ve forgotten.</p>
+
+<h3>File storage stuff</h3>
+
+<ul>
+<li><p><a href="http://www.dropbox.com/">Dropbox</a>: A service for syncing files between different computers
+and devices transparently, through the concept of a single shared folder. It really does
+&#8220;just work&#8221;. While there&#8217;s a 2 GB free tier, I pay for the 100 GB tier because I never like throwing
+anything away.</p></li>
+<li><p><a href="http://www.tarsnap.com/">Tarsnap</a>: &#8220;Online backups for the truly paranoid&#8221;, Tarsnap
+performs encrypted backups to Amazon&#8217;s Simple Storage Service using extremely-strong,
+well-vetted and open-source encryption software. Fairly cheap, it&#8217;s priced at
+&#8220;300 picodollars/byte-month&#8221; ($0.30/GB-month) after compression and deduplication.
+This is my off-site backup solution for my personal machine and random servers (on-site is
+an Apple Time Capsule, which is also incredibly convenient).</p></li>
+</ul>
+
+
+<h3>Entertainment</h3>
+
+<p>These ones are typically shared with my wife, Leigh.</p>
+
+<ul>
+<li><p><a href="http://www.pandora.com/">Pandora</a>: Basically, auto-generated Internet radio stations.
+I pay for the &#8220;Pandora One&#8221; service to skip the ads, and it&#8217;s one of the best uses of $36/year
+I can think of. Maybe I&#8217;m lazy, but when I&#8217;m at work or concentrating on other things I&#8217;d rather
+not have to build a playlist, and I like getting new music. Pandora handles it for me.</p></li>
+<li><p><a href="http://www.netflix.com/">Netflix</a>: A huge archive of movies and TV shows, available
+all the time on most devices, for a low monthly fee? What&#8217;s not to like?</p></li>
+<li><p><a href="http://www.amazon.com">Amazon Instant Video, Cloud Player, and Kindle</a>: It doesn&#8217;t
+<em>quite</em> qualify as a cloud service in my mind, because you have to buy specific items;
+but Amazon does make it easy to watch/listen/read your purchases on just about
+any device, just by signing in.</p></li>
+</ul>
+
+
+<h3>Web/tech stuff</h3>
+
+<ul>
+<li><a href="http://www.lastpass.com/">LastPass</a>: An encrypted password manager with browser integration, mobile
+clients, etc. I pay for LastPass because you can&#8217;t get the mobile clients otherwise, and there are a
+few other value-adds. And right there, I never have to remember another password again. I really think
+that a password manager with good encryption, a long master password, and randomly-generated per-account
+passwords make for excellent security.</li>
+</ul>
+
+
+<h3>Honorable mentions: Free, but I&#8217;d totally pay if necessary</h3>
+
+<ul>
+<li><p><a href="http://www.bitbucket.org">Bitbucket</a>: A source-code hosting site with free private repositories,
+git and mercurial support, and some pretty decent wiki and issue-tracking features. I also like
+<a href="http://www.github.com/">Github</a>, and I use it for public projects because it has a larger
+mind-share in the software development community, but I generally prefer Bitbucket for personal
+stuff.</p></li>
+<li><p><a href="http://www.google.com/">Google Apps</a>: Including Mail, Docs, Calendar, and just about
+everything else under the sun. These tools are invaluable, and I love that I can set up Apps
+for a personal domain for free with little to no hassle. If I didn&#8217;t live in a world
+dominated by Outlook and MS-Office, I&#8217;d do everything in Google&#8217;s tools.</p></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Physics book recommendations (#askolo rescued answer)]]></title>
+    <link href="http://ajdecon.github.com/physics-book-recommendations-number-askolo-rescued-answer/"/>
+    <updated>2012-10-26T01:42:00-06:00</updated>
+    <id>http://ajdecon.github.com/physics-book-recommendations-number-askolo-rescued-answer</id>
+    <content type="html"><![CDATA[<p><em><a href="http://www.askolo.com">Askolo</a> is a question-answer site
+<a href="http://blog.ajdecon.org/some-thoughts-on-hpc-in-the-cloud-askolo-ques/">I played with for a while</a>, but it was recently accounced that
+the site was going into maintenance mode so the startup in question could focus on other projects. It&#8217;s a little sad, but
+my own usage of the site did tail off pretty quickly. I did have a couple of answers there which I put a little
+thought into, so I might rescue a few of them as blog posts. Here&#8217;s one.</em></p>
+
+<h4>Q: Do you have any recommendations for high quality physics books? (I&#8217;ve been enjoying the Structure and Interpretation of Classical Mechanics recently).</h4>
+
+<p>A: It&#8217;s been a little while since I sat down with a good physics text, but here are some I remember liking:</p>
+
+<h4>General physics:</h4>
+
+<ul>
+<li>Anything of Feynman&#8217;s is good, particularly his Lectures on Physics and The Character of Physical Law (absolutely one of my favorite short physics books). One exception: they&#8217;re selling a book of problem sets with his lectures now, but to be honest I didn&#8217;t care for them much.</li>
+<li>Quantum Physics by Eisberg and Resnick - I remember liking this as a good general intro for quantum physics, but it doesn&#8217;t use braket notation which quite bothered me at the time.</li>
+<li>I also used Principles of Quantum Mechanics by Shankar, which did provide a really good introduction to braket notation but I thought did less well with the actual physics</li>
+<li>Griffiths wrote decent if unexciting texts on Electrodynamics and Quantum Physics, which are very well-regarded by many</li>
+<li>Introductory Statistical Mechanics by Bowley and Sanchez - One of the most readable intros to stat-mech I&#8217;ve found</li>
+<li>Introduction to Solid State Physics by Kittel - Another classic recommendation, but still an excellent solid state book. I actually bought this for myself and read it despite having no solid state class that semester, and found it fun.</li>
+<li>Not a textbook, but George Gamow&#8217;s &#8220;Thirty Years That Shook Physics&#8221; is a nicely readable history of the early development of quantum physics by someone who lived through it.</li>
+</ul>
+
+
+<p>AVOID &#8220;Electromagnetism&#8221; by Pollack and Stump, and &#8220;Optical Waves in Crystals&#8221; by Yariv and Yeh. I found both books intensely unpleasant.</p>
+
+<p>Edit: I notice after-the-fact that there&#8217;s not a single book on classical mechanics in above list, except Feynman. I honestly just never liked any of them. Perhaps I should read Newton? :-)</p>
+
+<h4>Materials science, soft-matter physics and polymer physics:</h4>
+
+<ul>
+<li>Electronic Materials and Devices by Kasap - My second intro to solid state physics, and perhaps it was strictly more useful than Kittel: I remember the problem sets being much better. It was much more focused on the materials science and practical engineering.</li>
+<li>Molecular Driving Forces by Dill and Bromberg - Starts as another stat-mech book, but flows into some generic materials science and polymer physics</li>
+<li>Polymer Physics by Rubinstein and Colby - This is a truly excellent introductory text on polymer physics and rheology, and explains the weird statistical ways that polymeric materials behave in a much clearer fashion than most of the books I found.</li>
+<li>Structure and Rheology of Complex Fluids by Larson - I actually really hated the experience of reading this book, but it&#8217;s the best survey I&#8217;ve found for all the weird things viscoelastic materials do. I read it mostly for the references.</li>
+</ul>
+
+
+<p>Hope you find something useful in there!</p>
+]]></content>
+  </entry>
+  
+</feed>

@@ -1,0 +1,253 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>PostgreSQL to include JSON as a core type - Thinking Out Loud</title>
+  <meta name="author" content="Adam DeConinck">
+
+   
+  <meta name="description" content="">
+  
+  <meta name="keywords" content="">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://ajdecon.github.com/postgresql-to-include-json-as-a-core-type">
+  <link href="/favicon.png" rel="icon">
+  <link href='http://fonts.googleapis.com/css?family=Quicksand:300,400' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Thinking Out Loud" type="application/atom+xml">
+  <script src="/js/jquery.js"></script>
+  <script src="/js/bootstrap-collapse.js"></script>
+  <script src="/js/modernizr-2.0.js"></script>
+  <script src="/js/octopress.js" type="text/javascript"></script>
+  <script src="/js/application.js"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-12576607-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <div class="navbar navbar-inverse navbar-static-top">
+  	<div class="navbar-inner">
+  	  <div class="container">
+        <a class="btn btn-navbar" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+          <span class="fui-menu-24"></span>
+        </a>
+  	  	<div class="nav-collapse collapse navbar-responsive-collapse" style="height:0;">
+  	      <ul class="nav">
+    
+        <li ><a href="/">Home</a></li>
+    
+        <li ><a href="/about">About Adam</a></li>
+    
+        <li ><a href="https://www.ajdecon.org/ajdecon-key.txt">GPG key</a></li>
+    
+        <li ><a href="/pubs">Publications</a></li>
+    
+        <li ><a href="/atom.xml">RSS</a></li>
+    
+</ul>
+
+<ul class="nav pull-right">
+    
+    <li><a href="http://github.com/ajdecon" title="Github Profile"><i class="icon-github-sign social-navbar"></i></a></li>
+    
+    
+    
+    <li><a href="http://linkedin.com/in/ajdecon" title="Linkedin Profile"><i class="icon-linkedin-local social-navbar"></i></a></li>
+    
+    
+    <li><a href="http://twitter.com/ajdecon" title="Twitter Profile"><i class="icon-twitter-local social-navbar"></i></a></li>
+    
+    
+    <li><a href="http://plus.google.com/116247823819167414235" title="Google+ Profile"><i class="icon-google-plus-local social-navbar"></i></a></li>
+    
+    
+    
+
+    
+    <li><a href="mailto:ajdecon@ajdecon.org" title="Email"><i class="icon-envelope social-navbar"></i></a></li>
+    
+</ul>
+
+  	    </div>
+  	  </div>
+  	</div>
+  </div>
+  <div class="container" id="main">
+      <div class="row-fluid">
+        <div id="content">
+          <div>
+<article class="hentry" role="article">
+  
+
+  <header>
+  <div class="jumbotron">
+    PostgreSQL to Include JSON as a Core Type
+	<h5>
+
+
+
+
+
+
+
+
+  
+
+
+<i class="icon-calendar-empty"></i> <time datetime="2012-01-16T00:00:00-07:00" pubdate data-updated="true">Jan 16<span>th</span>, 2012</time></h5>
+  </div>
+</header>
+  <div class="row-fluid">
+    <div class="span12">
+      <p>In what I think is a rather cool move, <a href="http://people.planetpostgresql.org/andrew/index.php?/archives/244-Under-the-wire.html">PostgreSQL will be adding support for JSON as a core data type</a> for database fields.</p> <p /> <p>When I&#8217;ve written any kind of database-driven project I&#8217;ve typically used MySQL or just SQLite, mostly due to familiarity. But this might be the stimulus for me to seriously try out PostreSQL in my next project. I&#8217;ve been moving more and more to using JSON as an interchange format when my programs need to talk to other software, especially over a network (see my <a href="https://bitbucket.org/ajdecon/warewulf-module-rest/overview">REST module for Warewulf</a> as an example). The libraries are solid for just about every language, and both Perl and Python supply very good functionality for translating variables to and from JSON with minimal pain. In Python in particular, working with JSON is <a href="http://www.doughellmann.com/PyMOTW/json/">not quite as easy as Pickle-ing</a>, but it&#8217;s close.</p> <p /> <p>What would be nice is if I could find a database which let me search for specific key/values in a JSON field from SQL, i.e. &#8220;SELECT * FROM Users WHERE Address%City == &#8216;Urbana&#8217;&#8221;, where City is a key in the JSON field Address. This may very well exist somewhere, and if it does, feel free to let me know: not a lot of the software I write has much to do with large databases, but the proportion has been increasing so I&#8217;ve been trying to get better-acquainted with the popular options.</p>
+
+    </div>
+  </div>
+
+
+
+  <footer>
+    <hr>
+    
+    <div class="row-fluid">
+      
+      <div class="span6">
+        <p class="meta">
+        
+        
+
+
+
+  <a href="/blog/categories/databases/"><span class="badge">databases</span></a>
+
+  <a href="/blog/categories/programming/"><span class="badge">programming</span></a>
+
+
+
+
+        </p>
+      </div>
+      
+      <div class="span6 social-sharing">
+        <div class="sharing">
+  <div class="addthis_toolbox addthis_default_style ">
+  
+  
+  <a class="addthis_button_tweet"></a>
+  
+  
+  <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+  
+  <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid="></script>
+</div>
+
+      </div>
+      
+      
+    </div>
+    
+    <div class="row-fluid">
+      <div class="span12">
+        <p class="meta">
+          
+            <a class="basic-alignment left" href="/making-progress-on-the-new-years-resolutions/" title="Previous Post: Making progress on the New Years Resolutions...">&laquo; Making progress on the New Years Resolutions...</a>
+          
+          
+            <a class="basic-alignment right" href="/learning-chef-compute-cluster-with-slurm/" title="Next Post: Learning Chef: Compute Cluster with SLURM">Learning Chef: Compute Cluster with SLURM &raquo;</a>
+          
+        </p>
+      </div>
+    </div>
+  </footer>
+</article>
+
+</div>
+
+
+
+        </div>
+      </div>
+      <div class="row-fluid">
+        <footer class="footer-page" role="contentinfo">
+          <p>
+  Copyright &copy; 2015 - Adam DeConinck -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span> - Theme by <a href="http://alexgaribay.com">Alex Garibay</a>
+</p>
+
+
+        </footer>
+      </div>
+  </div>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'ajdecon';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

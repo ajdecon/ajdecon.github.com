@@ -1,0 +1,442 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Thinking Out Loud</title>
+  <meta name="author" content="Adam DeConinck">
+
+   
+  <meta name="description" content="">
+  
+  <meta name="keywords" content="">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://ajdecon.github.com/blog/page/8">
+  <link href="/favicon.png" rel="icon">
+  <link href='http://fonts.googleapis.com/css?family=Quicksand:300,400' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Thinking Out Loud" type="application/atom+xml">
+  <script src="/js/jquery.js"></script>
+  <script src="/js/bootstrap-collapse.js"></script>
+  <script src="/js/modernizr-2.0.js"></script>
+  <script src="/js/octopress.js" type="text/javascript"></script>
+  <script src="/js/application.js"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-12576607-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <div class="navbar navbar-inverse navbar-static-top">
+  	<div class="navbar-inner">
+  	  <div class="container">
+        <a class="btn btn-navbar" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+          <span class="fui-menu-24"></span>
+        </a>
+  	  	<div class="nav-collapse collapse navbar-responsive-collapse" style="height:0;">
+  	      <ul class="nav">
+    
+        <li ><a href="/">Home</a></li>
+    
+        <li ><a href="/about">About Adam</a></li>
+    
+        <li ><a href="https://www.ajdecon.org/ajdecon-key.txt">GPG key</a></li>
+    
+        <li ><a href="/pubs">Publications</a></li>
+    
+        <li ><a href="/atom.xml">RSS</a></li>
+    
+</ul>
+
+<ul class="nav pull-right">
+    
+    <li><a href="http://github.com/ajdecon" title="Github Profile"><i class="icon-github-sign social-navbar"></i></a></li>
+    
+    
+    
+    <li><a href="http://linkedin.com/in/ajdecon" title="Linkedin Profile"><i class="icon-linkedin-local social-navbar"></i></a></li>
+    
+    
+    <li><a href="http://twitter.com/ajdecon" title="Twitter Profile"><i class="icon-twitter-local social-navbar"></i></a></li>
+    
+    
+    <li><a href="http://plus.google.com/116247823819167414235" title="Google+ Profile"><i class="icon-google-plus-local social-navbar"></i></a></li>
+    
+    
+    
+
+    
+    <li><a href="mailto:ajdecon@ajdecon.org" title="Email"><i class="icon-envelope social-navbar"></i></a></li>
+    
+</ul>
+
+  	    </div>
+  	  </div>
+  	</div>
+  </div>
+  <div class="container" id="main">
+      <div class="row-fluid">
+        <div id="content">
+          <div class="jumbotron">
+  <div class="container">
+    
+      Thinking Out Loud
+    
+    <h3 class="tagline">
+      
+        Occasional thoughts on supercomputers, sysadmin, and other random geekery
+      
+    </h3>
+  </div>
+</div>
+
+
+<div class="blog-index">
+  
+  
+  
+    <article>
+      
+
+  <div class="row-fluid">
+    <div class="span2 post-meta">
+	  <h5 class="date-time">
+
+
+
+
+
+
+
+
+  
+
+
+<i class="icon-calendar-empty"></i> <time datetime="2012-03-06T00:00:00-07:00" pubdate data-updated="true">Mar 6<span>th</span>, 2012</time></h5>
+          <div class="row-fluid">
+          
+          </div>
+          
+          <div class="row-fluid">
+          
+          </div>
+          
+    </div>
+    <div class="span10 post-container">
+      <h1 class="link"><a href="/parallel-word-count-with-julia-an-interesting/">Parallel Word Count with Julia, an interesting new language for technical computing</a></h1>
+      <p><a href="http://julialang.org/" title="Julia programming language">Julia</a> is an interesting new language focused on scientific computing which &#8220;launched&#8221; to the community at large a few weeks ago. I ran across the launch post via a <a href="http://news.ycombinator.com/item?id=3606380">link on Hacker News</a> (where there is actually a very good discussion), and was immediately impressed. &nbsp;In this post I&#8217;ll provide a little background about the language, and walk through a parallelized &#8220;word count&#8221; example I wrote to play with the language&#8217;s built-in parallelism.</p>
+<p>
+      
+       <a href="/parallel-word-count-with-julia-an-interesting/">Read on &rarr;</a> 
+    </div>
+  </div>
+
+
+
+    </article>
+    
+    <hr>
+    
+  
+  
+    <article>
+      
+
+  <div class="row-fluid">
+    <div class="span2 post-meta">
+	  <h5 class="date-time">
+
+
+
+
+
+
+
+
+  
+
+
+<i class="icon-calendar-empty"></i> <time datetime="2012-02-23T00:00:00-07:00" pubdate data-updated="true">Feb 23<span>rd</span>, 2012</time></h5>
+          <div class="row-fluid">
+          
+          </div>
+          
+          <div class="row-fluid">
+          
+          </div>
+          
+    </div>
+    <div class="span10 post-container">
+      <h1 class="link"><a href="/interesting-startup-for-managing-research-lab/">Interesting startup for managing research labs</a></h1>
+      <p>While I don&#8217;t work in a research lab anymore, I was still pretty impressed by a new <a href="http://ycombinator.com">YC</a> startup I ran across tonight: <a href="http://www.quartzy.com/">Quartzy</a>, a web application for managing laboratory inventories. This might not sound like much, but it&#8217;s potentially very useful: in my research on doing polymer lithography in microchannels, at one point I was keeping track of over a dozen monomer solutions and a bunch of different dyes, photoinitiators, and other reagents&#8230; and I was dealing with a relatively simple system (chemically, anyway).</p>
+<p>It&#8217;s nice to see YC funding something other than a consumer-oriented webapp, and also cool to see the webdev crowd taking the needs of research labs seriously. Quartzy is also apparently developing a mobile app, which makes it more likely that harried grad students might actually use an inventory system.</p>
+<p>(I&#8217;m not sure &#8220;more likely&#8221; is the same thing as &#8220;likely&#8221;, though&#8230;)</p>
+<ul>
+<li><a href="http://blogs.wsj.com/venturecapital/2012/02/23/quartzy-scores-1-2m-to-help-life-scientists-stay-organized/">WSJ blot post on Quartzy</a></li>
+<li><a href="http://news.ycombinator.com/item?id=3625548">HN discussion</a></li>
+</ul>
+<p>&nbsp;</p>
+
+      
+      
+    </div>
+  </div>
+
+
+
+    </article>
+    
+    <hr>
+    
+  
+  
+    <article>
+      
+
+  <div class="row-fluid">
+    <div class="span2 post-meta">
+	  <h5 class="date-time">
+
+
+
+
+
+
+
+
+  
+
+
+<i class="icon-calendar-empty"></i> <time datetime="2012-01-24T00:00:00-07:00" pubdate data-updated="true">Jan 24<span>th</span>, 2012</time></h5>
+          <div class="row-fluid">
+          
+          </div>
+          
+          <div class="row-fluid">
+          
+          </div>
+          
+    </div>
+    <div class="span10 post-container">
+      <h1 class="link"><a href="/new-toys-are-fun/">New toys are fun</a></h1>
+      <div class="CodeRay">
+  <div class="code"><pre>processor       : 7
+vendor_id       : GenuineIntel
+cpu family      : 6
+model           : 42
+model name      :           Intel(R) Xeon(R) CPU E31270 @ 3.40GHz
+stepping        : 7
+cpu MHz         : 3392.493
+cache size      : 8192 KB
+...</pre></div>
+</div>
+
+<p>&nbsp;</p>
+<p>As of about a month ago <a href="http://www.r-hpc.com/" title="R-HPC">at work</a>, we got a shiny new cluster running Intel&#8217;s new <a href="http://en.wikipedia.org/wiki/Sandy_Bridge">Sandy Bridge</a> <a href="http://ark.intel.com/products/52276">processors</a>. We immediately started running Windows HPC on them, which made me sad in way, but what the user needs for the application is right by definition. &nbsp;We got some nice improvements even with code that couldn&#8217;t be re-compiled for the new optimizations available, but we finally got to start cutting a few of them over to Linux today. I can&#8217;t wait to start running benchmarks&#8230;</p>
+
+      
+      
+    </div>
+  </div>
+
+
+
+    </article>
+    
+    <hr>
+    
+  
+  
+    <article>
+      
+
+  <div class="row-fluid">
+    <div class="span2 post-meta">
+	  <h5 class="date-time">
+
+
+
+
+
+
+
+
+  
+
+
+<i class="icon-calendar-empty"></i> <time datetime="2012-01-21T00:00:00-07:00" pubdate data-updated="true">Jan 21<span>st</span>, 2012</time></h5>
+          <div class="row-fluid">
+          
+          </div>
+          
+          <div class="row-fluid">
+          
+          <a href="/blog/categories/chef/"><span class="badge">chef</span></a>
+          
+          <a href="/blog/categories/hpc/"><span class="badge">hpc</span></a>
+          
+          <a href="/blog/categories/learning/"><span class="badge">learning</span></a>
+          
+          <a href="/blog/categories/slurm/"><span class="badge">slurm</span></a>
+          
+          </div>
+          
+    </div>
+    <div class="span10 post-container">
+      <h1 class="link"><a href="/learning-chef-compute-cluster-with-slurm/">Learning Chef: Compute Cluster with SLURM</a></h1>
+      <p>I&#8217;ve recently started playing with Chef, a configuration management system which provides a lot of nice automation for setting up servers quickly and easily. As a science/HPC guy, my default question for any system like this is, &#8220;How easily can this be used to set up a cluster?&#8221; &nbsp;</p>
+<p>This blog post is a quick walkthrough of a simple cookbook I put together for a SLURM-managed compute cluster, targeted at running MPI applications. &nbsp;I put it together simultaneously with learning a lot of the basics of Chef, so this is by no means a fully general SLURM cookbook, just a demonstration of concepts. In particular, I&#8217;m only targeting Ubuntu installations with this cookbook rather than generalizing to RHEL-ish distros as well, and I&#8217;m only testing on EC2 at the moment. &nbsp;Nevertheless, I think it&#8217;s a useful learning exercise.</p>
+<p><em>The cookbook I walk through below can be found in my <a href="https://github.com/ajdecon/hpc-chef">hpc-chef repo</a> on Github, along with other HPC-related cookbooks. The version used in this blog post is at <a href="https://github.com/ajdecon/hpc-chef/tree/4a80d92c21047a44057157af8a40b538f72daff3">this commit</a>.</em></p>
+<p><em>
+      
+       <a href="/learning-chef-compute-cluster-with-slurm/">Read on &rarr;</a> 
+    </div>
+  </div>
+
+
+
+    </article>
+    
+    <hr>
+    
+  
+  
+    <article>
+      
+
+  <div class="row-fluid">
+    <div class="span2 post-meta">
+	  <h5 class="date-time">
+
+
+
+
+
+
+
+
+  
+
+
+<i class="icon-calendar-empty"></i> <time datetime="2012-01-16T00:00:00-07:00" pubdate data-updated="true">Jan 16<span>th</span>, 2012</time></h5>
+          <div class="row-fluid">
+          
+          </div>
+          
+          <div class="row-fluid">
+          
+          <a href="/blog/categories/databases/"><span class="badge">databases</span></a>
+          
+          <a href="/blog/categories/programming/"><span class="badge">programming</span></a>
+          
+          </div>
+          
+    </div>
+    <div class="span10 post-container">
+      <h1 class="link"><a href="/postgresql-to-include-json-as-a-core-type/">PostgreSQL to include JSON as a core type</a></h1>
+      <p>In what I think is a rather cool move, <a href="http://people.planetpostgresql.org/andrew/index.php?/archives/244-Under-the-wire.html">PostgreSQL will be adding support for JSON as a core data type</a> for database fields.</p> <p /> <p>When I&#8217;ve written any kind of database-driven project I&#8217;ve typically used MySQL or just SQLite, mostly due to familiarity. But this might be the stimulus for me to seriously try out PostreSQL in my next project. I&#8217;ve been moving more and more to using JSON as an interchange format when my programs need to talk to other software, especially over a network (see my <a href="https://bitbucket.org/ajdecon/warewulf-module-rest/overview">REST module for Warewulf</a> as an example). The libraries are solid for just about every language, and both Perl and Python supply very good functionality for translating variables to and from JSON with minimal pain. In Python in particular, working with JSON is <a href="http://www.doughellmann.com/PyMOTW/json/">not quite as easy as Pickle-ing</a>, but it&#8217;s close.</p> <p /> <p>What would be nice is if I could find a database which let me search for specific key/values in a JSON field from SQL, i.e. &#8220;SELECT * FROM Users WHERE Address%City == &#8216;Urbana&#8217;&#8221;, where City is a key in the JSON field Address. This may very well exist somewhere, and if it does, feel free to let me know: not a lot of the software I write has much to do with large databases, but the proportion has been increasing so I&#8217;ve been trying to get better-acquainted with the popular options.</p>
+
+      
+      
+    </div>
+  </div>
+
+
+
+    </article>
+    
+  
+  <div class="pagination">
+    
+    <a class="prev" href="/blog/page/9/">&larr; Older</a>
+    
+
+    
+    <a class="next" href="/blog/page/7/">Newer &rarr;</a>
+    
+  </div>
+</div>
+
+
+        </div>
+      </div>
+      <div class="row-fluid">
+        <footer class="footer-page" role="contentinfo">
+          <p>
+  Copyright &copy; 2015 - Adam DeConinck -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span> - Theme by <a href="http://alexgaribay.com">Alex Garibay</a>
+</p>
+
+
+        </footer>
+      </div>
+  </div>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'ajdecon';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: compilers | Thinking Out Loud]]></title>
+  <link href="http://ajdecon.github.com/blog/categories/compilers/atom.xml" rel="self"/>
+  <link href="http://ajdecon.github.com/"/>
+  <updated>2015-04-12T13:23:58-06:00</updated>
+  <id>http://ajdecon.github.com/</id>
+  <author>
+    <name><![CDATA[Adam DeConinck]]></name>
+    <email><![CDATA[ajdecon@ajdecon.org]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Extremely contrived GCC vs V8 benchmark]]></title>
+    <link href="http://ajdecon.github.com/extremely-contrived-gcc-vs-v8-benchmark/"/>
+    <updated>2011-06-10T00:00:00-06:00</updated>
+    <id>http://ajdecon.github.com/extremely-contrived-gcc-vs-v8-benchmark</id>
+    <content type="html"><![CDATA[<p>On Hacker News today, someone posted a link to an <a href="http://wingolog.org/archives/2011/06/10/v8-is-faster-than-gcc">extremely contrived benchmark</a> in which it was claimed that the V8 Javascript compiler was faster than GCC. This was true, in the very narrow case where GCC was prevented from optimizing properly while V8 was run in ideal conditions, <em>and</em> in which the benchmark was compile time plus run time rather than run time alone.</p>
+
+
+<p> <p /> <p>I wouldn't post this, except that I've been reading a lot about benchmarking recently and this is an excellent example of how to do it completely wrong. Brennan at comment 12 on the original post sums it up:</p> <p /> <blockquote class="posterous_medium_quote"> <br />What you've just written is one of the most contrived benchmarks I <br />have ever read. At no point in your rambling, incoherent argument were <br />you even close to anything that could be considered an objective <br />comparison. Everyone in this room is now dumber for having read it. I <br />award you no points, and may God have mercy on your soul.</blockquote></p>
+]]></content>
+  </entry>
+  
+</feed>

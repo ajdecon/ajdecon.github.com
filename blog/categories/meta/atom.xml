@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: meta | Thinking Out Loud]]></title>
+  <link href="http://ajdecon.github.com/blog/categories/meta/atom.xml" rel="self"/>
+  <link href="http://ajdecon.github.com/"/>
+  <updated>2015-04-12T13:23:58-06:00</updated>
+  <id>http://ajdecon.github.com/</id>
+  <author>
+    <name><![CDATA[Adam DeConinck]]></name>
+    <email><![CDATA[ajdecon@ajdecon.org]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[My normal reading list (RSS)]]></title>
+    <link href="http://ajdecon.github.com/my-normal-reading-list-rss/"/>
+    <updated>2013-01-19T22:56:00-07:00</updated>
+    <id>http://ajdecon.github.com/my-normal-reading-list-rss</id>
+    <content type="html"><![CDATA[<p>Since I've been harrassing people on Twitter for things to read lately, I
+figured it was only fair to share what lives in my feed reader these days.
+It also gave me the perfect excuse to clean it up, removing 20-30 feeds which
+I decided I could live without. (Yes, this is the cleaned-up list!)</p>
+
+<p>If you want it in OPML for importing into your own reader, here's the
+<a href="http://ajdecon-public.s3.amazonaws.com/subscriptions.xml">xml file</a>.</p>
+
+<!-- more -->
+
+
+<h3>HPC and Scientific Computing</h3>
+
+<ul>
+<li>[<a href="http://www.ellipsix.net/feeds/posts.atom">RSS</a>] <a href="http://www.ellipsix.net/feeds/posts.atom"><div xmlns="http://www.w3.org/1999/xhtml">Ellipsix Informatics</div></a></li>
+<li>[<a href="http://feeds.feedburner.com/CiscoBlogHighPerformanceComputingNetworking">RSS</a>] <a href="http://blogs.cisco.com">Cisco Blog » High Performance Computing Networking</a></li>
+<li>[<a href="http://www.clustermonkey.net/component/option,com_rss/feed,ATOM0.3/no_html,1/">RSS</a>] <a href="http://www.clustermonkey.net/">Cluster Monkey</a></li>
+<li>[<a href="http://www.drdobbs.com/go-parallel/rss/all">RSS</a>] <a href="http://www.drdobbs.com/">Dr. Dobb's Go Parallel RSS</a></li>
+<li>[<a href="http://blog.sheptechllc.com/feeds/posts/default">RSS</a>] <a href="http://blog.sheptechllc.com/">FaaS - Failure as a Service</a></li>
+<li>[<a href="http://www.hpcnotes.com/feeds/posts/default">RSS</a>] <a href="http://www.hpcnotes.com/">High Performance Computing - HPC Notes</a></li>
+<li>[<a href="http://www.hpcinthecloud.com/rss/hpccloud/">RSS</a>] <a href="http://www.hpcinthecloud.com/">HPC in the Cloud</a></li>
+<li>[<a href="http://www.hpcinthecloud.com/offthewire/index.rss2">RSS</a>] <a href="http://www.hpcinthecloud.com/offthewire">HPC in the Cloud: Cloud Computing News and Information</a></li>
+<li>[<a href="http://www.hpcinthecloud.com/features/index.rss2">RSS</a>] <a href="http://www.hpcinthecloud.com/features">HPC in the Cloud: Featured Articles on Cloud Computing</a></li>
+<li>[<a href="http://hpcprogrammer.com/rss.xml">RSS</a>] <a href="http://hpcprogrammer.com">HPC Programmer</a></li>
+<li>[<a href="http://www.hpcwire.com/news/index.rss2">RSS</a>] <a href="http://www.hpcwire.com/news">HPCwire: HPC News for Supercomputing Professionals</a></li>
+<li>[<a href="http://blog.jcuff.net/feeds/posts/default">RSS</a>] <a href="http://blog.jcuff.net/">http://blog dot jamesdotcuff dot net</a></li>
+<li>[<a href="http://feeds.feedburner.com/InsideBigdata">RSS</a>] <a href="http://inside-bigdata.com">Inside Bigdata</a></li>
+<li>[<a href="http://feeds.feedburner.com/Insidehpc">RSS</a>] <a href="http://insidehpc.com">insideHPC</a></li>
+<li>[<a href="http://hpc.sagepub.com/rss/ahead.xml">RSS</a>] <a href="http://hpc.sagepub.com">International Journal of High Performance Computing Applications RSS feed -- OnlineFirst Articles</a></li>
+<li>[<a href="http://marchamilton.wordpress.com/feed/">RSS</a>] <a href="http://marchamilton.wordpress.com">Marc Hamilton's Blog</a></li>
+<li>[<a href="http://micro.jcuff.net/rss.xml">RSS</a>] <a href="http://micro.jcuff.net">James Cuff</a></li>
+<li>[<a href="http://developer.nvidia.com/blog/feed/2">RSS</a>] <a href="https://developer.nvidia.com/">NVIDIA Developer Blog</a></li>
+<li>[<a href="http://developer.nvidia.com/blog/feed/3">RSS</a>] <a href="https://developer.nvidia.com/">NVIDIA Developer Blog</a></li>
+<li>[<a href="http://blogs.scalablelogic.com/feeds/posts/default">RSS</a>] <a href="http://blogs.scalablelogic.com/">Open Source Grid Engine Blog</a></li>
+
+<li>[<a href="http://www.rce-cast.com/rss20">RSS</a>] <a href="http://www.rce-cast.com/">RCE an HPC Podcast</a></li>
+<li>[<a href="http://scalability.org/?feed=rss2">RSS</a>] <a href="http://scalability.org">scalability.org</a></li>
+<li>[<a href="http://www.streamcomputing.eu/feed/">RSS</a>] <a href="http://streamcomputing.eu">StreamComputing</a></li>
+<li>[<a href="http://technicaldiscovery.blogspot.com/feeds/posts/default">RSS</a>] <a href="http://technicaldiscovery.blogspot.com/">Technical Discovery</a></li>
+<li>[<a href="http://feeds.feedburner.com/JuliaLang">RSS</a>] <a href="http://julialang.org/blog">The Julia Blog</a></li>
+<li>[<a href="http://blog.nag.com/feeds/posts/default">RSS</a>] <a href="http://blog.nag.com/">The NAG Blog</a></li>
+<li>[<a href="http://techblog.netflix.com/rss.xml">RSS</a>] <a href="http://techblog.netflix.com/">The Netflix Tech Blog</a></li>
+<li>[<a href="http://www.johndcook.com/blog/feed/">RSS</a>] <a href="http://www.johndcook.com/blog">The Endeavour</a></li>
+
+</ul>
+
+
+<h3>Science, Academia, Stats and related</h3>
+
+<ul>
+<li>[<a href="http://cosmicvariance.com/feed/">RSS</a>] <a href="http://blogs.discovermagazine.com/cosmicvariance">*Cosmic Variance*</a></li>
+<li>[<a href="http://www.datawrangling.com/feed/">RSS</a>] <a href="http://www.datawrangling.com">Data Wrangling</a></li>
+<li>[<a href="http://feeds.feedburner.com/Datavisualization">RSS</a>] <a href="http://datavisualization.ch">Datavisualization.ch</a></li>
+<li>[<a href="http://rss.sciam.com/doing-good-science/feed">RSS</a>] <a href="http://blogs.scientificamerican.com/doing-good-science">Doing Good Science</a></li>
+<li>[<a href="http://scienceblogs.com/dotphysics/index.xml">RSS</a>] <a href="http://scienceblogs.com/dotphysics">Dot Physics</a></li>
+<li>[<a href="http://scientopia.org/blogs/drugmonkey/feed/">RSS</a>] <a href="http://scientopia.org/blogs/drugmonkey">DrugMonkey</a></li>
+<li>[<a href="http://blog.regehr.org/feed">RSS</a>] <a href="http://blog.regehr.org">Embedded in Academia</a></li>
+<li>[<a href="http://fuckyeahfluiddynamics.tumblr.com/rss">RSS</a>] <a href="http://fuckyeahfluiddynamics.tumblr.com/">Fuck Yeah Fluid Dynamics</a></li>
+<li>[<a href="http://scientopia.org/blogs/galacticinteractions/feed/rss/">RSS</a>] <a href="http://scientopia.org/blogs/galacticinteractions">Galactic Interactions</a></li>
+<li>[<a href="http://feeds.feedburner.com/GettingGeneticsDone">RSS</a>] <a href="http://gettinggeneticsdone.blogspot.com/">Getting Genetics Done</a></li>
+<li>[<a href="http://feeds.feedburner.com/ItsTheRheoThing">RSS</a>] <a href="http://www.rheothing.com/">It's the Rheo Thing</a></li>
+<li>[<a href="http://learningcurves.blogspot.com/feeds/posts/default">RSS</a>] <a href="http://learningcurves.blogspot.com/">Learning Curves</a></li>
+<li>[<a href="http://ivory.idyll.org/blog/feeds/all.atom.xml">RSS</a>] <a href="http://ivory.idyll.org/blog">Living in an Ivory Basement</a></li>
+<li>[<a href="http://www.nature.com/nmat/journal/vaop/ncurrent/rss.rdf">RSS</a>] <a href="http://www.nature.com/nmat/current_issue/">Nature Materials</a></li>
+<li>[<a href="http://missmse.blogspot.com/feeds/posts/default">RSS</a>] <a href="http://missmse.blogspot.com/">Periodic Boundary Conditions</a></li>
+<li>[<a href="http://www.phdcomics.com/gradfeed.php">RSS</a>] <a href="http://www.phdcomics.com">PHD Comics</a></li>
+<li>[<a href="http://physicsandphysicists.blogspot.com/feeds/posts/default">RSS</a>] <a href="http://physicsandphysicists.blogspot.com/">Physics and Physicists</a></li>
+<li>[<a href="http://pointersgonewild.wordpress.com/feed/">RSS</a>] <a href="http://pointersgonewild.wordpress.com">Pointers Gone Wild</a></li>
+<li>[<a href="http://chronicle.com/blognetwork/researchcentered/feed/">RSS</a>] <a href="http://chronicle.com/blognetwork/researchcentered">Research Centered</a></li>
+<li>[<a href="https://researchcentered.wordpress.com/feed/">RSS</a>] <a href="https://researchcentered.wordpress.com">Research Centered</a></li>
+<li>[<a href="http://www.rsc.org/publishing/journals/rssfeed.asp?FeedType=LatestArticles&JournalCode=LC">RSS</a>] <a href="http://pubs.rsc.org/en/Journals/Journal/LC">RSC - Lab Chip latest articles</a></li>
+<li>[<a href="http://www.preposterousuniverse.com/blog/feed/">RSS</a>] <a href="http://www.preposterousuniverse.com/blog">Sean Carroll</a></li>
+<li>[<a href="http://www.stat.columbia.edu/~cook/movabletype/mlm/atom.xml">RSS</a>] <a href="http://andrewgelman.com">Statistical Modeling, Causal Inference, and Social Science</a></li>
+<li>[<a href="http://feeds.feedburner.com/scienceblogs/uncertainprinciples">RSS</a>] <a href="http://scienceblogs.com/principles/">Uncertain Principles</a></li>
+<li>[<a href="http://www.wired.com/wiredscience/feed/">RSS</a>] <a href="http://www.wired.com/wiredscience">Wired Science</a></li>
+<li>[<a href="http://feeds2.feedburner.com/wsj/numbersguy/feed">RSS</a>] <a href="http://blogs.wsj.com/numbersguy">WSJ.com: The Numbers Guy</a></li>
+</ul>
+
+
+<h3>Security and Crypto</h3>
+
+<ul>
+<li>[<a href="http://www.daemonology.net/blog/index.rss">RSS</a>] <a href="http://www.daemonology.net/blog/">Daemonic Dispatches</a></li>
+<li>[<a href="http://dankaminsky.com/feed/">RSS</a>] <a href="http://dankaminsky.com">Dan Kaminsky's Blog</a></li>
+<li>[<a href="http://www.lightbluetouchpaper.org/feed/">RSS</a>] <a href="http://www.lightbluetouchpaper.org">Light Blue Touchpaper</a></li>
+<li>[<a href="http://www.crypto.com/blog/rss10.xml">RSS</a>] <a href="http://www.crypto.com/blog">Matt Blaze's Exhaustive Search</a></li>
+<li>[<a href="http://feeds.feedburner.com/schneier/fulltext">RSS</a>] <a href="http://www.schneier.com/blog/">Schneier on Security</a></li>
+<li>[<a href="http://security.blogoverflow.com/feed/">RSS</a>] <a href="http://security.blogoverflow.com">Stack Exchange Security Blog</a></li>
+<li>[<a href="http://blog.cryptographyengineering.com/feeds/posts/default">RSS</a>] <a href="http://blog.cryptographyengineering.com/">A Few Thoughts on Cryptographic Engineering</a></li>
+<li>[<a href="http://www.wired.com/threatlevel/feed/">RSS</a>] <a href="http://www.wired.com/threatlevel">Threat Level</a></li>
+
+</ul>
+
+
+<h3>Other Computing</h3>
+
+<ul>
+
+
+<li>[<a href="http://www.anandtech.com/rss/">RSS</a>] <a href="http://www.anandtech.com">AnandTech</a></li>
+<li>[<a href="http://feeds.arstechnica.com/arstechnica/index">RSS</a>] <a href="http://arstechnica.com">Ars Technica</a></li>
+<li>[<a href="http://blog.stackoverflow.com/feed/">RSS</a>] <a href="http://blog.stackoverflow.com">Blog - Stack Overflow</a></li>
+<li>[<a href="http://blog.serverfault.com/feed/">RSS</a>] <a href="http://blog.serverfault.com">blog.serverfault.com</a></li>
+<li>[<a href="http://pl.atyp.us/wordpress/index.php/feed/">RSS</a>] <a href="http://pl.atyp.us/wordpress">Canned Platypus</a></li>
+<li>[<a href="http://codemonkey.ravelry.com/feed/">RSS</a>] <a href="http://codemonkey.ravelry.com">Code Monkey Island</a></li>
+<li>[<a href="http://feeds.feedburner.com/codinghorror">RSS</a>] <a href="http://www.codinghorror.com/blog/">Coding Horror</a></li>
+<li>[<a href="http://cuddletech.com/blog/?feed=rss2">RSS</a>] <a href="http://cuddletech.com/blog">Cuddletech</a></li>
+<li>[<a href="http://devops.com/feed/">RSS</a>] <a href="http://devops.com">DevOps.com</a></li>
+<li>[<a href="http://blog.kamilkisiel.net/feed">RSS</a>] <a href="http://blog.kamilkisiel.net">Fast, Stable, Cheap - Pick One</a></li>
+<li>[<a href="http://feeds.feedburner.com/FutureChips">RSS</a>] <a href="http://www.futurechips.org">Future Chips</a></li>
+<li>[<a href="http://www.kalzumeus.com/feed/">RSS</a>] <a href="http://www.kalzumeus.com">MicroISV on a Shoestring</a></li>
+<li>[<a href="http://feeds.feedburner.com/oreilly/radar/atom">RSS</a>] <a href="http://radar.oreilly.com">O'Reilly Radar - Insight, analysis, and research about emerging technologies.</a></li>
+
+<li>[<a href="http://wesmckinney.com/blog/?feed=rss2">RSS</a>] <a href="http://wesmckinney.com/blog">Quant Pythonista</a></li>
+<li>[<a href="http://feeds.feedburner.com/Researchintel">RSS</a>] <a href="http://blogs.intel.com/research/">Research@Intel</a></li>
+<li>[<a href="http://robhirschfeld.com/feed/">RSS</a>] <a href="http://robhirschfeld.com">Rob Hirschfeld's Blog</a></li>
+<li>[<a href="http://theagileadmin.com/feed/">RSS</a>] <a href="http://theagileadmin.com">the agile admin</a></li>
+<li>[<a href="http://blogs.msdn.com/oldnewthing/rss.xml">RSS</a>] <a href="http://blogs.msdn.com/b/oldnewthing/">The Old New Thing</a></li>
+
+</ul>
+
+
+<h3>Webcomics</h3>
+
+<ul>
+
+<li>[<a href="http://www.giantitp.com/comics/comics.rss">RSS</a>] <a href="http://www.giantitp.com/Comics.html">Comics at GiantITP.com</a></li>
+<li>[<a href="http://www.somethingpositive.net/somethingpositive1.xml">RSS</a>] <a href="http://www.somethingpositive.net/">Comics: Somethingpositive</a></li>
+<li>[<a href="http://www.dumbingofage.com/feed/rss/">RSS</a>] <a href="http://www.dumbingofage.com">Dumbing of Age</a></li>
+<li>[<a href="http://www.girlgeniusonline.com/ggmain.rss">RSS</a>] <a href="http://www.girlgeniusonline.com/">Girl Genius</a></li>
+<li>[<a href="http://feeds.feedburner.com/Girls_With_Slingshots">RSS</a>] <a href="http://www.girlswithslingshots.com">Girls With Slingshots</a></li>
+<li>[<a href="http://www.erfworld.com/feed/">RSS</a>] <a href="http://www.erfworld.com">ErfWorld</a></li>
+<li>[<a href="http://littleleaguecomic.tumblr.com/rss">RSS</a>] <a href="http://littleleaguecomic.tumblr.com/">Little League</a></li>
+<li>[<a href="http://www.questionablecontent.net/QCRSS.xml">RSS</a>] <a href="http://www.questionablecontent.net">QC RSS</a></li>
+<li>[<a href="http://saintforrent.com/rss.php">RSS</a>] <a href="http://www.saintforrent.com/">Saint for Rent</a></li>
+<li>[<a href="http://somethingpositive.net/sp.xml">RSS</a>] <a href="http://www.somethingpositive.net">Something Positive by R.K. Milholland</a></li>
+<li>[<a href="http://xkcd.com/atom.xml">RSS</a>] <a href="http://xkcd.com/">xkcd.com</a></li>
+<li>[<a href="http://studiofoglio.livejournal.com/data/atom">RSS</a>] <a href="http://studiofoglio.livejournal.com/">Studio Foglio News</a></li>
+
+</ul>
+
+
+<h3>Science Fiction and Authors Thereof</h3>
+
+<ul>
+<li>[<a href="http://www.antipope.org/charlie/blog-static/index.xml">RSS</a>] <a href="http://www.antipope.org/charlie/blog-static/">Charlie's Diary</a></li>
+<li>[<a href="http://austingrossman.blogspot.com/feeds/posts/default">RSS</a>] <a href="http://austingrossman.blogspot.com/">Ice Station Impossible!</a></li>
+
+<li>[<a href="http://feeds.gawker.com/io9/full">RSS</a>] <a href="http://io9.com">io9</a></li>
+<li>[<a href="http://jimhines.livejournal.com/data/rss">RSS</a>] <a href="http://jimhines.livejournal.com/">Jim C. Hines</a></li>
+
+<li>[<a href="http://jl8comic.tumblr.com/rss">RSS</a>] <a href="http://jl8comic.tumblr.com/">Remains of a Not-So-Distant Civilization</a></li>
+
+<li>[<a href="http://feeds.feedburner.com/TobiasBuckell">RSS</a>] <a href="http://www.tobiasbuckell.com">Tobias Buckell Online</a></li>
+<li>[<a href="http://www.tor.com/index.php?option=com_content&view=all&format=feed&type=rss&content=frontpage">RSS</a>] <a href="http://www.tor.com/">tor.com</a></li>
+<li>[<a href="http://feeds.feedburner.com/Sfsignal">RSS</a>] <a href="http://www.sfsignal.com">SF Signal</a></li>
+<li>[<a href="http://www.thewaythefutureblogs.com/feed/">RSS</a>] <a href="http://www.thewaythefutureblogs.com">The Way the Future Blogs</a></li>
+<li>[<a href="http://whatever.scalzi.com/feed/atom/">RSS</a>] <a href="http://whatever.scalzi.com/">Whatever</a></li>
+
+</ul>
+
+
+<h3>Misc</h3>
+
+<ul>
+<li>[<a href="http://www.wired.com/beyond_the_beyond/feed/">RSS</a>] <a href="http://www.wired.com/beyond_the_beyond">Beyond The Beyond - | Wired.com</a></li>
+<li>[<a href="http://feeds.boingboing.net/boingboing/iBag">RSS</a>] <a href="http://boingboing.net">Boing Boing</a></li>
+<li>[<a href="http://feeds2.feedburner.com/ChartPorn">RSS</a>] <a href="http://chartporn.org">Chart Porn</a></li>
+<li>[<a href="http://sivers.org/en.atom">RSS</a>] <a href="http://sivers.org/">Derek Sivers</a></li>
+<li>[<a href="http://kajafoglio.livejournal.com/data/rss">RSS</a>] <a href="http://kajafoglio.livejournal.com/">Diary of a Cartoon Girl</a></li>
+
+<li>[<a href="http://www.fencing.net/feed/">RSS</a>] <a href="http://www.fencing.net">Fencing.Net</a></li>
+<li>[<a href="http://greatlakesimages.blogspot.com/feeds/posts/default?alt=rss">RSS</a>] <a href="http://greatlakesimages.blogspot.com/">Great Lakes Images</a></li>
+
+<li>[<a href="http://feeds.feedburner.com/LettersOfNote">RSS</a>] <a href="http://www.lettersofnote.com/">Letters of Note</a></li>
+<li>[<a href="http://nielsenhayden.com/makinglight/index.rdf">RSS</a>] <a href="http://nielsenhayden.com/makinglight/">Making Light</a></li>
+<li>[<a href="http://blag.xkcd.com/feed/">RSS</a>] <a href="http://blog.xkcd.com">xkcd blog</a></li>
+<li>[<a href="http://www.thegameaisle.com/feed/">RSS</a>] <a href="http://www.thegameaisle.com">The Game Aisle: Game Reviews</a></li>
+<li>[<a href="http://feeds.feedburner.com/longnow">RSS</a>] <a href="http://blog.longnow.org">The Long Now Blog</a></li>
+<li>[<a href="http://w00tstock.net/wp-content/plugins/gigs-calendar/rss.php">RSS</a>] <a href="http://w00tstock.net/shows/">w00tstock - Upcoming Gigs feed</a></li>
+
+
+</ul>
+
+
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Because I've been quiet lately...]]></title>
+    <link href="http://ajdecon.github.com/because-ive-been-quiet-lately-dot-dot-dot/"/>
+    <updated>2013-01-16T20:02:00-07:00</updated>
+    <id>http://ajdecon.github.com/because-ive-been-quiet-lately-dot-dot-dot</id>
+    <content type="html"><![CDATA[<p>Here's a picture of a cat.</p>
+
+<p><img src="https://s3.amazonaws.com/ajdecon-public/mrd-20130105.jpg" width=300
+ alt="Picture of our Persian cat" /></p>
+
+<p>More seriously: I haven't had much time or energy to devote to writing longer-form
+content for this blog lately, which is really what it's good for. I've been
+posting much more frequently to
+<a href="http://www.twitter.com/ajdecon">Twitter</a> and
+<a href="https://plus.google.com/116247823819167414235/posts">Google+</a>. It's
+(usually) shorter, and a lot of it is interesting -- especially if you're
+here for the HPC and not the cat posts. :)</p>
+
+<p>I've also been sharing code more frequently on <a href="http://www.github.com/ajdecon">Github</a>
+lately, mostly small tools and scripts to make life easier when doing sysadmin
+on a cluster.</p>
+]]></content>
+  </entry>
+  
+</feed>

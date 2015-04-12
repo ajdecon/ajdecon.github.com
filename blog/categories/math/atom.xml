@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: math | Thinking Out Loud]]></title>
+  <link href="http://ajdecon.github.com/blog/categories/math/atom.xml" rel="self"/>
+  <link href="http://ajdecon.github.com/"/>
+  <updated>2015-04-12T13:23:58-06:00</updated>
+  <id>http://ajdecon.github.com/</id>
+  <author>
+    <name><![CDATA[Adam DeConinck]]></name>
+    <email><![CDATA[ajdecon@ajdecon.org]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Machine learning course ]]></title>
+    <link href="http://ajdecon.github.com/machine-learning-course/"/>
+    <updated>2010-01-15T00:00:00-07:00</updated>
+    <id>http://ajdecon.github.com/machine-learning-course</id>
+    <content type="html"><![CDATA[<p>While I'm taking a break from coursework this semester to focus on <br />research, I really don't want this to become a semester where I don't <br />learn anything interesting outside my tiny project. I don't want <br />homework deadlines, but I do want to keep my brain expanding. <p /> Usefully, I've just discovered a <a href="http://see.stanford.edu/see/courseinfo.aspx?coll=348ca38a-3a6d-4052-937d-cb017338d7b1">machine learning course</a> from Stanford which has all the lectures, videos, <br />etc. up on the web. This seems like something reasonable for me to <br />play with during some downtime, especially since machine learning and <br />statistics are things I've always been interested in. It also seems <br />like a good excuse to keep this blog revitalized. :) <p /> I'll start on lecture 1, and as I go try to summarize the essential <br />features as I go. Watch this space.</p>
+]]></content>
+  </entry>
+  
+</feed>

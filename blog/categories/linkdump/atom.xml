@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: linkdump | Thinking Out Loud]]></title>
+  <link href="http://ajdecon.github.com/blog/categories/linkdump/atom.xml" rel="self"/>
+  <link href="http://ajdecon.github.com/"/>
+  <updated>2015-04-12T13:23:58-06:00</updated>
+  <id>http://ajdecon.github.com/</id>
+  <author>
+    <name><![CDATA[Adam DeConinck]]></name>
+    <email><![CDATA[ajdecon@ajdecon.org]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Linkdump 2015-01-11]]></title>
+    <link href="http://ajdecon.github.com/linkdump-2015-01-11/"/>
+    <updated>2015-01-11T12:00:00-07:00</updated>
+    <id>http://ajdecon.github.com/linkdump-2015-01-11</id>
+    <content type="html"><![CDATA[<h3>HPC</h3>
+
+<ul>
+<li><p><a href="http://www.failureasaservice.com/2015/01/using-infiniband-with-matlab-parallel.html">Using Infiniband with MATLAB Parallel Computing Toolbox </a> by <a href="https://www.twitter.com/brockpalen">Brock Palen</a></p></li>
+<li><p><a href="http://cliffmass.blogspot.com/2015/01/a-major-advance-for-numerical-weather.html">A Major Advance for Numerical Weather Prediction in the U.S. </a> by <a href="http://cliffmass.blogspot.com/">Cliff Mass</a></p></li>
+<li><p><a href="https://www.tacc.utexas.edu/icert-reu">TACC's summer internships in HPC</a></p></li>
+<li><p><a href="http://insidehpc.com/2014/12/video-accelerating-ornls-applications-exascale/">Accelerating ORNL’s Applications to the Exascale</a> (video)</p></li>
+</ul>
+
+
+<h3>Distributed systems</h3>
+
+<ul>
+<li><a href="http://googlecloudplatform.blogspot.com/2015/01/in-coming-weeks-we-will-be-publishing.html">An introduction to containers, Kubernetes, and the trajectory of modern cloud computing</a> from Google's
+<a href="http://googlecloudplatform.blogspot.com/">Cloud Platform Blog</a></li>
+</ul>
+
+
+<h3>Happy news</h3>
+
+<ul>
+<li><a href="http://mashable.com/2015/01/06/intel-diversity-initiative/">Intel takes on diversity and inclusion in tech with $300M initiative</a></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Linkdump 2014-12-28]]></title>
+    <link href="http://ajdecon.github.com/linkdump-2014-12-28/"/>
+    <updated>2014-12-28T12:59:00-07:00</updated>
+    <id>http://ajdecon.github.com/linkdump-2014-12-28</id>
+    <content type="html"><![CDATA[<p>Been a while since I did one of these, so here's a list of some of the
+interesting links I find in my Pinboard bookmarks from this December.</p>
+
+<h3>Computing</h3>
+
+<ul>
+<li><a href="http://www.knewton.com/tech/blog/2014/12/eureka-shouldnt-use-zookeeper-service-discovery/">Eureka! Why You Shouldn’t Use ZooKeeper for Service Discovery</a> - knewton developer blog</li>
+<li><a href="http://techblog.netflix.com/2014/12/introducing-atlas-netflixs-primary.html">Introducing Atlas: Netflix's Primary Telemetry Platform </a> - Netflix Tech Blog</li>
+<li><a href="http://blog.fastmail.com/2014/12/23/jmap-a-better-way-to-email/">JMAP - A better way to email</a> - Fastmail blog</li>
+<li><a href="http://dcg.ethz.ch/lectures/podc_allstars/lecture/podc.pdf">Principles of Distributed Computing</a> - A good book I saw linked to several times this month, by Roger Wattenhofer</li>
+<li><a href="http://voltdb.com/blog/how-docker-simplifies-distributed-systems-development-voltdb">How Docker Simplifies Distributed Systems Development at VoltDB</a> - VoltDB blog</li>
+<li><a href="http://nuitka.net/">Nuitka</a> - A Python compiler</li>
+<li><a href="http://www.evanmiller.org/please-offer-an-excel-export-option.html">Please Offer An Excel Export Option</a> - Evan Miller</li>
+<li><a href="http://sysadvent.blogspot.com/2014/12/day-13-managing-repositories-with-pulp.html">Managing Repositories with Pulp</a> - <a href="https://twitter.com/rothgar">Justin Garrison</a> on the Sysadvent blog</li>
+<li><a href="https://titanous.com/posts/docker-insecurity">Docker Image Insecurity</a> - <a href="https://twitter.com/titanous">Jonathan Rudenberg</a></li>
+<li><a href="https://www.youtube.com/watch?v=wvIca1KLDYg">Ross Anderson talks about practical tradecraft for journalists</a> - from The Logan Symposium</li>
+</ul>
+
+
+<h3>Physics</h3>
+
+<ul>
+<li><a href="http://www.nature.com/ncomms/2014/141219/ncomms6814/full/ncomms6814.html">Equivalence of wave–particle duality to entropic uncertainty</a></li>
+</ul>
+
+
+<h3>Books and Fun</h3>
+
+<ul>
+<li><a href="https://www.goodreads.com/book/show/19288259-dear-committee-members">Dear Committee Members, by Julie Schumacher</a> - A fun epistolary novel about an emattled English professor at a small research university. Mostly letters of recommendation.</li>
+<li><a href="http://www.amazon.com/Legion-Skin-Deep-Brandon-Sanderson/dp/1596066903">Legion: Skin Deep</a> - by Brandon Sanderson</li>
+<li><a href="http://www.amazon.com/Box-Shipping-Container-Smaller-Economy/dp/0691136408/ref=sr_1_1?ie=UTF8&amp;qid=1419797840&amp;sr=8-1&amp;keywords=the+box">The Box: How the Shipping Container Made the World Smaller and the World Economy Bigger</a> - by Mark Levinson</li>
+<li><a href="http://www.amazon.com/Peripheral-William-Gibson-ebook/dp/B00INIXKV2/ref=sr_1_1?ie=UTF8&amp;qid=1419797934&amp;sr=8-1&amp;keywords=peripheral">The Peripheral</a> - by William Gibson</li>
+<li><p><a href="http://www.amazon.com/The-Black-Company-Chronicles/dp/0812521390">The Black Company</a> - by Glen Cook (re-read this month)</p></li>
+<li><p><a href="https://www.kickstarter.com/projects/craftygames/mistborn-allomancy-dice">Mistborn Allomancy Dice</a> - A Kickstarter project</p></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Good links from the past week - 11/22]]></title>
+    <link href="http://ajdecon.github.com/good-links-from-the-past-week-11-22/"/>
+    <updated>2014-11-22T14:15:00-07:00</updated>
+    <id>http://ajdecon.github.com/good-links-from-the-past-week-11-22</id>
+    <content type="html"><![CDATA[<p>A few things I read and enjoyed over the past week. No guarantee that they
+were originally posted during that week... sometimes I'm a little slow. :)</p>
+
+<h3>Operations and system administration</h3>
+
+<p>(Much of this is from LISA14, which I did not attend, but followed on the Internet)</p>
+
+<ul>
+<li><p><a href="http://www.slideshare.net/brendangregg/linux-performance-analysis-new-tools-and-old-secrets">Linus Performance Analysis: New Tools and Old Secrets</a> -- Brendan Gregg at Netflix</p></li>
+<li><p><a href="https://www.usenix.org/sites/default/files/conference/protected-files/rockwood_lisa14_slides.pdf">I Am Sysadmin (And So Can You!)</a> -- Ben Rockwood at Chef</p></li>
+<li><p><a href="http://www.standalone-sysadmin.com/blog/2014/11/new-technologies-to-study-from-lisa14/">New Technologies to Study from #LISA14</a> -- Matt Simmons</p></li>
+<li><p><a href="http://robhirschfeld.com/2014/11/13/ops-is-ops/">Ops is Ops, except when it ain’t. Breaking down the impedance mismatches between physical and cloud ops.</a> -- Rob Hirschfeld</p></li>
+<li><p><a href="https://code.facebook.com/posts/360346274145943/introducing-data-center-fabric-the-next-generation-facebook-data-center-network">Introducing data center fabric, the next-generation Facebook data center network</a></p></li>
+</ul>
+
+
+<h3>Distributed Systems</h3>
+
+<ul>
+<li><a href="http://brooker.co.za/blog/2014/11/15/exactly-once.html">Exactly-Once Delivery May Not Be What You Want</a> -- <a href="https://twitter.com/MarcJBrooker">Marc Brooker</a></li>
+</ul>
+
+
+<h3>HPC</h3>
+
+<ul>
+<li><p><a href="http://www.hpcwire.com/2014/11/14/coral-signals-new-dawn-exascale-ambitions/">CORAL Signals New Dawn for Exascale Ambitions</a></p></li>
+<li><p><a href="https://www.olcf.ornl.gov/summit/">Summit</a> -- ORNL's page on their next big system</p></li>
+</ul>
+
+
+<h3>Random Internet Fun</h3>
+
+<ul>
+<li><a href="http://tabletopaudio.com/">Tabletop Audio</a> -- Ambient sounds for your roleplaying game</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Good links from the past week]]></title>
+    <link href="http://ajdecon.github.com/good-links-from-the-past-week/"/>
+    <updated>2014-11-22T14:15:00-07:00</updated>
+    <id>http://ajdecon.github.com/good-links-from-the-past-week</id>
+    <content type="html"><![CDATA[<p>A few things I read and enjoyed over the past week. No guarantee that they
+were originally posted during that week... sometimes I'm a little slow. :)</p>
+
+<h3>Operations and system administration</h3>
+
+<p>(Much of this is from LISA14, which I did not attend, but followed on the Internet)</p>
+
+<ul>
+<li><p><a href="http://www.slideshare.net/brendangregg/linux-performance-analysis-new-tools-and-old-secrets">Linus Performance Analysis: New Tools and Old Secrets</a> -- Brendan Gregg at Netflix</p></li>
+<li><p><a href="https://www.usenix.org/sites/default/files/conference/protected-files/rockwood_lisa14_slides.pdf">I Am Sysadmin (And So Can You!)</a> -- Ben Rockwood at Chef</p></li>
+<li><p><a href="http://www.standalone-sysadmin.com/blog/2014/11/new-technologies-to-study-from-lisa14/">New Technologies to Study from #LISA14</a> -- Matt Simmons</p></li>
+<li><p><a href="http://robhirschfeld.com/2014/11/13/ops-is-ops/">Ops is Ops, except when it ain’t. Breaking down the impedance mismatches between physical and cloud ops.</a> -- Rob Hirschfeld</p></li>
+<li><p><a href="https://code.facebook.com/posts/360346274145943/introducing-data-center-fabric-the-next-generation-facebook-data-center-network">Introducing data center fabric, the next-generation Facebook data center network</a></p></li>
+</ul>
+
+
+<h3>Distributed Systems</h3>
+
+<ul>
+<li><a href="http://brooker.co.za/blog/2014/11/15/exactly-once.html">Exactly-Once Delivery May Not Be What You Want</a> -- <a href="https://twitter.com/MarcJBrooker">Marc Brooker</a></li>
+</ul>
+
+
+<h3>HPC</h3>
+
+<ul>
+<li><p><a href="http://www.hpcwire.com/2014/11/14/coral-signals-new-dawn-exascale-ambitions/">CORAL Signals New Dawn for Exascale Ambitions</a></p></li>
+<li><p><a href="https://www.olcf.ornl.gov/summit/">Summit</a> -- ORNL's page on their next big system</p></li>
+</ul>
+
+
+<h3>Random Internet Fun</h3>
+
+<ul>
+<li><a href="http://tabletopaudio.com/">Tabletop Audio</a> -- Ambient sounds for your roleplaying game</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Good links from the past week]]></title>
+    <link href="http://ajdecon.github.com/good-links-from-the-past-week/"/>
+    <updated>2014-11-11T08:10:00-07:00</updated>
+    <id>http://ajdecon.github.com/good-links-from-the-past-week</id>
+    <content type="html"><![CDATA[<p>Being a list of things I read and enjoyed over the past week.</p>
+
+<h3>HPC</h3>
+
+<ul>
+<li><a href="http://www.nersc.gov/assets/HPCOR/HPCOR-Data-2014.pdf">DOE HPC Operational Review: "Enabling Data-Driven Scientific Discovery at DOE HPC Facilities"</a> -- A long read, but interesting if you like thinking about how large HPC centers work</li>
+</ul>
+
+
+<h3>Distributed Systems</h3>
+
+<ul>
+<li><p><a href="http://blog.typeobject.com/a-quick-comparison-of-mesos-and-yarn">A quick comparison of Mesos and Yarn</a> from <a href="https://twitter.com/jonbringhurst">Jon Bringhurst</a> -- Highlights some interesting relative strengths</p></li>
+<li><p><a href="https://www.cs.berkeley.edu/~alig/papers/mesos.pdf">Mesos: A Platform for Fine-Grained Resource Sharing in the Data Center</a> -- The original paper on Mesos, which does a better job of explaining how resource offers and multiple schedulers work than most blog posts on the topic. :-)</p></li>
+<li><p><a href="http://blog.empathybox.com/post/19574936361/getting-real-about-distributed-system-reliability">Getting Real About Distributed System Reliability</a> from <a href="https://twitter.com/jaykreps">Jay Kreps</a></p></li>
+</ul>
+
+
+<h3>Tech culture</h3>
+
+<ul>
+<li><a href="http://bridgetkromhout.com/blog/2014/11/03/the-first-rule-of-devops-club/">The First Rule of DevOps Club</a> from <a href="https://twitter.com/bridgetkromhout">Bridget Kromhout</a> -- Inclusion, it's for winners.</li>
+</ul>
+
+
+<h3>Fiction</h3>
+
+<ul>
+<li><p><a href="http://www.amazon.com/Coming-Home-Alex-Benedict-Novel/dp/0425260879">Coming Home</a>, the latest <a href="https://www.goodreads.com/series/42152-alex-benedict">Alex Benedict series</a> novel from <a href="http://www.jackmcdevitt.com/">Jack McDevitt</a></p></li>
+<li><p><a href="http://www.amazon.com/Wings-Kingdom-Cherie-Priest/dp/B001OMHU7Y">Wings to the Kingdom</a> by <a href="http://www.cheriepriest.com/">Cherie Priest</a></p></li>
+<li><p><a href="http://www.strangehorizons.com/2011/20111121/tomorrow-f.shtml">Tomorrow Is Waiting</a> by Holli Mintzer</p></li>
+<li><p><a href="http://www.strangehorizons.com/2014/20141103/1banks-a.shtml">A Few Questions About the Culture: An Interview with Iain Banks</a> -- Not fiction in itself, but commentary on it. Banks is always excellent. Also, you should <a href="http://www.strangehorizons.com/fund_drives/2014/main.shtml">donate to Strange Horizons</a>.</p></li>
+</ul>
+
+
+<h3>Randomness</h3>
+
+<ul>
+<li><a href="https://twitter.com/FozzTexx">Chris Osborn</a> has a real live BBS running on an Apple IIgs: <a href="http://bbs.fozztexx.com/">bbs.fozztexx.com</a></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>

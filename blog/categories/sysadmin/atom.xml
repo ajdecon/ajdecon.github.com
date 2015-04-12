@@ -1,0 +1,887 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: sysadmin | Thinking Out Loud]]></title>
+  <link href="http://ajdecon.github.com/blog/categories/sysadmin/atom.xml" rel="self"/>
+  <link href="http://ajdecon.github.com/"/>
+  <updated>2015-04-12T13:23:58-06:00</updated>
+  <id>http://ajdecon.github.com/</id>
+  <author>
+    <name><![CDATA[Adam DeConinck]]></name>
+    <email><![CDATA[ajdecon@ajdecon.org]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Tools of choice, spring 2013 edition]]></title>
+    <link href="http://ajdecon.github.com/tools-of-choice/"/>
+    <updated>2013-05-05T12:30:00-06:00</updated>
+    <id>http://ajdecon.github.com/tools-of-choice</id>
+    <content type="html"><![CDATA[<p>This list encompasses 95% of my daily computer usage, and captures
+most of the tools that make my life easier, both at work and
+for general use. I re-do this list every once in a while,
+partly for my future reference and I guess partly for nerd cred. ;-)</p>
+
+<h3>HPC and sysadmin stuff</h3>
+
+<ul>
+<li>Linux provisioning: <a href="http://warewulf.lbl.gov">Warewulf</a> for HPC or
+sometimes <a href="http://www.cobblerd.org/">Cobbler</a>
+
+<ul>
+<li>But also looking into <a href="http://www.openstack.org/">OpenStack</a> for some things</li>
+<li>And of course I use <a href="http://aws.amazon.com/">EC2</a> a lot for when I don't need to own the hardware</li>
+</ul>
+</li>
+<li>Configuration management: <a href="http://www.ansible.cc">Ansible</a> is my current favorite, and
+I occasionally use <a href="http://www.opscode.com/chef">Chef</a></li>
+<li>Parallel SSH: <a href="https://code.google.com/p/pdsh/">pdsh</a></li>
+<li>Cluster resource management: <a href="http://slurm.schedmd.com/">SLURM</a> or sometimes
+<a href="https://github.com/adaptivecomputing/torque">Torque</a></li>
+<li>Monitoring with <a href="http://www.warewulf.lbl.gov">Warewulf</a> (monitor and NHC) and
+<a href="http://www.nagios.org/">Nagios</a></li>
+</ul>
+
+
+<h3>Programming</h3>
+
+<ul>
+<li>For almost all prototyping, and many final projects: <a href="http://www.python.org">Python</a>
+
+<ul>
+<li>Except networking stuff where I care about performance: <a href="http://www.golang.org/">Go</a></li>
+<li>Or sometimes when I need to dig into the guts: <a href="http://en.wikipedia.org/wiki/C_(programming_language">C</a>)</li>
+</ul>
+</li>
+<li>For scientific computing: <a href="http://www.numpy.org/">NumPy</a> and <a href="http://www.scipy.org/">SciPy</a>
+
+<ul>
+<li>Except when I use <a href="http://en.wikipedia.org/wiki/Fortran">Fortran</a></li>
+<li>And <a href="http://www.julialang.org">Julia</a> is also fun</li>
+</ul>
+</li>
+</ul>
+
+
+<h3>General-use tools:</h3>
+
+<ul>
+<li>For web browsing, mostly I use <a href="https://www.google.com/intl/en/chrome/browser/">Chrome</a>
+like everyone else</li>
+<li>Terminal-multiplexing: <a href="http://www.gnu.org/software/screen/">GNU Screen</a></li>
+<li>Command-line mail client: <a href="http://www.mutt.org/">Mutt</a></li>
+<li>IRC: <a href="http://www.irssi.org/">irssi</a></li>
+<li>Command-line twitter: <a href="http://www.floodgap.com/software/ttytter/">TTYtter</a></li>
+<li>Desktop virtualization: <a href="http://www.virtualbox.org/">VirtualBox</a></li>
+</ul>
+
+
+<h3>Time-wasting</h3>
+
+<ul>
+<li><a href="http://www.bay12games.com/dwarves/">Dwarf Fortress</a></li>
+<li><a href="http://www.nethack.org/">Nethack</a></li>
+<li>See also <a href="http://www.google.com/chrome/">Chrome</a> and <a href="http://www.irssi.org/">irssi</a></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Some notes on the HPC cluster software stack]]></title>
+    <link href="http://ajdecon.github.com/the-hpc-cluster-software-stack/"/>
+    <updated>2012-11-03T18:48:00-06:00</updated>
+    <id>http://ajdecon.github.com/the-hpc-cluster-software-stack</id>
+    <content type="html"><![CDATA[<p><strong>Updates:</strong></p>
+
+<ul>
+<li>2012-04-23: Added notes on <a href="#automate">build automation</a>.</li>
+<li>2014-12-15: Updates to <a href="#configuration">configuration management</a>,
+<a href="#modules">modules</a> and <a href="#adhoc">ad-hoc tools</a>.</li>
+</ul>
+
+
+<hr />
+
+<p><strong>In this post, I'm mostly organizing a set of notes I've been using to help
+people put together small high-performance computing clusters.</strong></p>
+
+<p>For each category I'll try to summarize
+what that layer accomplishes for the cluster as a whole
+and give a few examples of software packages which fit into
+that layer. I'm not going to try to come up with an exhaustive list for each
+category, but instead talk about some packages which I've worked with
+personally and indicate a few favorites. I'll also mostly be
+limiting myself to the Linux HPC world, deploying onto commodity hardware
+(not a pre-built solution like a Cray), and mostly talking about open-source
+solutions (because I'm often giving advice to poor graduate students).</p>
+
+<p>The levels of the software stack I discuss include:</p>
+
+<ul>
+<li><a href="#provisioning">Provisioning System</a></li>
+<li><a href="#configuration">Configuration Management</a>
+
+<ul>
+<li>with some notes on <a href="#adhoc">ad-hoc tools</a> that are useful</li>
+</ul>
+</li>
+<li><a href="#mpi">Message passing libraries</a>
+
+<ul>
+<li>with some notes on <a href="#modules">library management</a> with environment-modules</li>
+<li>and on <a href="#automate">automating software builds</a></li>
+</ul>
+</li>
+<li><a href="#scheduling">Job scheduler</a></li>
+<li><a href="#filesystem">Shared filesystems</a></li>
+<li><a href="#monitoring">Monitoring</a></li>
+</ul>
+
+
+<!-- more -->
+
+
+<h3><a id="provisioning"></a>Provisioning system</h3>
+
+<p>An HPC cluster typically includes a few different types of computers:</p>
+
+<ul>
+<li>A master node, which runs any scheduler, monitoring, or other
+"infrastructure" software you have in place.</li>
+<li>One or more compute nodes which accomplish the actual computation.</li>
+<li>(optional) One or more separate fileserver nodes which export a shared
+filesystem.</li>
+<li>(optional) One or more separate login nodes, which users log into to
+submit their jobs.</li>
+<li>(optional) Other service nodes, which sometimes break out the functions of
+a master node into multiple servers in a large cluster.</li>
+</ul>
+
+
+<p>Now you could manually install an operating system on each of these
+servers, put together each server's software stack, and carefully configure
+each one... but for anything more than two or three compute nodes, this becomes
+really unpleasant. So you typically want to have some method
+to automatically deploy a pre-configured system image to one or more identical
+nodes.</p>
+
+<p>If you're using a cloud service like Amazon's
+<a href="http://aws.amazon.com/ec2/">Elastic Compute Cloud</a>, the provisioning system is
+provided with the service. For example, Amazon lets you boot up a VM from
+an image provided by Amazon or the community, make changes, and then save your
+modified system to a new image you can re-deploy to mutliple new VMs.</p>
+
+<p>If you're deploying onto hardware you own, there are a number of software packages
+which can automate OS deployment for you. A few of the ones I've used to set up
+HPC systems are:</p>
+
+<ul>
+<li><p><a href="http://en.wikipedia.org/wiki/Kickstart_(Linux">Kickstart</a> is a method for
+automating the installation of a Linux system using a file which specifies the
+system configuration and a list of packages to be installed. You boot the system
+with an installer for your Linux distribution of choice, and the installer
+follows the instructions in the kickstart file rather than
+making you manually step through the install. Kickstart was designed for Red Hat
+clones, but can be used for <a href="http://www.linuxuser.co.uk/tutorials/unattended-ubuntu-installations">Ubuntu</a>
+and other distros as well.</p>
+
+<p>  The major advantage of using Kickstart is that it's just an installation file,
+and can be used whether your install DVD is a physical DVD, an ISO distributed
+over the network, or whatever. A lot of provisioning systems require booting
+over the network using <a href="http://en.wikipedia.org/wiki/Preboot_Execution_Environment">PXE</a>,
+which works for most servers but is occasionally unavailable on older or
+desktop computers.</p></li>
+<li><p><a href="http://cobbler.github.com/">Cobbler</a> is a companion project to Kickstart, and
+makes it easier to manage Kickstart images and boot them over a network. It also
+includes a handy tool called koan which makes it possible to do network re-installs
+even if you can't do automated PXE boots.</p></li>
+<li><p><a href="http://warewulf.lbl.gov/trac">Warewulf</a> is a cluster management system which is
+designed for HPC. It provides a number of tools for building and deploying
+provisioning images, managing network configuration, and provides a basic configuration
+management system (see below).</p>
+
+<p>  Like xCAT and some other HPC-focused tools, it
+allows both "stateful" provisioning (where Linux is installed to the local disk), and
+"stateless" provisioning where the entire OS is simply loaded in RAM. This has the
+advantage of making it easy to change cluster configurations quickly because
+re-provisioning is much faster than writing the image to disk; but it means that
+in stateless mode, the nodes can't reboot unless the master is available to
+re-provision them.</p>
+
+<p>  In the most recent releases, Warewulf also includes a package called
+"warewulf-cluster" which sets up some sane defaults for managing users, NFS, etc.
+and "warewulf-icr", which is cerified under the
+<a href="http://software.intel.com/en-us/cluster-ready">Intel Cluster Ready</a> program.</p></li>
+<li><p><a href="http://www.openstack.org/">OpenStack</a> is a tool for creating private
+"cloud"-style systems, in which virtual machines are provisioned onto a
+pool of hardware and managed in a self-service manner by the users. I have
+qualms about using cloud-style provisioning systems for HPC because of
+the virtualization penalty and limited support for Infiniband, but
+OpenStack has a big community and provides some very good tools for
+image and node management.</p></li>
+<li><p><a href="http://www.platform.com/">Platform HPC</a> is a proprietary HPC cluster
+management system which aims to build clusters in a "turn-key" fashion.
+It does a pretty good job of this, provisioning stateful nodes using
+a Kickstart-based system, and automates the configuration of networking.
+It also integrates well with Platform's scheduler (LSF), provides some
+monitoring, and functions well as an all-around management system.</p></li>
+</ul>
+
+
+<p>Some other common provisioning systems designed for HPC
+include <a href="http://xcat.sourceforge.net/">xCAT</a> and <a href="http://www.brightcomputing.com/Bright-Cluster-Manager.php">Bright Cluster
+Manager</a> (proprietary).</p>
+
+<p><strong>My tool of choice:</strong> Warewulf, because it's free, flexible, and it fits my
+own mental model of clusters better than most other tools. I've also done
+a small amount of development for the project, so I'm very familiar with the code.</p>
+
+<h3><a id="configuration"></a>Configuration management</h3>
+
+<p>Provisioning "golden images" is a good way to deploy a large cluster of
+identical systems, but it's not the most flexible system: if all you have is a
+set of images, you either need to re-provision whenever you want to make a change
+(leading to downtime), or you need to make changes manually in-situ and carefully
+sync everything back into the image.</p>
+
+<p>Configuration management systems
+are used to bridge this gap, by providing an automated solution
+for deploying configuration files and scripted installations after the nodes
+are provisioned. Changing the configuration doesn't require a full OS
+re-deployment or a reboot, just re-running the configuration manager.</p>
+
+<p>How much of your configuration you want to keep in a provisioning image vs
+a configuration management system is a matter of choice. Some people
+try to put everything in their OS image to simplify deployments, where others
+provision pristine images straight from the Linux distribution and install their
+entire HPC configuration using a configuration management system.</p>
+
+<p>My own usual approach
+is somewhere between these extremes: I tend to provision system images which include
+all the software packages I want installed, but then configure the resulting
+images at boot time using a configuration manager.
+This lets me re-use the provisioning image whenever I
+want to set up a new cluster (because there's no cluster-specific configuration in
+the image), but means my configuration manager doesn't get bogged down
+doing software installs whenever I spin up.</p>
+
+<p>Some configuration management systems I've used include:</p>
+
+<ul>
+<li><p><a href="http://warewulf.lbl.gov/trac/wiki/Provision/Files">Warewulf file provisioning</a>:
+On Warewulf-provisioned clusters, I use the "file provisioning" system to sync
+configuration files to compute nodes. It's an extremely lightweight system: the
+files and their metadata are stored in a database on the master node, includes
+a basic templating language, and the files are served over HTTP. The nodes don't
+have any kind of specialized daemon on them to keep in sync: instead, there's just
+a basic script that's run by a cron job to download updated files using wget every
+five minutes.</p>
+
+<p>  The limitation of this system is that it can't do everything a larger
+configuration manager can do. File provisioning isn't really useful for
+provisioning software packages or managing service daemons, it just does
+what it says on the tin: provisions files. I find it usually works extremely
+well with systems like compute nodes, but it can be limiting when you need a
+more flexible system.</p></li>
+<li><p><a href="http://puppetlabs.com/">Puppet</a> is a configuration management system which
+defines a domain-specific languange (DSL) for describing the configuration of
+a server. For example, to install and configure the Torque scheduler client on
+a compute node, a snippet might look like this:</p>
+
+<pre><code>  class torque_mom {
+      package { "torque-client":
+          ensure =&gt; installed
+      }
+
+      file { "mom_config":
+          path =&gt; "/var/spool/torque/mom_priv/config",
+          ensure =&gt; file,
+          require =&gt; Package['torque-client'],
+          source =&gt; 'puppet://modules/torque_mom/config'
+      }
+
+      service { "pbs_mom":
+          name =&gt; "pbs_mom",
+          ensure =&gt; running,
+          enable =&gt; true,
+          subscribe =&gt; File["mom_config"]
+      }
+  }
+</code></pre>
+
+<p>  This manifest would then be read by the puppetd daemon on each node,
+  which would apply the described configuration to the server.
+  Puppet manifests can be run in any order, so you have to specify dependencies
+  manually where they exist. This helps ensure that the manifest is
+  <a href="http://en.wikipedia.org/wiki/Idempotence">idempotent</a>, meaning that you can
+  run the same manifest multiple times and the final state will always be the
+  same. This is helpful for maintaining a consistent system, because if a
+  node gets in a weird state you can just re-run the puppet manifests to
+  restore it to a good state.</p></li>
+<li><p><a href="http://www.opscode.com/chef/">Opscode Chef</a> uses a DSL as well, but this DSL
+is really some specialized syntax added to the Ruby language. Chef recipes are
+distributed to client nodes and run as Ruby scripts, but let you define
+configuration files, software resources, and services like this:</p>
+
+<pre><code>  package "torque-client" do
+      action :install
+  end
+
+  cookbook_file "mom_config" do
+      source "mom_config"
+      action :create
+      path "/var/spool/torque/mom_priv/config"
+  end
+
+  service "pbs_mom" do
+      supports :status =&gt; true, :restart =&gt; true
+      action [:enable, :start]
+  end
+</code></pre>
+
+<p>  It looks a lot like Puppet, but you can use the rest of the Ruby language too:
+  loops, conditionals, etc. It also doesn't do any re-ordering or dependency
+  management: all the recipes run from top to bottom, in order of their filenames.
+  This makes it easier to think through how a given recipe execute, but makes
+  ensuring idempotence trickier.</p></li>
+<li><p><em>(Update: 2014-12-15)</em> <a href="http://www.ansible.com">Ansible</a> is one of the newer kids on the block
+when it comes to configuration management, but it's already achieved a lot
+of popularity and has some strong advantages over some of the older systems.
+In particular, it brings with it a much simpler syntax, and has minimal
+external dependencies -- basically just Python and the Ansible package
+itself.</p>
+
+<p>  A simple Ansible playbook for deploying a Torque client would look
+  something like this:</p>
+
+<pre><code>  ---
+  - hosts: all
+    user: root
+    tasks:
+      - yum:
+          name="torque-client"
+          state=installed
+      - copy:
+          src="mom_config"
+          dest="/var/spool/torque/mom_priv/config"
+      - service:
+          name="pbs_mom"
+          state=started
+          enabled=yes
+</code></pre>
+
+<p>  The documentation generally recommends running Ansible in a
+  "push" mode, where a single controller node runs the actual Ansible
+  software and remotely executes the configuration process on each
+  client via SSH. This has some advantages, including the fact that
+  each of your client nodes doesn't need to have any Ansible software
+  installed at all -- only Python. However I've found that this process
+  doesn't scale very well to extremely large clusters, and that it makes
+  it a bit more difficult to automatically re-run the configuration at
+  set times to make sure the desired state is in place.</p>
+
+<p>  Instead, when I've built clusters with Ansible, I've usually set up
+  a "pull" process where each node periodically downloads my configuration
+  scripts in a cron job, and the Ansible plays themselves are set up to
+  run on "localhost" for each node. This takes a little more work, and it
+  means that each node has to already have Ansible installed, but provides
+  a workflow I find more natural. The actual sync process needs to be set
+  up separately, but can be as simple as putting a "wget" or "git pull"
+  command in your cron job.</p></li>
+</ul>
+
+
+<p>There are a bunch of other configuration management systems out there,
+including <a href="http://cfengine.com">Cfengine</a> and <a href="http://www.saltstack.com/">SaltStack</a>.
+Each system has its own syntax, advantages and disadvantages... but the most important
+thing is that your configuration is well-defined and can be easily deployed.</p>
+
+<p><strong>My tool of choice</strong>: If I'm using Warewulf I will typically use file
+provisioning for basic configuration, simply because integrating into
+the provisioning system makes life a lot easier. For any complex configuration,
+or for different environments, I typically use Ansible these days.</p>
+
+<h4><a id="adhoc"></a>Ad-hoc management tools</h4>
+
+<p>Another category worth noting here is "ad-hoc" cluster
+management tools: systems which
+are more about carrying out operations on a large number of nodes
+simultaneously, than about ensuring a consistent system state. Two useful tools
+I've encountered are:</p>
+
+<ul>
+<li><p><a href="http://code.google.com/p/pdsh/">pdsh</a>: the Parallel Distributed Shell, all it
+does is execute ssh commands in parallel on a large number of nodes. This is
+really useful for doing quick on-the-fly operations on a cluster. For example,
+running <code>pdsh -w node[000-999] "touch /tmp/file"</code> will create a file called
+"/tmp/file" on all thousand nodes in a cluster. It's just that simple.</p></li>
+<li><p><a href="http://docs.fabfile.org/en/1.4.3/">Fabric</a> is a Python library which accomplishes
+similar operations as pdsh, basically doing ssh in a loop. The difference is that
+you typically write a python script to accomplish a series of operations, like so:</p>
+
+<pre><code>  from fabric.api import local
+
+  def prepare_deploy():
+      local("./manage.py test my_app")
+      local("git add -p &amp;&amp; git commit")
+      local("git push")
+</code></pre>
+
+<p>  (borrowed from the Fabric tutorial). Running <code>fab prepare_deploy</code> would then run the relevant
+  commands on all the nodes supplied, either on the command line or in a config file.</p></li>
+<li><p><em>(Update: 2014-12-15)</em>
+<a href="https://cea-hpc.github.io/clustershell/">ClusterShell</a> is a new favorite
+of mine which combines some of the advantages of pdsh and Fabric. It provides
+a Python library for performing shell commands in parallel, on both
+local and remote nodes, as well as a command line tool <code>clush</code> which replaces
+pdsh and adds a few bells and whistles. The documentation actually claims
+better performance than pdsh, and I certainly haven't experienced a performance
+hig when using pdsh.</p>
+
+<p>  Here's an example of using the ClusterShell library to execute a command
+  on a group of nodes, adapted from the documentation:</p>
+
+<pre><code>  from ClusterShell.Task import task_self
+
+  # set up the task
+  task = task_self
+  task.shell("/usr/bin/uptime", nodes="compute0[01,30-90]")
+  task.resume()
+
+  # Print the results
+  for buf, nodes in task.iter_buffers():
+      print nodes, buf
+</code></pre>
+
+<p>  And then the clush tool works just like pdsh:</p>
+
+<pre><code>  clush -w compute[001-050] /usr/bin/uptime
+</code></pre>
+
+<p>  A few of the extras that clush provides over pdsh include colorized
+  output, a built-in option <code>-b</code> which acts like <code>dshbak</code>, and a tool
+  called <code>nodeset</code> for manipulating pdsh-style node lists (i.e.
+  <code>login0[1-5,7],compute[100-155]</code>).</p></li>
+</ul>
+
+
+<h3><a id="mpi"></a> Message passing libraries</h3>
+
+<p>In cluster computing, the class of libraries that gets the most attention is
+generally the <a href="http://en.wikipedia.org/wiki/Message_Passing_Interface">Message Passing Interface</a>
+(MPI). MPI is a standardized interface which simplifies inter-process communication
+for parallel applications. Many popular scientific applications depend on MPI,
+especially applications like parallel physics or chemistry simulations which
+require many processes to collaborate on a single time-stepped simulation.</p>
+
+<p>In case you haven't seen much MPI code, here's
+a simple example of an MPI prorgram which includes communication between
+processes, where each process sends a greeting message to the rank-0 process:</p>
+
+<pre><code>    #include &lt;stdio.h&gt;
+    #include &lt;mpi.h&gt;
+    #include &lt;string.h&gt;
+
+    int main(int argc, char* argv[]) {
+        int rank, count, source, dest;
+        int tag = 0;
+        char message[100];
+        MPI_Status status;
+
+        MPI_Init(&amp;argc, &amp;argv);
+        MPI_Comm_rank(MPI_COMM_WORLD, &amp;rank);
+        MPI_Comm_size(MPI_COMM_WORLD, &amp;count);
+
+        if (rank != 0) {
+            sprintf(message, "Greetings from process %d!",my_rank);
+            dest = 0;
+            MPI_Send(message, strlen(message)+1, MPI_CHAR, dest, tag, MPI_COMM_WORLD);
+        } else {
+            for (source = 1; source &lt; count; source++) {
+                MPI_Recv(message,100,MPI_CHAR,source,tag,MPI_COMM_WORLD, &amp;status);
+                printf("%s\n",message);
+            }
+        }
+        MPI_Finalize();
+    }
+</code></pre>
+
+<p>This program can be run across multiple systems, on whatever interconnect you like,
+without thinking about any of the networking involved: MPI abstracts the communication
+details away from you, leaving you to focus on the (already difficult) problem of
+parallel computing. Just run <code>mpirun -np &lt;number-of-processes&gt; -hostfile &lt;list-of-hosts&gt; ./a.out</code>.
+(Syntax can vary by implementation.) It provides a lot of useful constructs not just for sending and
+receiving messages, but providing barriers for synchronization, topologies
+for thinking about your processes in terms of your problem decomposition, etc.</p>
+
+<p><em>It's worth noting that MPI programs depend on the assumption of a reliable network,
+and typically don't have any resiliancy against major network or node failures.
+This means that if any node fails, the job dies. Most HPC scheduling systems
+therefore adopt the same model.</em></p>
+
+<p>However, "MPI" isn't a software package: it's a standard defined by committee, and
+there are multiple competing implementations of this standard, both
+open-source and proprietary. These implementations
+often specialize for certain hardware, or for different types of performance. A
+few MPI implementations worth knowing about include:</p>
+
+<ul>
+<li><a href="http://www.open-mpi.org/">OpenMPI</a>: One of the most popular MPIs out there, it
+is open-source, integrates with many different job schedulers, and supports most
+different cluster interconnects with good performance.</li>
+<li><a href="http://www.mcs.anl.gov/research/projects/mpich2/">MPICH2</a>: Developed by
+Argonne National Lab, MPICH2 is almost as widely used as OpenMPI. Its usage
+model is a little different than OpenMPI, but is also well-supported by
+most schedulers.</li>
+<li><a href="http://mvapich.cse.ohio-state.edu/overview/mvapich2/">MVAPICH2</a> is an MPI
+based on MPICH2, specialized for use with the high-performance
+Infiniband interconnect. Recently it has also included integration with CUDA
+for doing direct memory copies of data in GPU memory for NVIDIA GPUs.</li>
+<li><a href="http://software.intel.com/en-us/intel-mpi-library">Intel MPI</a> integrates well with the Intel
+compilers and offers generally high performance. The newest versions also have
+support for Intel's new Xeon Phi accelerators.</li>
+</ul>
+
+
+<p>There are many other implementations, including a lot of specialized and proprietary
+implementations: the ones above are just the ones I'm most familiar with.</p>
+
+<p>Choosing an MPI is complicated by whether you are writing your own software
+or using an open-source or licensed application; what hardware you will be using,
+especially what interconnect you are using; which HPC scheduler you're using, if any;
+and many other factors. My advice is to use the MPI recommended by your software vendor,
+which works with your hardware, or just using your favorite.</p>
+
+<h3><a id="modules"></a>Library management: Environment Modules</h3>
+
+<p>On many clusters, including almost all shared systems, you can't choose just one
+implementation of common libraries such as MPI, BLAS, LAPACK, etc. You might
+also want to have multiple versions of the same compilers or tools available,
+for application compatibility and performance tests. For example, I work with a couple
+of applications which only work with older versions of OpenMPI, but I still want to use
+the new versions on the same cluster.</p>
+
+<p>However, it's often
+hard to keep multiple versions of the same software around on Linux, as they tend
+to want to own the same files. One solution to this problem is the
+<a href="http://modules.sourceforge.net/">environment modules</a>
+system.</p>
+
+<p>When using environment modules, you typically install each software package into
+a non-standard location. For example, instead of letting each of your MPI implementations
+install into the standard Linux locations (<code>/usr/bin</code>, <code>/usr/lib</code>, etc), you install each
+one into a self-contained folder. For example, we might install OpenMPI 1.6.2 into
+<code>/opt/openmpi-1.6.2</code>.</p>
+
+<p>We then define a <em>modulefile</em> for each software package. The modulefile defines changes
+to the user's environment variables which are required to use the software package
+in question. For our OpenMPI package, the modulefile might look something like
+this:</p>
+
+<pre><code>    #%Module
+    set     root            /opt/openmpi-1.6.2
+    prepend-path    PATH                    $root/bin
+    prepend-path    LD_LIBRARY_PATH         $root/lib
+    prepend-path    C_INCLUDE_PATH          $root/include
+    prepend-path    MANPATH                 $root/share/man
+    conflict mpi
+</code></pre>
+
+<p>Let's go line-by-line. The first line declare this to be a module-file; the next
+line defines a "root" variable which shows where the software is installed. The next
+four lines use the "prepend-path" command to add the OpenMPI bin, library, include, and
+man directories to the relevant environment variables as the first entry; and the "conflict
+mpi" line notes that this modulefile conflicts with other mpi modulefiles.
+We then put this file in the modulefiles directory (/usr/share/Modules/modulefiles) as
+<code>mpi/openmpi/1.6.2</code>.</p>
+
+<p>On my personal development system, I have this and other modules installed to manage my
+software. If I type "module avail", I see the following output:</p>
+
+<pre><code>    [ajdecon@exp ~]$ module avail
+
+    ----------------------------------------------------------- /usr/share/Modules/modulefiles -----------------------------------------------------------
+    dot                     module-info             mpi/openmpi/1.6.2       python/2.7.3            use.own
+    gcc/4.7.2               modules                 mpi/openmpi/1.7-current python/3.2.3
+    module-cvs              mpi/mpich2/1.4.1        null                    ruby/1.9.3-p194
+</code></pre>
+
+<p>So you can see that I have multiple conflicting MPI and Python versions installed, as well as some
+other software. Then, when I load my OpenMPI 1.6.2 module, it changes my PATH to make sure I
+point to the right files:</p>
+
+<pre><code>    [ajdecon@exp ~]$ echo $PATH
+    /usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/home/ajdecon/bin
+    [ajdecon@exp ~]$ module load mpi/openmpi/1.6.2 
+    [ajdecon@exp ~]$ echo $PATH
+    /opt/openmpi-1.6.2/bin:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/home/ajdecon/bin
+</code></pre>
+
+<p><em>(Update: 2014-12-15)</em> There is also an alternative implementation of Modules called
+<a href="https://www.tacc.utexas.edu/research-development/tacc-projects/lmod">Lmod</a> which
+has been gaining popularity recently. Lmod duplicates the functionality of
+the regular implementation of Modules, but also provides some really cool
+additional features. One of these is support for module files written
+in Lua, a programming language which makes it easier to write more complex
+dynamic modules than the original Tcl-based language. It also provides support
+for <strong>hierarchical modules</strong>, which enable you to show the user only those
+application modules which can be used with the currently-loaded compiler
+and library modules.</p>
+
+<h3><a id="automate"></a>Automating software builds (added 2013-04-23)</h3>
+
+<p>When you start building a large number of libraries of different versions
+around, you may encounter an ugly truth: the build process for many scientific
+and HPC packages sucks.</p>
+
+<p>Many scientific applications have complex custom build
+processes which deviate from the simple <code>./configure &amp;&amp; make &amp;&amp; make install</code>
+you might wish for, and it can be difficult to get all the dependencies sorted
+out properly. And even when you do get them built, many applications and
+libraries are updated frequently with new features you want, making the
+software build challenge an ongoing issue.</p>
+
+<p>For these reasons, many HPC sites make use of some method for automating the
+process of building and updating software which is distributed as source.
+Keeping a large library of home-grown scripts is not uncommon, and Oak Ridge
+National Lab has a system called <a href="http://www.olcf.ornl.gov/center-projects/swtools/">SWTools</a>
+which is used in a number of places.</p>
+
+<p>My current favorite tool for this problem is called <a href="https://github.com/hpcugent/easybuild">EasyBuild</a>.
+EasyBuild provides a convenient framework for automating most software build
+processes via Python, as well as a fairly large library of existing recipes
+for a variety of common applications. If it knows how to build the dependencies
+of a given package, it will build those too... And it will automatically generate
+Module files with the right dependencies set up as well, to make your new
+software easy to use.</p>
+
+<p>Even more interesting (for those of us with demanding users), EasyBuild
+works just as well in a user's home directory as it does installing in a
+system location, and it will cheerfully create a local repository of software
+installs complete with generated Module files. Handy for both the users and the
+admins!</p>
+
+<p>For more details I suggest checking out the <a href="https://github.com/hpcugent/easybuild/wiki">EasyBuild wiki</a>
+on GitHub.</p>
+
+<h3><a id="scheduling"></a>Cluster scheduler</h3>
+
+<p>HPC clusters are often expensive systems, and it's important to make efficient use
+of them. This is especially true on a shared system where multiple users are
+competing for the same resources. HPC cluster schedulers generally implement
+a queuing system, where the compute nodes are divided into one or more queues
+and jobs are submitted to the scheduler. These jobs are then run automatically
+by the scheduler when the required resource become available.</p>
+
+<p>In most schedulers, this sort of automation is accomplished using the concept
+of a job script. Each user writes a simple (or not-so-simple) program, usually
+a shell script, automates the process of running their job. This script often
+contains directives to the scheduler which describe what resources are
+required. It is this program which is run by the scheduler when the job reaches
+the head of the queue.</p>
+
+<p>For example, a script for the PBS scheduler to run an MPI program which requires
+a temporary data directory might look like this:</p>
+
+<pre><code>    #!/bin/bash
+    #PBS -l nodes=4:ppn=12
+    #PBS -l walltime=02:00:00
+    mkdir /tmp/data
+    cd $HOME/myprogram
+    mpirun -np 48 ./myprogram --datadir=/tmp/data
+</code></pre>
+
+<p>This script includes directives to the scheduler saying that it needs 4 nodes with
+12 processors per node and that it will need 2 hours to run. It creates its data directory,
+changes to the directory where the binary is located, and launches a 48-process MPI
+program.  In most schedulers, there is some mechanism for the STDOUT and STDERR
+of the job to be captured and saved for the user, usually as files in the user's
+home directory identified by job number.</p>
+
+<p>HPC schedulers also generally provide some facilities for managing the compute
+nodes they will use to run: reporting on the CPU and memory activity, identifying
+which nodes have GPUs installed, and other resource management features. They
+also usually have the concept of "offlining" or "draining" a node, marking
+an individual compute node so that it will be assigned no new jobs. This allows
+the system administrator to let a node finish any existing jobs, then do
+maintenance on the node without worrying about disturbing new users.</p>
+
+<p>A few common HPC schedulers you might use on a cluster are:</p>
+
+<ul>
+<li><p><a href="http://www.adaptivecomputing.com/products/open-source/torque/">Torque</a>: Based on
+the old OpenPBS scheduler, Torque is a common open-source HPC resource manager
+developed by Adaptive Computing. It provides various facilities for node
+management and a simple "first-in first-out" scheduler. Torque also has
+extremely good integration with many MPI implementations, so that an MPI
+program can get its host-list directly from the scheduler with no
+incantations by the user.</p>
+
+<ul>
+<li>Adaptive Computing also develops the open-source <a href="http://www.clusterresources.com/products/maui-cluster-scheduler.php">Maui</a>
+and commercial <a href="http://www.adaptivecomputing.com/products/hpc-products/moab-hpc-basic-edition/">Moab</a>
+schedulers. These schedulers "sit on top" of a resource manager like Torque,
+providing more advanced options for scheduling user jobs. These products
+can be used to implement quality-of-service options for specific users;
+implement "fair-share" scheduling in which users who have not had any
+recent allocations get higher priority; and many other options.
+I tend to put together a lot of clusters which run Torque with Maui
+as the scheduler, but Moab has even more advanced features (and is
+updated more often).</li>
+</ul>
+</li>
+<li><p><a href="http://en.wikipedia.org/wiki/Oracle_Grid_Engine">Grid Engine</a> is a
+popular scheduler with a complicated past. Originally developed by Sun
+Microsystems, it is went with the rest of Sun's IP to Oracle... except
+that it was also an open-source project, which was forked to the name
+<a href="http://gridscheduler.sourceforge.net/">Open Grid Scheduler</a> when the
+community became dissatisfied with Oracle's stewardship. Meanwhile
+<a href="http://www.univa.com/products/grid-engine">Univa</a> hired many of Sun's
+original Grid Engine developers and established their own commercial
+fork, and this inspired <a href="https://arc.liv.ac.uk/trac/SGE">Son of Grid Engine</a>,
+yet another open source fork.</p>
+
+<p>  Confused yet?</p>
+
+<p>  For all its complicated history, Grid Engine is a high-quality and popular
+  HPC scheduling system. It's a little trickier to configure than Torque
+  (in my opinion) and manages its queues differently, but it fundamentally
+  manages the same problems. It also provides better quality-of-service
+  and prioritization options than the built-in Torque scheduler, though I
+  don't think it quite matches Maui or Moab.</p>
+
+<p>  Another noteworthy detail about Grid Engine is that it's the scheduler
+  of choice for the <a href="http://star.mit.edu/cluster/">MIT StarCluster</a> project,
+  which provides easy automation for setting up an HPC cluster on Amazon's
+  EC2 service. If you want to run on EC2, you could do worse than to just
+  run StarCluster.</p></li>
+<li><p><a href="http://www.schedmd.com/slurmdocs/slurm.html">SLURM</a> is another open-source
+resource manager, originally developed by Lawrence Livermore National Lab. It's
+an extremely scalable solution, able to run on truly huge supercomputing clusters,
+and has a lot of useful new ideas on resource management. It's also a lot easier to
+configure than Torque or GridEngine (in my opinion), but has less in the way of
+easy MPI integration, mostly because it's newer. SLURM's built-in
+scheduler is also FIFO like Torque, but can also integrate with Maui or Moab for
+more complex quality-of-service rules.</p></li>
+</ul>
+
+
+<p>Some other schedulers which are in common use include
+<a href="http://www.platform.com/workload-management/high-performance-computing">Platform LSF</a> and
+<a href="http://www.pbsworks.com/Product.aspx?id=1&amp;AspxAutoDetectCookieSupport=1">PBS Professional</a> by
+PBS Works.</p>
+
+<p><strong>My tool of choice</strong>: As a sysadmin I typically prefer using SLURM because of its ease of cofiguration,
+but PBS-based systems like Torque are much more common and most users are more
+familiar with them at this time.</p>
+
+<h3><a id="filesystem"></a>Shared filesystem</h3>
+
+<p>Most HPC clusters make use of shared network filesystems. These are typically used for user
+home directories, shared software, and sometimes for fast shared "scratch" filesystems for
+temporary job files. A shared filesystem is often the most brittle part of an HPC
+cluster, as these systems tend to fail more often than schedulers or MPI communication,
+but are so useful it's probably still worth it.</p>
+
+<p>Most small HPC clusters should just use <a href="http://en.wikipedia.org/wiki/Network_File_System">NFS</a>:
+it provides decent performance and
+reliability, is built in to most Linux distributions, and is very easy to set up.
+My advice in most cases is to set up your cluster with NFS first and benchmark
+applications. If you can get away with it, stop here: it all becomes much more complicated
+from there.</p>
+
+<p>However, the name of the game is "high performance", and many applications become I/O
+bound if run with a slow NFS server; so there are several parallel
+filesystems used on HPC clusters to eliminate I/O as a performance blocker.</p>
+
+<p>The only one I'm really familiar with is <a href="http://wiki.lustre.org/index.php/Main_Page">Lustre</a>,
+a shared filesystem which
+achieves high-performance by striping across disks attached to multiple I/O nodes.
+With a fast network, this improves performance both by increasing the number of disks
+any file is striped across, and by sharing the load across multiple network connections
+on multiple nodes. Lustre achieves this high performance in part by working at the level
+of the Linux kernel, and requires a patched kernel for the I/O nodes.</p>
+
+<p>One interesting feature of Lustre is that it actually allows the user to
+set up how any given file or directory is striped across the I/O nodes,
+so the particular I/O patterns can be tuned for any given job or application.</p>
+
+<p>Lustre, like Grid Engine, is an old Sun Microsystems project that has since
+been somewhat neglected by Oracle. Much of the interesting work on Lustre
+has recently been done by a startup called <a href="http://www.whamcloud.com/">WhamCloud</a>,
+who also sell some useful management tools for Lustre filesystems.</p>
+
+<p>Other parallel filesystems include <a href="http://www.pvfs.org/">PVFS2</a>, IBM's
+<a href="http://www-03.ibm.com/systems/software/gpfs/">GPFS</a>, and
+<a href="http://www.gluster.org/">GlusterFS</a>.</p>
+
+<p><strong>My tool of choice:</strong> NFS if I can get away with it, otherwise Lustre.</p>
+
+<h3><a id="monitoring"></a>Monitoring system</h3>
+
+<p>My tools of choice for monitoring HPC clusters include:</p>
+
+<ul>
+<li><p><a href="http://ganglia.sourceforge.net/">Ganglia</a> for real-time monitoring of
+cluster usage. Ganglia monitors just about everything: CPU, memory, networking, GPUs,
+and many other metrics. If a process is running away with too many resources, you
+can probably see it in Ganglia.</p></li>
+<li><p><a href="http://www.nagios.org/">Nagios</a> for notifications of problems like down nodes,
+full filesytems, dangerous loads, etc. Nagios can be tricky to learn to configure,
+but is extremely extensible and gan monitor just about anything with a little work.</p></li>
+</ul>
+
+
+<h3>My preferred cluster stack</h3>
+
+<p>Just to summarize at the end: here is my own preferred stack, subject to change
+based on the needs of the particular situation.</p>
+
+<ul>
+<li><strong>Warewulf</strong> for provisioning</li>
+<li><strong>Warewulf</strong> and <strong>Ansible</strong> for configuration management</li>
+<li><strong>OpenMPI</strong> for MPI, or whatever your app works best with</li>
+<li><strong>Environment modules (Lmod)</strong> for managing different libraries and compilers</li>
+<li><strong>EasyBuild</strong> for automating software builds</li>
+<li><strong>SLURM</strong> for job scheduling</li>
+<li><strong>NFS</strong> for a simple shared filesystem, or <strong>Lustre</strong> if I need the performance</li>
+<li><strong>Ganglia</strong> and <strong>Nagios</strong> for monitoring.</li>
+</ul>
+
+
+<p>But the right answer is to always benchmark, profile, and talk to your users!</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Migrated from Posterous to Octopress]]></title>
+    <link href="http://ajdecon.github.com/migrated-from-posterous-to-octopress/"/>
+    <updated>2012-10-22T06:49:00-06:00</updated>
+    <id>http://ajdecon.github.com/migrated-from-posterous-to-octopress</id>
+    <content type="html"><![CDATA[<p>Today I decided to take a leap I'd been thinking about for a while, and migrated
+my blog from <a href="http://www.posterous.com">Posterous</a> to the
+<a href="https://github.com/mojombo/jekyll/wiki">Jekyll</a>-based
+<a href="http://octopress.org/">Octopress</a>, a static page-generator. I did this
+<a href="http://blog.ajdecon.org/getting-disillusioned-with-blogging-sites/">partly because I've been losing faith in Posterous</a>,
+partly because I've been meaning to play with Jekyll/Octopress for a while, and
+partly because I'd just grown bored with the look of my website.</p>
+
+<p>Honestly, it was surprisingly easy, assuming some basic knowledge of Markdown and git.
+The docs on the Octopress website were very straightforward, I found a
+<a href="http://blog.justin.kelly.org.au/moved-from-posterous-to-octopress-plus-p-dot-ostero-dot-us/">handy script to migrate from Posterous</a>,
+and it was pretty easy to find a
+<a href="https://github.com/bkutil/bootstrap-theme">bootstrap-based theme</a> to use for the blog. It worked so
+well that I decided to go whole-hog and merge in my basic homepage as well as the blog (goodbye,
+old Wordpress install!) and the whole thing hosts easily at Github Pages.</p>
+
+<p>On the whole I think I like the new look, and I definitely enjoy the new workflow better.
+(Editing posts in Markdown with vim, hooray!) It also means I'm more independent of
+hosting providers, as I can generate the whole site statically and put it wherever I like.
+We'll see if it lasts, or I get bored with it again, but based on a day's interaction, I'm
+impressed.</p>
+]]></content>
+  </entry>
+  
+</feed>

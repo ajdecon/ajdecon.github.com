@@ -1,0 +1,358 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Building tiny compute clusters for fun and learning - Thinking Out Loud</title>
+  <meta name="author" content="Adam DeConinck">
+
+   
+  <meta name="description" content="">
+  
+  <meta name="keywords" content="">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://ajdecon.github.com/building-tiny-compute-clusters-for-fun-and-learning">
+  <link href="/favicon.png" rel="icon">
+  <link href='http://fonts.googleapis.com/css?family=Quicksand:300,400' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Thinking Out Loud" type="application/atom+xml">
+  <script src="/js/jquery.js"></script>
+  <script src="/js/bootstrap-collapse.js"></script>
+  <script src="/js/modernizr-2.0.js"></script>
+  <script src="/js/octopress.js" type="text/javascript"></script>
+  <script src="/js/application.js"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-12576607-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <div class="navbar navbar-inverse navbar-static-top">
+  	<div class="navbar-inner">
+  	  <div class="container">
+        <a class="btn btn-navbar" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+          <span class="fui-menu-24"></span>
+        </a>
+  	  	<div class="nav-collapse collapse navbar-responsive-collapse" style="height:0;">
+  	      <ul class="nav">
+    
+        <li ><a href="/">Home</a></li>
+    
+        <li ><a href="/about">About Adam</a></li>
+    
+        <li ><a href="https://www.ajdecon.org/ajdecon-key.txt">GPG key</a></li>
+    
+        <li ><a href="/pubs">Publications</a></li>
+    
+        <li ><a href="/atom.xml">RSS</a></li>
+    
+</ul>
+
+<ul class="nav pull-right">
+    
+    <li><a href="http://github.com/ajdecon" title="Github Profile"><i class="icon-github-sign social-navbar"></i></a></li>
+    
+    
+    
+    <li><a href="http://linkedin.com/in/ajdecon" title="Linkedin Profile"><i class="icon-linkedin-local social-navbar"></i></a></li>
+    
+    
+    <li><a href="http://twitter.com/ajdecon" title="Twitter Profile"><i class="icon-twitter-local social-navbar"></i></a></li>
+    
+    
+    <li><a href="http://plus.google.com/116247823819167414235" title="Google+ Profile"><i class="icon-google-plus-local social-navbar"></i></a></li>
+    
+    
+    
+
+    
+    <li><a href="mailto:ajdecon@ajdecon.org" title="Email"><i class="icon-envelope social-navbar"></i></a></li>
+    
+</ul>
+
+  	    </div>
+  	  </div>
+  	</div>
+  </div>
+  <div class="container" id="main">
+      <div class="row-fluid">
+        <div id="content">
+          <div>
+<article class="hentry" role="article">
+  
+
+  <header>
+  <div class="jumbotron">
+    Building Tiny Compute Clusters for Fun and Learning
+	<h5>
+
+
+
+
+
+
+
+
+  
+
+
+<i class="icon-calendar-empty"></i> <time datetime="2013-07-20T09:54:00-06:00" pubdate data-updated="true">Jul 20<span>th</span>, 2013</time></h5>
+  </div>
+</header>
+  <div class="row-fluid">
+    <div class="span12">
+      <p><img src="https://s3.amazonaws.com/ajdecon-public/Pi_Lego_detail.jpg" width=600></p>
+
+<p>Just for fun,
+I recently built a small HPC-style computing cluster out of five
+<a href="http://www.raspberrypi.org/">Raspberry Pi</a> servers.  While this kind of
+thing has of course been <a href="http://www.southampton.ac.uk/mediacentre/features/raspberry_pi_supercomputer.shtml">done</a>
+<a href="http://coen.boisestate.edu/ece/raspberry-pi/">before</a>, I wanted to build one
+anyway as a geek toy and a platform for me to play with a few HPC ideas.</p>
+
+<p>I think it actually turned out rather well, and it was a ridiculous amount of
+fun to build. My wife <a href="http://www.twitter.com/Leigh_47">Leigh</a> helped put together
+the Lego rack, and it was a lot of fun to put together. Because I was focusing more on
+duplicating a &#8220;real&#8221; cluster rather than getting performance, I included all the usual
+cluster services such as a <a href="http://slurm.schedmd.com">SLURM</a> scheduler,
+<a href="http://ganglia.sourceforge.net">Ganglia</a> for monitoring, and using one of the
+Pi&#8217;s as a non-computing login node. Total <a href="http://gist.github.com/ajdecon/6045818">HPL performance</a>,
+670 MFlops. Oh yeah!</p>
+
+<p>A few folks at <a href="http://www.nvidia.com/">NVIDIA</a>, where I also work on HPC clusters,
+also thought this was a cool project. The Pi cluster thus ended up being featured
+as an &#8220;Inner Geek&#8221; post on the
+<a href="http://blogs.nvidia.com/blog/2013/07/17/raspberry-pi/">company blog</a>, alongside
+other awesome projects from NVIDIANs such as a
+<a href="http://blogs.nvidia.com/blog/2013/05/23/inner-geek-restoring-my-fathers-meyers-aero-commander/">cool airplane restoration</a>
+and an <a href="http://blogs.nvidia.com/blog/2012/11/28/inner-geek-nvidia-engineer-serves-up-holiday-lights-gangnam-style/">amazing holiday lights display</a>.</p>
+
+<p>If you&#8217;re curious, I have details on how I put it together in my
+<a href="https://github.com/ajdecon/ansible-pi-cluster">ansible-pi-cluster</a> GitHub
+repository. This includes the <a href="http://www.ansible.cc">Ansible</a> playbooks
+I used to install all the software (though they still need some work), as
+well as some notes on the physical assembly and OS provisioning in the
+<a href="https://github.com/ajdecon/ansible-pi-cluster/blob/master/README.md">README</a>.</p>
+
+<p>I&#8217;ll admit that the <a href="http://gist.github.com/ajdecon/6045818">performance isn&#8217;t awesome</a>
+compared to other clusters
+(or even many laptops!), but I like having a cluster I can hold in my hands:</p>
+
+<p><img src="https://s3.amazonaws.com/ajdecon-public/PiWithLegos.jpg" width=600></p>
+
+<p>There are all sorts of other &#8220;tiny HPC cluster&#8221; projects out there,
+frequently used for teaching, and which have often done some real science.<br/>
+Here&#8217;s a short roundup of some other tiny clusters I&#8217;ve seen&#8230;
+And if you know something else I should include in this post, let me know
+and I&#8217;ll add it in.</p>
+
+<ul>
+<li><a href="http://www.southampton.ac.uk/~sjc/raspberrypi/">Idris-Pi</a>,
+the original Raspberry Pi + Legos supercomputer from Southampton University.
+This cluster included 64 Raspberry Pi boards, and they also have some
+<a href="http://www.southampton.ac.uk/~sjc/raspberrypi/pi_supercomputer_southampton.htm">instructions</a>
+posted for how they set up the software stack.  There was also a very
+interesting discussion of this cluster on the
+<a href="http://www.beowulf.org/pipermail/beowulf/2012-September/029953.html">Beowulf list</a></li>
+</ul>
+
+
+<iframe width="560" height="315" src="//www.youtube.com/embed/Jq5nrHz9I94" frameborder="0" allowfullscreen></iframe>
+
+
+
+
+<br/><br/>
+
+
+<ul>
+<li><a href="http://coen.boisestate.edu/ece/files/2013/05/Creating.a.Raspberry.Pi-Based.Beowulf.Cluster_v2.pdf">RPiCluster</a>
+from Boise State, a 32-node cluster built by <a href="http://www.linkedin.com/in/jkiepert">Joshua Kiepert</a>
+to use for his dissertation research. This link also includes detailed instructions on building
+his cluster.</li>
+</ul>
+
+
+<iframe width="560" height="315" src="//www.youtube.com/embed/i_r3z1jYHAc" frameborder="0" allowfullscreen></iframe>
+
+
+
+
+<br/><br/>
+
+
+<ul>
+<li><a href="http://littlefe.net/">LittleFe</a> is an ongoing project focused on building
+small educational HPC clusters which teachers can use in their classes.
+Their web site includes a continually-updated design for a 6-node cluster
+of Intel Atom processors, and their organization also holds build events at
+conferences such as <a href="http://www.supercomp.org/">SuperComputing</a> where
+interested teachers can build clusters they can take home.</li>
+</ul>
+
+
+<iframe width="560" height="315" src="//www.youtube.com/embed/ciY4vsij_ak" frameborder="0" allowfullscreen></iframe>
+
+
+<br/><br/>
+
+
+<hr />
+
+    </div>
+  </div>
+
+
+
+  <footer>
+    <hr>
+    
+    <div class="row-fluid">
+      
+      <div class="span6">
+        <p class="meta">
+        
+        
+
+
+
+  <a href="/blog/categories/hpc/"><span class="badge">HPC</span></a>
+
+  <a href="/blog/categories/raspberry_pi/"><span class="badge">raspberry_pi</span></a>
+
+
+
+
+        </p>
+      </div>
+      
+      <div class="span6 social-sharing">
+        <div class="sharing">
+  <div class="addthis_toolbox addthis_default_style ">
+  
+  
+  <a class="addthis_button_tweet"></a>
+  
+  
+  <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+  
+  <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid="></script>
+</div>
+
+      </div>
+      
+      
+    </div>
+    
+    <div class="row-fluid">
+      <div class="span12">
+        <p class="meta">
+          
+            <a class="basic-alignment left" href="/tools-of-choice/" title="Previous Post: Tools of choice, spring 2013 edition">&laquo; Tools of choice, spring 2013 edition</a>
+          
+          
+            <a class="basic-alignment right" href="/big-systems-talks/" title="Next Post: Big Systems Talks">Big Systems Talks &raquo;</a>
+          
+        </p>
+      </div>
+    </div>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+
+
+        </div>
+      </div>
+      <div class="row-fluid">
+        <footer class="footer-page" role="contentinfo">
+          <p>
+  Copyright &copy; 2015 - Adam DeConinck -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span> - Theme by <a href="http://alexgaribay.com">Alex Garibay</a>
+</p>
+
+
+        </footer>
+      </div>
+  </div>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'ajdecon';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://ajdecon.github.com/building-tiny-compute-clusters-for-fun-and-learning/';
+        var disqus_url = 'http://ajdecon.github.com/building-tiny-compute-clusters-for-fun-and-learning/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

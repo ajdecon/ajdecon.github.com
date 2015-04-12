@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: blogs | Thinking Out Loud]]></title>
+  <link href="http://ajdecon.github.com/blog/categories/blogs/atom.xml" rel="self"/>
+  <link href="http://ajdecon.github.com/"/>
+  <updated>2015-04-12T13:23:58-06:00</updated>
+  <id>http://ajdecon.github.com/</id>
+  <author>
+    <name><![CDATA[Adam DeConinck]]></name>
+    <email><![CDATA[ajdecon@ajdecon.org]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Looking for good Big Data, Data Vis and HPC blogs]]></title>
+    <link href="http://ajdecon.github.com/looking-for-good-big-data-data-vis-and-hpc-bl/"/>
+    <updated>2011-05-29T00:00:00-06:00</updated>
+    <id>http://ajdecon.github.com/looking-for-good-big-data-data-vis-and-hpc-bl</id>
+    <content type="html"><![CDATA[<p>Last year I moved on from computationally-tinged academic research into straight HPC, but my Google Reader feeds are still largely focused on physics and materials. (Well, and webcomics, and science fiction...) I've added a few feeds related to my new focus, but they've been chosen pretty haphazardly and I don't know if I'm missing out on something awesome or important.</p>
+
+
+<p> <p /> <p>I'm looking for good blogs related to high-performance computing, "Big Data" science, and data visualization. In no particular order, here's what I've got so far:</p> <p /> <ul> <li><a href="http://www.clustermonkey.net/">Cluster Monkey</a></li> <li><a href="http://www.datawrangling.com/">Data Wrangling</a></li> <li><a href="http://www.hpcinthecloud.com/">HPC in the Cloud</a></li> <li><a href="http://insidehpc.com/">insideHPC</a></li> <li><a href="http://www.hpcwire.com/">HPCwire</a></li> <li><a href="http://marchamilton.wordpress.com/">Marc Hamilton's Blog</a></li> <li><a href="http://blogs.cisco.com/category/performance/">Cisco High-Performance Networking</a></li> <li><a href="http://radar.oreilly.com/">O'Reilly Radar</a></li> <li><a href="http://blog.kamilkisiel.net/">Fast, Stable, Cheap--Pick One</a></li> <li><a href="http://chartporn.org/">Chart Porn</a></li> </ul></p>
+]]></content>
+  </entry>
+  
+</feed>

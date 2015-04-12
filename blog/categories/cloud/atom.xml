@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: cloud | Thinking Out Loud]]></title>
+  <link href="http://ajdecon.github.com/blog/categories/cloud/atom.xml" rel="self"/>
+  <link href="http://ajdecon.github.com/"/>
+  <updated>2015-04-12T13:23:58-06:00</updated>
+  <id>http://ajdecon.github.com/</id>
+  <author>
+    <name><![CDATA[Adam DeConinck]]></name>
+    <email><![CDATA[ajdecon@ajdecon.org]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Cloud services worth paying for]]></title>
+    <link href="http://ajdecon.github.com/cloud-services-worth-paying-for/"/>
+    <updated>2012-10-27T06:00:00-06:00</updated>
+    <id>http://ajdecon.github.com/cloud-services-worth-paying-for</id>
+    <content type="html"><![CDATA[<p>Despite being generally suspicious of any branding relating to "the cloud", I actually do use
+a variety of Internet-based services to accomplish many of my computing tasks. Even more than
+that, I pay for many of them!</p>
+
+<p>Here's a list of cloud services I find valuable enough to actually spend money on them. This
+entry will likely get updated as I find new services and/or remember any of them
+that I've forgotten.</p>
+
+<h3>File storage stuff</h3>
+
+<ul>
+<li><p><a href="http://www.dropbox.com/">Dropbox</a>: A service for syncing files between different computers
+and devices transparently, through the concept of a single shared folder. It really does
+"just work". While there's a 2 GB free tier, I pay for the 100 GB tier because I never like throwing
+anything away.</p></li>
+<li><p><a href="http://www.tarsnap.com/">Tarsnap</a>: "Online backups for the truly paranoid", Tarsnap
+performs encrypted backups to Amazon's Simple Storage Service using extremely-strong,
+well-vetted and open-source encryption software. Fairly cheap, it's priced at
+"300 picodollars/byte-month" ($0.30/GB-month) after compression and deduplication.
+This is my off-site backup solution for my personal machine and random servers (on-site is
+an Apple Time Capsule, which is also incredibly convenient).</p></li>
+</ul>
+
+
+<h3>Entertainment</h3>
+
+<p>These ones are typically shared with my wife, Leigh.</p>
+
+<ul>
+<li><p><a href="http://www.pandora.com/">Pandora</a>: Basically, auto-generated Internet radio stations.
+I pay for the "Pandora One" service to skip the ads, and it's one of the best uses of $36/year
+I can think of. Maybe I'm lazy, but when I'm at work or concentrating on other things I'd rather
+not have to build a playlist, and I like getting new music. Pandora handles it for me.</p></li>
+<li><p><a href="http://www.netflix.com/">Netflix</a>: A huge archive of movies and TV shows, available
+all the time on most devices, for a low monthly fee? What's not to like?</p></li>
+<li><p><a href="http://www.amazon.com">Amazon Instant Video, Cloud Player, and Kindle</a>: It doesn't
+<em>quite</em> qualify as a cloud service in my mind, because you have to buy specific items;
+but Amazon does make it easy to watch/listen/read your purchases on just about
+any device, just by signing in.</p></li>
+</ul>
+
+
+<h3>Web/tech stuff</h3>
+
+<ul>
+<li><a href="http://www.lastpass.com/">LastPass</a>: An encrypted password manager with browser integration, mobile
+clients, etc. I pay for LastPass because you can't get the mobile clients otherwise, and there are a
+few other value-adds. And right there, I never have to remember another password again. I really think
+that a password manager with good encryption, a long master password, and randomly-generated per-account
+passwords make for excellent security.</li>
+</ul>
+
+
+<h3>Honorable mentions: Free, but I'd totally pay if necessary</h3>
+
+<ul>
+<li><p><a href="http://www.bitbucket.org">Bitbucket</a>: A source-code hosting site with free private repositories,
+git and mercurial support, and some pretty decent wiki and issue-tracking features. I also like
+<a href="http://www.github.com/">Github</a>, and I use it for public projects because it has a larger
+mind-share in the software development community, but I generally prefer Bitbucket for personal
+stuff.</p></li>
+<li><p><a href="http://www.google.com/">Google Apps</a>: Including Mail, Docs, Calendar, and just about
+everything else under the sun. These tools are invaluable, and I love that I can set up Apps
+for a personal domain for free with little to no hassle. If I didn't live in a world
+dominated by Outlook and MS-Office, I'd do everything in Google's tools.</p></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>

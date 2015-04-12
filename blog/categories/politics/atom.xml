@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: politics | Thinking Out Loud]]></title>
+  <link href="http://ajdecon.github.com/blog/categories/politics/atom.xml" rel="self"/>
+  <link href="http://ajdecon.github.com/"/>
+  <updated>2015-04-12T13:23:58-06:00</updated>
+  <id>http://ajdecon.github.com/</id>
+  <author>
+    <name><![CDATA[Adam DeConinck]]></name>
+    <email><![CDATA[ajdecon@ajdecon.org]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Whedon on Romney: A candidate who isn't afraid to bring about the zombie apocalypse]]></title>
+    <link href="http://ajdecon.github.com/whedon-on-romney-a-candidate-who-isnt-afraid-to-bring-about-the-zombie-apocalypse/"/>
+    <updated>2012-10-29T05:08:00-06:00</updated>
+    <id>http://ajdecon.github.com/whedon-on-romney-a-candidate-who-isnt-afraid-to-bring-about-the-zombie-apocalypse</id>
+    <content type="html"><![CDATA[<iframe width="560" height="315" src="http://www.youtube.com/embed/6TiXUF9xbTo" frameborder="0" allowfullscreen></iframe>
+
+
+<p>I typically try to keep this blog a politics-free zone, as I think MPI, Fortran, science fiction, and zombies are all
+much more interesting topics to talk about.</p>
+
+<p>Thankfully, we've got some zombies right here for you...</p>
+]]></content>
+  </entry>
+  
+</feed>

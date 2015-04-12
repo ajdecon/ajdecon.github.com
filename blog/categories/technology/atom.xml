@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: technology | Thinking Out Loud]]></title>
+  <link href="http://ajdecon.github.com/blog/categories/technology/atom.xml" rel="self"/>
+  <link href="http://ajdecon.github.com/"/>
+  <updated>2015-04-12T13:23:58-06:00</updated>
+  <id>http://ajdecon.github.com/</id>
+  <author>
+    <name><![CDATA[Adam DeConinck]]></name>
+    <email><![CDATA[ajdecon@ajdecon.org]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[ajdecon.usesthis]]></title>
+    <link href="http://ajdecon.github.com/ajdeconusesthis/"/>
+    <updated>2010-10-01T00:00:00-06:00</updated>
+    <id>http://ajdecon.github.com/ajdeconusesthis</id>
+    <content type="html"><![CDATA[<p>Any geek will tell you that their computer setup is a very personal thing. The combination of a person's machine, operating system, choice of editor, and myriad configuration options can be important to a person's workflow, and sometimes to their very peace of mind. These are Important Choices.</p>
+
+
+<p> <p /> <p><a href="http://www.usesthis.com/">The Setup</a> is a fun if geeky blog which interviews prominent people and asks them about how they have their systems set up. It's a lot of fun to follow, partly because it gives you different ideas about how to set up your own computer. And partly because it's fun to find out that Matthew Mckeon refuses to let go of his zombie Thinkpad; that Keita Takahashi, the designer of Katamari Damacy, found it important to list the make and model of his refrigerator; and that Stephen Wolfram uses Mathematica for everything he can get away with.</p> <p /> <p>This got me thinking about my own setup, and how I've played with it and become comfortable with it. And since I'm bored and waiting for Leigh for dinner, I figured I'd write it all out. I can compare it with 6 months from now, and see what changes. We'll pretend I'm important enough to do an interview at the Setup. :)</p> <p /> <p><b>Who are you, and what do you do?</b></p> <p /> <p>My name is Adam DeConinck. I'm currently a grad student in materials science, doing research on colloidal materials. In November I'll be starting a job in high-performance computing at R Systems NA, Inc.</p> <p /> <p><b>What hardware are you using?</b></p> <p /> <p>My primary computer is a little Asus netbook, an EeePC 1005HAB. It's tiny and underpowered but it's probably as fast as my first laptop, and does the job pretty well. I like that it's very portable, the small keyboard doesn't bother me, and it's a lot more solid than some larger laptops I've used. It dual-boots Ubuntu and Win7, which I'm sure Asus never intended.</p> <p /> <p>I also have an iPod Touch, a Dell desktop of indeterminate age which serves media files to my Xbox 360, and a bargain-basement Verizon phone I plan to replace at my earliest convenience. My work machine is a occasionally-used Dell laptop which the University owns, and sits on my desk. My new employers will also buy my a Dell laptop, but I hope to use that more.</p> <p /> <p><b>And what software?</b></p> <p /> <p>Most important is probably Dropbox, as it backs up my important files and syncs with the University laptop, as well as helping with several paper collaborations. My browser of choice is Google Chrome, which I like for its minimal chrome and good stability. I like that the "pin tab" function in Chrome, and Gmail, Twitter and Pandora generally all live in pins on the left-hand side of my tab bar.</p> <p /> <p>I use a wide variety of software for my research, but the most important are probably ImageJ for lightweight image processing, python for simple text processing, and Matlab for image analysis and data processing. I test on my laptop and then run on full datasets on our group servers. I also have a VPS which I use for personal server-based work.</p> <p /> <p>I generally live in Ubuntu when I can, though some of my research tools require Windows. I generally have issues managing screen real estate, but I recently hit on a solution for the netbook involving lots of virtual desktops. Compiz provides a nice "expose" view of all at once which gives a good overview, and then I can maximize all my windows without fear of annoying overlap or Alt-Tab hell.</p> <p /> <p>My editor is vim and I use mercurial for version control. That's sufficient for taking sides in holy wars.</p> <p /> <p><b>What would be your dream setup?</b></p> <p /> <p>My favorite laptops are probably IBM Thinkpads, but I don't insist on them. Honestly my major requirement for a laptop is that it not be ten pounds, and not feel like it's going to break in my hands. The majority of my work has always been on a server or larger computer via ssh, so the particular hardware doesn't matter much. </p></p>
+]]></content>
+  </entry>
+  
+</feed>
