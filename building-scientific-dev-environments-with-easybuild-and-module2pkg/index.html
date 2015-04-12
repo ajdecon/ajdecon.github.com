@@ -160,49 +160,91 @@ basic development tools (the &#8220;@development&#8221; yum group), EasyBuild, a
 It also pulls down my &#8220;module2pkg&#8221; wrapper script for packaging modules
 with FPM. (More on that later.)</p>
 
-<pre><code>---
-- hosts: builder
-  user: root
-  tasks:
-  - name: install dev and packaging tools
-    yum: name= state=present
-    with_items:
-    - "@development"
-    - "environment-modules"
-    - "python-pip"
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>---
+</span><span class='line'>    - hosts: builder
+</span><span class='line'>      user: root
+</span><span class='line'>      tasks:
+</span><span class='line'>      - name: install dev and packaging tools
+</span><span class='line'>        yum: name={{item}} state=present
+</span><span class='line'>        with_items:
+</span><span class='line'>        - "@development"
+</span><span class='line'>        - "environment-modules"
+</span><span class='line'>        - "python-pip"
+</span><span class='line'> 
+</span><span class='line'>      # Set up module2pkg script
+</span><span class='line'>      - name: install fpm
+</span><span class='line'>        gem: name=fpm state=present
+</span><span class='line'>
+</span><span class='line'>      - name: pull down module2pkg script
+</span><span class='line'>        git: repo="https://github.com/ajdecon/module2pkg" dest=/opt/module2pkg
+</span><span class='line'> 
+</span><span class='line'>      - name: symlink for running module2pkg
+</span><span class='line'>        file: src="/opt/module2pkg/module2pkg" dest="/usr/local/bin/module2pkg" state=link
+</span><span class='line'> 
+</span><span class='line'> 
+</span><span class='line'>      # Set up and configure EasyBuild
+</span><span class='line'>      - name: easybuild user for building software
+</span><span class='line'>        user: name=easybuild createhome=yes state=present
+</span><span class='line'> 
+</span><span class='line'>      - name: /opt/easybuild where EB sw will go
+</span><span class='line'>        file: path="/opt/easybuild" owner=easybuild mode=0755 state=directory
+</span><span class='line'>             - name: install easybuild
+</span><span class='line'>        pip: name=easybuild state=present
+</span><span class='line'> 
+</span><span class='line'>      - name: ensure easybuild user .config dir exists
+</span><span class='line'>        file: path="/home/easybuild/.config/easybuild" owner=easybuild mode=0755
+</span><span class='line'>              state=directory
+</span><span class='line'> 
+</span><span class='line'>      - name: ensure ~easybuild/.config/config.cfg exists
+</span><span class='line'>        file: path="/home/easybuild/.config/easybuild/config.cfg" owner=easybuild
+</span><span class='line'>              mode=0644 state=touch
+</span><span class='line'> 
+</span><span class='line'>      - name: configure prefix
+</span><span class='line'>        ini_file: dest="/home/easybuild/.config/easybuild/config.cfg" section="config"
+</span><span class='line'>                  option="prefix" value="/opt/easybuild"</span></code></pre></td></tr></table></div></figure>
 
-  # Set up module2pkg script
-  - name: install fpm
-    gem: name=fpm state=present
-
-  - name: pull down module2pkg script
-    git: repo="https://github.com/ajdecon/module2pkg" dest=/opt/module2pkg
-
-  - name: symlink for running module2pkg
-    file: src="/opt/module2pkg/module2pkg" dest="/usr/local/bin/module2pkg" state=link
-
-
-  # Set up and configure EasyBuild
-  - name: easybuild user for building software
-    user: name=easybuild createhome=yes state=present
-
-  - name: /opt/easybuild where EB sw will go
-    file: path="/opt/easybuild" owner=easybuild mode=0755 state=directory
-         - name: install easybuild
-    pip: name=easybuild state=present
-
-  - name: ensure easybuild user .config dir exists
-    file: path="/home/easybuild/.config/easybuild" owner=easybuild mode=0755
-          state=directory
-
-  - name: ensure ~easybuild/.config/config.cfg exists
-    file: path="/home/easybuild/.config/easybuild/config.cfg" owner=easybuild
-          mode=0644 state=touch
-
-  - name: configure prefix
-    ini_file: dest="/home/easybuild/.config/easybuild/config.cfg" section="config"
-              option="prefix" value="/opt/easybuild"
-</code></pre>
 
 <h2>Building Modules with EasyBuild</h2>
 
