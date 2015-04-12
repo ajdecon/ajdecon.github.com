@@ -4,7 +4,7 @@
   <title><![CDATA[Category: easybuild | Thinking Out Loud]]></title>
   <link href="http://blog.ajdecon.org/blog/categories/easybuild/atom.xml" rel="self"/>
   <link href="http://blog.ajdecon.org/"/>
-  <updated>2015-04-12T13:36:40-06:00</updated>
+  <updated>2015-04-12T13:38:18-06:00</updated>
   <id>http://blog.ajdecon.org/</id>
   <author>
     <name><![CDATA[Adam DeConinck]]></name>
@@ -58,7 +58,7 @@ with FPM. (More on that later.)</p>
   user: root
   tasks:
   - name: install dev and packaging tools
-    yum: name="" state=present
+    yum: name= state=present
     with_items:
     - "@development"
     - "environment-modules"
@@ -67,6 +67,7 @@ with FPM. (More on that later.)</p>
   # Set up module2pkg script
   - name: install fpm
     gem: name=fpm state=present
+
   - name: pull down module2pkg script
     git: repo="https://github.com/ajdecon/module2pkg" dest=/opt/module2pkg
 
