@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: scifi | Thinking Out Loud]]></title>
-  <link href="http://ajdecon.github.com/blog/categories/scifi/atom.xml" rel="self"/>
-  <link href="http://ajdecon.github.com/"/>
-  <updated>2015-04-12T13:31:50-06:00</updated>
-  <id>http://ajdecon.github.com/</id>
+  <link href="http://blog.ajdecon.org/blog/categories/scifi/atom.xml" rel="self"/>
+  <link href="http://blog.ajdecon.org/"/>
+  <updated>2015-04-12T13:36:40-06:00</updated>
+  <id>http://blog.ajdecon.org/</id>
   <author>
     <name><![CDATA[Adam DeConinck]]></name>
     <email><![CDATA[ajdecon@ajdecon.org]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Book Review: YOU]]></title>
-    <link href="http://ajdecon.github.com/book-review-you/"/>
+    <link href="http://blog.ajdecon.org/book-review-you/"/>
     <updated>2013-04-27T12:56:00-06:00</updated>
-    <id>http://ajdecon.github.com/book-review-you</id>
+    <id>http://blog.ajdecon.org/book-review-you</id>
     <content type="html"><![CDATA[<p><a href="http://www.goodreads.com/book/show/15790854-you">YOU</a>, by Austin Grossman,
 is a novel about video games, growing up with your high school friends,
 and figuring out what the hell you
@@ -89,9 +89,9 @@ Invincible</em>.</p>
   
   <entry>
     <title type="html"><![CDATA[Where do we come from? The dark side of the moon!]]></title>
-    <link href="http://ajdecon.github.com/where-do-we-come-from-the-dark-side-of-the-moon-a-review-of-iron-sky/"/>
+    <link href="http://blog.ajdecon.org/where-do-we-come-from-the-dark-side-of-the-moon-a-review-of-iron-sky/"/>
     <updated>2012-10-29T05:20:00-06:00</updated>
-    <id>http://ajdecon.github.com/where-do-we-come-from-the-dark-side-of-the-moon-a-review-of-iron-sky</id>
+    <id>http://blog.ajdecon.org/where-do-we-come-from-the-dark-side-of-the-moon-a-review-of-iron-sky</id>
     <content type="html"><![CDATA[<p>Months ago I came across a movie trailer which I had to share with everyone I knew.
 I was convinced that this movie could be nothing but concentrated awesome. It
 looked like it had everything an excellent action movie needs...
@@ -134,9 +134,9 @@ It's only the writers and the actors who disappointed me. :-)</p>
   
   <entry>
     <title type="html"><![CDATA[Whedon on Romney: A candidate who isn't afraid to bring about the zombie apocalypse]]></title>
-    <link href="http://ajdecon.github.com/whedon-on-romney-a-candidate-who-isnt-afraid-to-bring-about-the-zombie-apocalypse/"/>
+    <link href="http://blog.ajdecon.org/whedon-on-romney-a-candidate-who-isnt-afraid-to-bring-about-the-zombie-apocalypse/"/>
     <updated>2012-10-29T05:08:00-06:00</updated>
-    <id>http://ajdecon.github.com/whedon-on-romney-a-candidate-who-isnt-afraid-to-bring-about-the-zombie-apocalypse</id>
+    <id>http://blog.ajdecon.org/whedon-on-romney-a-candidate-who-isnt-afraid-to-bring-about-the-zombie-apocalypse</id>
     <content type="html"><![CDATA[<iframe width="560" height="315" src="http://www.youtube.com/embed/6TiXUF9xbTo" frameborder="0" allowfullscreen></iframe>
 
 

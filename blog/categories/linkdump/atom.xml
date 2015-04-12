@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: linkdump | Thinking Out Loud]]></title>
-  <link href="http://ajdecon.github.com/blog/categories/linkdump/atom.xml" rel="self"/>
-  <link href="http://ajdecon.github.com/"/>
-  <updated>2015-04-12T13:31:50-06:00</updated>
-  <id>http://ajdecon.github.com/</id>
+  <link href="http://blog.ajdecon.org/blog/categories/linkdump/atom.xml" rel="self"/>
+  <link href="http://blog.ajdecon.org/"/>
+  <updated>2015-04-12T13:36:40-06:00</updated>
+  <id>http://blog.ajdecon.org/</id>
   <author>
     <name><![CDATA[Adam DeConinck]]></name>
     <email><![CDATA[ajdecon@ajdecon.org]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Linkdump 2015-01-11]]></title>
-    <link href="http://ajdecon.github.com/linkdump-2015-01-11/"/>
+    <link href="http://blog.ajdecon.org/linkdump-2015-01-11/"/>
     <updated>2015-01-11T12:00:00-07:00</updated>
-    <id>http://ajdecon.github.com/linkdump-2015-01-11</id>
+    <id>http://blog.ajdecon.org/linkdump-2015-01-11</id>
     <content type="html"><![CDATA[<h3>HPC</h3>
 
 <ul>
@@ -47,9 +47,9 @@
   
   <entry>
     <title type="html"><![CDATA[Linkdump 2014-12-28]]></title>
-    <link href="http://ajdecon.github.com/linkdump-2014-12-28/"/>
+    <link href="http://blog.ajdecon.org/linkdump-2014-12-28/"/>
     <updated>2014-12-28T12:59:00-07:00</updated>
-    <id>http://ajdecon.github.com/linkdump-2014-12-28</id>
+    <id>http://blog.ajdecon.org/linkdump-2014-12-28</id>
     <content type="html"><![CDATA[<p>Been a while since I did one of these, so here's a list of some of the
 interesting links I find in my Pinboard bookmarks from this December.</p>
 
@@ -92,9 +92,9 @@ interesting links I find in my Pinboard bookmarks from this December.</p>
   
   <entry>
     <title type="html"><![CDATA[Good links from the past week - 11/22]]></title>
-    <link href="http://ajdecon.github.com/good-links-from-the-past-week-11-22/"/>
+    <link href="http://blog.ajdecon.org/good-links-from-the-past-week-11-22/"/>
     <updated>2014-11-22T14:15:00-07:00</updated>
-    <id>http://ajdecon.github.com/good-links-from-the-past-week-11-22</id>
+    <id>http://blog.ajdecon.org/good-links-from-the-past-week-11-22</id>
     <content type="html"><![CDATA[<p>A few things I read and enjoyed over the past week. No guarantee that they
 were originally posted during that week... sometimes I'm a little slow. :)</p>
 
@@ -137,9 +137,9 @@ were originally posted during that week... sometimes I'm a little slow. :)</p>
   
   <entry>
     <title type="html"><![CDATA[Good links from the past week]]></title>
-    <link href="http://ajdecon.github.com/good-links-from-the-past-week/"/>
+    <link href="http://blog.ajdecon.org/good-links-from-the-past-week/"/>
     <updated>2014-11-22T14:15:00-07:00</updated>
-    <id>http://ajdecon.github.com/good-links-from-the-past-week</id>
+    <id>http://blog.ajdecon.org/good-links-from-the-past-week</id>
     <content type="html"><![CDATA[<p>A few things I read and enjoyed over the past week. No guarantee that they
 were originally posted during that week... sometimes I'm a little slow. :)</p>
 
@@ -182,9 +182,9 @@ were originally posted during that week... sometimes I'm a little slow. :)</p>
   
   <entry>
     <title type="html"><![CDATA[Good links from the past week]]></title>
-    <link href="http://ajdecon.github.com/good-links-from-the-past-week/"/>
+    <link href="http://blog.ajdecon.org/good-links-from-the-past-week/"/>
     <updated>2014-11-11T08:10:00-07:00</updated>
-    <id>http://ajdecon.github.com/good-links-from-the-past-week</id>
+    <id>http://blog.ajdecon.org/good-links-from-the-past-week</id>
     <content type="html"><![CDATA[<p>Being a list of things I read and enjoyed over the past week.</p>
 
 <h3>HPC</h3>

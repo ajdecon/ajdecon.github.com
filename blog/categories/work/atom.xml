@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: work | Thinking Out Loud]]></title>
-  <link href="http://ajdecon.github.com/blog/categories/work/atom.xml" rel="self"/>
-  <link href="http://ajdecon.github.com/"/>
-  <updated>2015-04-12T13:31:50-06:00</updated>
-  <id>http://ajdecon.github.com/</id>
+  <link href="http://blog.ajdecon.org/blog/categories/work/atom.xml" rel="self"/>
+  <link href="http://blog.ajdecon.org/"/>
+  <updated>2015-04-12T13:36:40-06:00</updated>
+  <id>http://blog.ajdecon.org/</id>
   <author>
     <name><![CDATA[Adam DeConinck]]></name>
     <email><![CDATA[ajdecon@ajdecon.org]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Notice of Life Change: Heading to New Mexico and LANL]]></title>
-    <link href="http://ajdecon.github.com/heading-to-new-mexico-and-lanl/"/>
+    <link href="http://blog.ajdecon.org/heading-to-new-mexico-and-lanl/"/>
     <updated>2014-06-05T20:22:00-06:00</updated>
-    <id>http://ajdecon.github.com/heading-to-new-mexico-and-lanl</id>
+    <id>http://blog.ajdecon.org/heading-to-new-mexico-and-lanl</id>
     <content type="html"><![CDATA[<p>For those who haven't heard yet: Leigh and I are moving to Santa Fe! I
 am joining the HPC-3 team at Los Alamos National Lab as a Cluster
 Administrator helping to manage the Lab's production HPC systems.

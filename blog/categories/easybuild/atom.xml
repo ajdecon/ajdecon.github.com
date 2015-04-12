@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: easybuild | Thinking Out Loud]]></title>
-  <link href="http://ajdecon.github.com/blog/categories/easybuild/atom.xml" rel="self"/>
-  <link href="http://ajdecon.github.com/"/>
-  <updated>2015-04-12T13:31:50-06:00</updated>
-  <id>http://ajdecon.github.com/</id>
+  <link href="http://blog.ajdecon.org/blog/categories/easybuild/atom.xml" rel="self"/>
+  <link href="http://blog.ajdecon.org/"/>
+  <updated>2015-04-12T13:36:40-06:00</updated>
+  <id>http://blog.ajdecon.org/</id>
   <author>
     <name><![CDATA[Adam DeConinck]]></name>
     <email><![CDATA[ajdecon@ajdecon.org]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Notes on building and packaging environment modules with EasyBuild and FPM]]></title>
-    <link href="http://ajdecon.github.com/building-scientific-dev-environments-with-easybuild-and-module2pkg/"/>
+    <link href="http://blog.ajdecon.org/building-scientific-dev-environments-with-easybuild-and-module2pkg/"/>
     <updated>2015-04-11T11:41:00-06:00</updated>
-    <id>http://ajdecon.github.com/building-scientific-dev-environments-with-easybuild-and-module2pkg</id>
+    <id>http://blog.ajdecon.org/building-scientific-dev-environments-with-easybuild-and-module2pkg</id>
     <content type="html"><![CDATA[<p>Like any good sysadmin, I strongly prefer to install software using my OS's
 built-in package management system. Unfortunately, a lot of the software
 used in scientific high-performance computing doesn't make this easy.
@@ -28,7 +28,7 @@ build processes.</p>
 
 <p>This post consists of some notes on a workflow I've used for building scientific software and
 producing RPMs which can be used to distribute that software in the future.
-I mostly use this workflow mostly for <strong>personal projects</strong> -- building and testing
+I use this workflow mostly for <strong>personal projects</strong> -- building and testing
 clusters on Amazon EC2, for example. (<strong>Disclaimer:</strong> This is not the workflow in production use
 at the Day Job, where the software management problems are much more challenging!)</p>
 
@@ -71,7 +71,7 @@ with FPM. (More on that later.)</p>
     git: repo="https://github.com/ajdecon/module2pkg" dest=/opt/module2pkg
 
   - name: symlink for running module2pkg
-    file: src="http://ajdecon.github.com/opt/module2pkg/module2pkg" dest="/usr/local/bin/module2pkg" state=link
+    file: src="http://blog.ajdecon.org/opt/module2pkg/module2pkg" dest="/usr/local/bin/module2pkg" state=link
 
 
   # Set up and configure EasyBuild

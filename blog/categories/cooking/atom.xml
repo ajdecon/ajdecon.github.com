@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: cooking | Thinking Out Loud]]></title>
-  <link href="http://ajdecon.github.com/blog/categories/cooking/atom.xml" rel="self"/>
-  <link href="http://ajdecon.github.com/"/>
-  <updated>2015-04-12T13:31:50-06:00</updated>
-  <id>http://ajdecon.github.com/</id>
+  <link href="http://blog.ajdecon.org/blog/categories/cooking/atom.xml" rel="self"/>
+  <link href="http://blog.ajdecon.org/"/>
+  <updated>2015-04-12T13:36:40-06:00</updated>
+  <id>http://blog.ajdecon.org/</id>
   <author>
     <name><![CDATA[Adam DeConinck]]></name>
     <email><![CDATA[ajdecon@ajdecon.org]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Making progress on the New Years Resolutions...]]></title>
-    <link href="http://ajdecon.github.com/making-progress-on-the-new-years-resolutions/"/>
+    <link href="http://blog.ajdecon.org/making-progress-on-the-new-years-resolutions/"/>
     <updated>2012-01-08T00:00:00-07:00</updated>
-    <id>http://ajdecon.github.com/making-progress-on-the-new-years-resolutions</id>
+    <id>http://blog.ajdecon.org/making-progress-on-the-new-years-resolutions</id>
     <content type="html"><![CDATA[<p>Three of this year's Resolutions (or at least, strong intentions) have been to exercise more, cook more, and write in this blog more often. Today I made progress in all of these...</p>
 
 

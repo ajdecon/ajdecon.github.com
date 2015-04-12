@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: opinion | Thinking Out Loud]]></title>
-  <link href="http://ajdecon.github.com/blog/categories/opinion/atom.xml" rel="self"/>
-  <link href="http://ajdecon.github.com/"/>
-  <updated>2015-04-12T13:31:50-06:00</updated>
-  <id>http://ajdecon.github.com/</id>
+  <link href="http://blog.ajdecon.org/blog/categories/opinion/atom.xml" rel="self"/>
+  <link href="http://blog.ajdecon.org/"/>
+  <updated>2015-04-12T13:36:40-06:00</updated>
+  <id>http://blog.ajdecon.org/</id>
   <author>
     <name><![CDATA[Adam DeConinck]]></name>
     <email><![CDATA[ajdecon@ajdecon.org]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Some thoughts on #HPC in the #cloud... (#askolo question)]]></title>
-    <link href="http://ajdecon.github.com/some-thoughts-on-hpc-in-the-cloud-askolo-ques/"/>
+    <link href="http://blog.ajdecon.org/some-thoughts-on-hpc-in-the-cloud-askolo-ques/"/>
     <updated>2012-04-13T00:00:00-06:00</updated>
-    <id>http://ajdecon.github.com/some-thoughts-on-hpc-in-the-cloud-askolo-ques</id>
+    <id>http://blog.ajdecon.org/some-thoughts-on-hpc-in-the-cloud-askolo-ques</id>
     <content type="html"><![CDATA[<p><span style="font-size: small;">As <a href="http://blog.ajdecon.org/askolo-an-interesting-new-one-to-one-qa-site">previously mentioned</a>, I've been spending some time lately on <a href="http://www.askolo.com/">Askolo</a>, a directed Q&amp;A website. My first question from another user was "<span style="color: #161f21; font-family: Helvetica Neue, Helvetica, Arial, sans-serif; line-height: 16px;">What do you think of the AWS HPC clusters?</span><span style="color: #161f21; font-family: Helvetica Neue, Helvetica, Arial, sans-serif; font-weight: bold; line-height: 16px;">", </span><span style="color: #161f21; line-height: 16px;">and I wrote a fairly lengthy 
 and rambling response which seemed worth saving. <strong>(From 12/9/2012: Askolo went into maintenance mode later this year, and the 
 site's future is uncertain... so this may have been a good idea! :) )</strong>  I'm pasting it here (slightly modified) so it gets a different audience, and to keep my own copy for later comparison as my opinions evolve.</span></span></p>

@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: rss | Thinking Out Loud]]></title>
-  <link href="http://ajdecon.github.com/blog/categories/rss/atom.xml" rel="self"/>
-  <link href="http://ajdecon.github.com/"/>
-  <updated>2015-04-12T13:31:50-06:00</updated>
-  <id>http://ajdecon.github.com/</id>
+  <link href="http://blog.ajdecon.org/blog/categories/rss/atom.xml" rel="self"/>
+  <link href="http://blog.ajdecon.org/"/>
+  <updated>2015-04-12T13:36:40-06:00</updated>
+  <id>http://blog.ajdecon.org/</id>
   <author>
     <name><![CDATA[Adam DeConinck]]></name>
     <email><![CDATA[ajdecon@ajdecon.org]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Google Reader ]]></title>
-    <link href="http://ajdecon.github.com/google-reader/"/>
+    <link href="http://blog.ajdecon.org/google-reader/"/>
     <updated>2010-01-11T00:00:00-07:00</updated>
-    <id>http://ajdecon.github.com/google-reader</id>
+    <id>http://blog.ajdecon.org/google-reader</id>
     <content type="html"><![CDATA[<p>[[posterous-content:xeWmjOFgN1dbTr9K9s7c]]<p>As a lot of my friends know, I spend a ridiculous amount of time <br />reading RSS feeds in <a href="http://reader.google.com">Google Reader</a>. I follow a grand total of something like 96 feeds, and I <br />usually wake up each day with something over 200 unread items, and <br />then another 100-200 in the evening. A lot of these are things like <br />BBC and NYTimes articles for which I only skim headlines, but I <br />probably read in depth a good 50-70 articles per day. <p /> Recently I've also been playing with the social and tracking tools <br />that GReader includes, which are becoming more and more useful to me. <br />Each article has a little "Share" button under it, and clicking this <br />adds the article to a feed which other users can see. It also tags <br />the article with a small comment feed and an optional area to leave a <br />note at the top, almost as if you had just blogged about the article. <p /> This gets published in GReader, as its own web page (mine is <a href="http://www.google.com/reader/shared/ajdecon">here</a>), and as <br />an <a href="http://www.google.com/reader/public/atom/user%2F14044893685848644248%2Fstate%2Fcom.google%2Fbroadcast">Atom feed</a> which other people can subscribe to in any feed reader. You <br />can control how public or private this all is. This is a pretty <br />obvious targeting of Twitter, but I think it occupies its own niche as <br />Twitter does not easily connect with RSS on the article discovery <br />side. And Twitter is less about link sharing and more about <br />conversation anyway. <p /> The pool of people who auto-discover your feed through GReader <br />consists of your GChat contacts. This is useful, but it'd be better <br />if there were a better way of discovering new feeds, especially from <br />people you don't already know and email. Google might be restricting <br />this through some kind of privacy setting, or I might just not have <br />found any good ways to find people to follow, but I'd love to be able <br />to (for example) follow top scientists' reading that they share from <br />journals' rss feeds, without knowing them personally. <p /> Another neat feature they've thrown in recently is Trends (under the <br />home link on the sidebar), which gives you a nice view of your reading <br />and sharing habits. I don't know how useful that actually is, but <br />it's fun to look at.</p></p>
 ]]></content>
   </entry>

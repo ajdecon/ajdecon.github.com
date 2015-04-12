@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Maui | Thinking Out Loud]]></title>
-  <link href="http://ajdecon.github.com/blog/categories/maui/atom.xml" rel="self"/>
-  <link href="http://ajdecon.github.com/"/>
-  <updated>2015-04-12T13:31:50-06:00</updated>
-  <id>http://ajdecon.github.com/</id>
+  <link href="http://blog.ajdecon.org/blog/categories/maui/atom.xml" rel="self"/>
+  <link href="http://blog.ajdecon.org/"/>
+  <updated>2015-04-12T13:36:40-06:00</updated>
+  <id>http://blog.ajdecon.org/</id>
   <author>
     <name><![CDATA[Adam DeConinck]]></name>
     <email><![CDATA[ajdecon@ajdecon.org]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Non-exclusive scheduling in Torque/Maui]]></title>
-    <link href="http://ajdecon.github.com/non-exclusive-scheduling-in-torquemaui/"/>
+    <link href="http://blog.ajdecon.org/non-exclusive-scheduling-in-torquemaui/"/>
     <updated>2011-07-19T00:00:00-06:00</updated>
-    <id>http://ajdecon.github.com/non-exclusive-scheduling-in-torquemaui</id>
+    <id>http://blog.ajdecon.org/non-exclusive-scheduling-in-torquemaui</id>
     <content type="html"><![CDATA[<p> <a href="http://www.clusterresources.com/products/torque-resource-manager.php">Torque (PBS)</a>, the cluster resource manager, defaults to allocating any single compute server to only one job at a time. This makes sense most of the time, especially for parallel jobs which use MPI or another message-passing routine to handle communication between processes on different servers. If a server were shared by multiple jobs, contention for access to the network card could slow down all jobs by quite a lot. However, when the jobs are single-threaded or <a href="http://en.wikipedia.org/wiki/Embarrassingly_parallel">embarrassingly parallel</a>, this can result in a lot of wasted resources: for example, a single-threaded job tying up an eight-core server.</p>
 
 

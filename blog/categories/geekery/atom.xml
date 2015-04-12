@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: geekery | Thinking Out Loud]]></title>
-  <link href="http://ajdecon.github.com/blog/categories/geekery/atom.xml" rel="self"/>
-  <link href="http://ajdecon.github.com/"/>
-  <updated>2015-04-12T13:31:50-06:00</updated>
-  <id>http://ajdecon.github.com/</id>
+  <link href="http://blog.ajdecon.org/blog/categories/geekery/atom.xml" rel="self"/>
+  <link href="http://blog.ajdecon.org/"/>
+  <updated>2015-04-12T13:36:40-06:00</updated>
+  <id>http://blog.ajdecon.org/</id>
   <author>
     <name><![CDATA[Adam DeConinck]]></name>
     <email><![CDATA[ajdecon@ajdecon.org]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[My normal reading list (RSS)]]></title>
-    <link href="http://ajdecon.github.com/my-normal-reading-list-rss/"/>
+    <link href="http://blog.ajdecon.org/my-normal-reading-list-rss/"/>
     <updated>2013-01-19T22:56:00-07:00</updated>
-    <id>http://ajdecon.github.com/my-normal-reading-list-rss</id>
+    <id>http://blog.ajdecon.org/my-normal-reading-list-rss</id>
     <content type="html"><![CDATA[<p>Since I've been harrassing people on Twitter for things to read lately, I
 figured it was only fair to share what lives in my feed reader these days.
 It also gave me the perfect excuse to clean it up, removing 20-30 feeds which
@@ -209,9 +209,9 @@ I decided I could live without. (Yes, this is the cleaned-up list!)</p>
   
   <entry>
     <title type="html"><![CDATA[Living in the future]]></title>
-    <link href="http://ajdecon.github.com/living-in-the-future/"/>
+    <link href="http://blog.ajdecon.org/living-in-the-future/"/>
     <updated>2013-01-06T01:52:00-07:00</updated>
-    <id>http://ajdecon.github.com/living-in-the-future</id>
+    <id>http://blog.ajdecon.org/living-in-the-future</id>
     <content type="html"><![CDATA[<p>In the past few hours, I have...</p>
 
 <ul>
@@ -244,9 +244,9 @@ while, that despite all our problems, we live in an age of wonders.</p>
   
   <entry>
     <title type="html"><![CDATA[Cloud services worth paying for]]></title>
-    <link href="http://ajdecon.github.com/cloud-services-worth-paying-for/"/>
+    <link href="http://blog.ajdecon.org/cloud-services-worth-paying-for/"/>
     <updated>2012-10-27T06:00:00-06:00</updated>
-    <id>http://ajdecon.github.com/cloud-services-worth-paying-for</id>
+    <id>http://blog.ajdecon.org/cloud-services-worth-paying-for</id>
     <content type="html"><![CDATA[<p>Despite being generally suspicious of any branding relating to "the cloud", I actually do use
 a variety of Internet-based services to accomplish many of my computing tasks. Even more than
 that, I pay for many of them!</p>
@@ -319,9 +319,9 @@ dominated by Outlook and MS-Office, I'd do everything in Google's tools.</p></li
   
   <entry>
     <title type="html"><![CDATA[Migrated from Posterous to Octopress]]></title>
-    <link href="http://ajdecon.github.com/migrated-from-posterous-to-octopress/"/>
+    <link href="http://blog.ajdecon.org/migrated-from-posterous-to-octopress/"/>
     <updated>2012-10-22T06:49:00-06:00</updated>
-    <id>http://ajdecon.github.com/migrated-from-posterous-to-octopress</id>
+    <id>http://blog.ajdecon.org/migrated-from-posterous-to-octopress</id>
     <content type="html"><![CDATA[<p>Today I decided to take a leap I'd been thinking about for a while, and migrated
 my blog from <a href="http://www.posterous.com">Posterous</a> to the
 <a href="https://github.com/mojombo/jekyll/wiki">Jekyll</a>-based
@@ -348,9 +348,9 @@ impressed.</p>
   
   <entry>
     <title type="html"><![CDATA[Vote for the Hugo Awards for science fiction and fantasy, and get all the nominees for free!]]></title>
-    <link href="http://ajdecon.github.com/vote-for-the-hugo-awards-for-science-fiction/"/>
+    <link href="http://blog.ajdecon.org/vote-for-the-hugo-awards-for-science-fiction/"/>
     <updated>2011-05-28T00:00:00-06:00</updated>
-    <id>http://ajdecon.github.com/vote-for-the-hugo-awards-for-science-fiction</id>
+    <id>http://blog.ajdecon.org/vote-for-the-hugo-awards-for-science-fiction</id>
     <content type="html"><![CDATA[<p>The <a href="http://www.thehugoawards.org/">Hugo Awards</a> are the premier awards for science fiction and fantasy. The winners are popularly chosen by the fans themselves... or rather, by the attendees at that year's <a href="http://www.renovationsf.org/">Worldcon</a>. It's always seemed cool to me that the most prestigious awards in SFF are popularly-elected, but having been a poor student for most of my life, I haven't been able to make it to a Worldcon. (This year is <a href="http://www.renovationsf.org/">Renovation</a> in Reno, so I still probably can't make it.) And even though you can buy a voting-only "supporting" membership for $50, that and the cost of all the books to vote on still seemed like too much of a barrier to consider voting for the Hugos. <p /> Except now I've learned that for the past few years, the always-amusing <a href="http://whatever.scalzi.com/">John Scalzi</a> has been organizing the <a href="http://www.renovationsf.org/hugo-packet.php">Hugo Voters Packet</a>: electronic editions of the nominees' work, free to anyone with a supporting membership. Suddenly, $50 membership isn't just the right to vote in the Hugos. It's a massive collection of the best science fiction and fantasy of the past year, in a convenient format, at a great value. (And it's completely official, now that Scalzi is President of the Science Fiction and Fantasy Writers of America.)<p /> So I'm sure you're not surprised that I just payed for my $50 supporting membership at Renovation and downloaded all that shiny, shiny SF. This year's offerings clock in at 904 MB, zipped! (244 MB without the Graphic Novel nominees), for which I think $50 is ridiculously cheap. The ebooks are all in DRM-free RTF, PDF, MOBI or EPUB, which means that they should all be easy to convert and stick on my Kindle. And the Graphic Novels are PDFs... Maybe I talk <a href="http://www.twitter.com/liylak">Leigh</a> into letting me borrow her iPad for those... <p /> So if you enjoy science fiction and fantasy, <a href="http://www.renovationsf.org/cart-intro.php">go sign up for a membership</a>, support your fan community, and download some awesome fiction. Really, why not?</p>
 
 ]]></content>

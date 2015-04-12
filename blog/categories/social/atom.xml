@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: social | Thinking Out Loud]]></title>
-  <link href="http://ajdecon.github.com/blog/categories/social/atom.xml" rel="self"/>
-  <link href="http://ajdecon.github.com/"/>
-  <updated>2015-04-12T13:31:50-06:00</updated>
-  <id>http://ajdecon.github.com/</id>
+  <link href="http://blog.ajdecon.org/blog/categories/social/atom.xml" rel="self"/>
+  <link href="http://blog.ajdecon.org/"/>
+  <updated>2015-04-12T13:36:40-06:00</updated>
+  <id>http://blog.ajdecon.org/</id>
   <author>
     <name><![CDATA[Adam DeConinck]]></name>
     <email><![CDATA[ajdecon@ajdecon.org]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Some thoughts on Uncommon in Common]]></title>
-    <link href="http://ajdecon.github.com/some-thoughts-on-uncommon-in-common/"/>
+    <link href="http://blog.ajdecon.org/some-thoughts-on-uncommon-in-common/"/>
     <updated>2015-01-11T10:13:00-07:00</updated>
-    <id>http://ajdecon.github.com/some-thoughts-on-uncommon-in-common</id>
+    <id>http://blog.ajdecon.org/some-thoughts-on-uncommon-in-common</id>
     <content type="html"><![CDATA[<p>I'm fascinated by the concept of the <a href="http://theslowweb.com/">Slow Web Movement</a>.
 I understand it as the idea that our online lives should follow the pace of
 our offline lives, rather than the reverse. That instead of receiving a

@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: chef | Thinking Out Loud]]></title>
-  <link href="http://ajdecon.github.com/blog/categories/chef/atom.xml" rel="self"/>
-  <link href="http://ajdecon.github.com/"/>
-  <updated>2015-04-12T13:31:50-06:00</updated>
-  <id>http://ajdecon.github.com/</id>
+  <link href="http://blog.ajdecon.org/blog/categories/chef/atom.xml" rel="self"/>
+  <link href="http://blog.ajdecon.org/"/>
+  <updated>2015-04-12T13:36:40-06:00</updated>
+  <id>http://blog.ajdecon.org/</id>
   <author>
     <name><![CDATA[Adam DeConinck]]></name>
     <email><![CDATA[ajdecon@ajdecon.org]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Learning Chef: Compute Cluster with SLURM]]></title>
-    <link href="http://ajdecon.github.com/learning-chef-compute-cluster-with-slurm/"/>
+    <link href="http://blog.ajdecon.org/learning-chef-compute-cluster-with-slurm/"/>
     <updated>2012-01-21T00:00:00-07:00</updated>
-    <id>http://ajdecon.github.com/learning-chef-compute-cluster-with-slurm</id>
+    <id>http://blog.ajdecon.org/learning-chef-compute-cluster-with-slurm</id>
     <content type="html"><![CDATA[<p>I've recently started playing with Chef, a configuration management system which provides a lot of nice automation for setting up servers quickly and easily. As a science/HPC guy, my default question for any system like this is, "How easily can this be used to set up a cluster?" &nbsp;</p>
 
 

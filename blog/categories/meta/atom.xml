@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: meta | Thinking Out Loud]]></title>
-  <link href="http://ajdecon.github.com/blog/categories/meta/atom.xml" rel="self"/>
-  <link href="http://ajdecon.github.com/"/>
-  <updated>2015-04-12T13:31:50-06:00</updated>
-  <id>http://ajdecon.github.com/</id>
+  <link href="http://blog.ajdecon.org/blog/categories/meta/atom.xml" rel="self"/>
+  <link href="http://blog.ajdecon.org/"/>
+  <updated>2015-04-12T13:36:40-06:00</updated>
+  <id>http://blog.ajdecon.org/</id>
   <author>
     <name><![CDATA[Adam DeConinck]]></name>
     <email><![CDATA[ajdecon@ajdecon.org]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[My normal reading list (RSS)]]></title>
-    <link href="http://ajdecon.github.com/my-normal-reading-list-rss/"/>
+    <link href="http://blog.ajdecon.org/my-normal-reading-list-rss/"/>
     <updated>2013-01-19T22:56:00-07:00</updated>
-    <id>http://ajdecon.github.com/my-normal-reading-list-rss</id>
+    <id>http://blog.ajdecon.org/my-normal-reading-list-rss</id>
     <content type="html"><![CDATA[<p>Since I've been harrassing people on Twitter for things to read lately, I
 figured it was only fair to share what lives in my feed reader these days.
 It also gave me the perfect excuse to clean it up, removing 20-30 feeds which
@@ -209,9 +209,9 @@ I decided I could live without. (Yes, this is the cleaned-up list!)</p>
   
   <entry>
     <title type="html"><![CDATA[Because I've been quiet lately...]]></title>
-    <link href="http://ajdecon.github.com/because-ive-been-quiet-lately-dot-dot-dot/"/>
+    <link href="http://blog.ajdecon.org/because-ive-been-quiet-lately-dot-dot-dot/"/>
     <updated>2013-01-16T20:02:00-07:00</updated>
-    <id>http://ajdecon.github.com/because-ive-been-quiet-lately-dot-dot-dot</id>
+    <id>http://blog.ajdecon.org/because-ive-been-quiet-lately-dot-dot-dot</id>
     <content type="html"><![CDATA[<p>Here's a picture of a cat.</p>
 
 <p><img src="https://s3.amazonaws.com/ajdecon-public/mrd-20130105.jpg" width=300

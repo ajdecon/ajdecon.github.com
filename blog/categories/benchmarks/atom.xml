@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: benchmarks | Thinking Out Loud]]></title>
-  <link href="http://ajdecon.github.com/blog/categories/benchmarks/atom.xml" rel="self"/>
-  <link href="http://ajdecon.github.com/"/>
-  <updated>2015-04-12T13:31:50-06:00</updated>
-  <id>http://ajdecon.github.com/</id>
+  <link href="http://blog.ajdecon.org/blog/categories/benchmarks/atom.xml" rel="self"/>
+  <link href="http://blog.ajdecon.org/"/>
+  <updated>2015-04-12T13:36:40-06:00</updated>
+  <id>http://blog.ajdecon.org/</id>
   <author>
     <name><![CDATA[Adam DeConinck]]></name>
     <email><![CDATA[ajdecon@ajdecon.org]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Extremely contrived GCC vs V8 benchmark]]></title>
-    <link href="http://ajdecon.github.com/extremely-contrived-gcc-vs-v8-benchmark/"/>
+    <link href="http://blog.ajdecon.org/extremely-contrived-gcc-vs-v8-benchmark/"/>
     <updated>2011-06-10T00:00:00-06:00</updated>
-    <id>http://ajdecon.github.com/extremely-contrived-gcc-vs-v8-benchmark</id>
+    <id>http://blog.ajdecon.org/extremely-contrived-gcc-vs-v8-benchmark</id>
     <content type="html"><![CDATA[<p>On Hacker News today, someone posted a link to an <a href="http://wingolog.org/archives/2011/06/10/v8-is-faster-than-gcc">extremely contrived benchmark</a> in which it was claimed that the V8 Javascript compiler was faster than GCC. This was true, in the very narrow case where GCC was prevented from optimizing properly while V8 was run in ideal conditions, <em>and</em> in which the benchmark was compile time plus run time rather than run time alone.</p>
 
 

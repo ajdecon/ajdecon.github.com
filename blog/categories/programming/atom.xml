@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: programming | Thinking Out Loud]]></title>
-  <link href="http://ajdecon.github.com/blog/categories/programming/atom.xml" rel="self"/>
-  <link href="http://ajdecon.github.com/"/>
-  <updated>2015-04-12T13:31:50-06:00</updated>
-  <id>http://ajdecon.github.com/</id>
+  <link href="http://blog.ajdecon.org/blog/categories/programming/atom.xml" rel="self"/>
+  <link href="http://blog.ajdecon.org/"/>
+  <updated>2015-04-12T13:36:40-06:00</updated>
+  <id>http://blog.ajdecon.org/</id>
   <author>
     <name><![CDATA[Adam DeConinck]]></name>
     <email><![CDATA[ajdecon@ajdecon.org]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[PostgreSQL to include JSON as a core type]]></title>
-    <link href="http://ajdecon.github.com/postgresql-to-include-json-as-a-core-type/"/>
+    <link href="http://blog.ajdecon.org/postgresql-to-include-json-as-a-core-type/"/>
     <updated>2012-01-16T00:00:00-07:00</updated>
-    <id>http://ajdecon.github.com/postgresql-to-include-json-as-a-core-type</id>
+    <id>http://blog.ajdecon.org/postgresql-to-include-json-as-a-core-type</id>
     <content type="html"><![CDATA[<p>In what I think is a rather cool move, <a href="http://people.planetpostgresql.org/andrew/index.php?/archives/244-Under-the-wire.html">PostgreSQL will be adding support for JSON as a core data type</a> for database fields.</p>
 
 

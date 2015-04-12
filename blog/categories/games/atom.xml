@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: games | Thinking Out Loud]]></title>
-  <link href="http://ajdecon.github.com/blog/categories/games/atom.xml" rel="self"/>
-  <link href="http://ajdecon.github.com/"/>
-  <updated>2015-04-12T13:31:50-06:00</updated>
-  <id>http://ajdecon.github.com/</id>
+  <link href="http://blog.ajdecon.org/blog/categories/games/atom.xml" rel="self"/>
+  <link href="http://blog.ajdecon.org/"/>
+  <updated>2015-04-12T13:36:40-06:00</updated>
+  <id>http://blog.ajdecon.org/</id>
   <author>
     <name><![CDATA[Adam DeConinck]]></name>
     <email><![CDATA[ajdecon@ajdecon.org]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Book Review: YOU]]></title>
-    <link href="http://ajdecon.github.com/book-review-you/"/>
+    <link href="http://blog.ajdecon.org/book-review-you/"/>
     <updated>2013-04-27T12:56:00-06:00</updated>
-    <id>http://ajdecon.github.com/book-review-you</id>
+    <id>http://blog.ajdecon.org/book-review-you</id>
     <content type="html"><![CDATA[<p><a href="http://www.goodreads.com/book/show/15790854-you">YOU</a>, by Austin Grossman,
 is a novel about video games, growing up with your high school friends,
 and figuring out what the hell you

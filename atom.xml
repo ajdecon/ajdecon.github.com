@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Thinking Out Loud]]></title>
-  <link href="http://ajdecon.github.com/atom.xml" rel="self"/>
-  <link href="http://ajdecon.github.com/"/>
-  <updated>2015-04-12T13:31:50-06:00</updated>
-  <id>http://ajdecon.github.com/</id>
+  <link href="http://blog.ajdecon.org/atom.xml" rel="self"/>
+  <link href="http://blog.ajdecon.org/"/>
+  <updated>2015-04-12T13:36:40-06:00</updated>
+  <id>http://blog.ajdecon.org/</id>
   <author>
     <name><![CDATA[Adam DeConinck]]></name>
     <email><![CDATA[ajdecon@ajdecon.org]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Notes on building and packaging environment modules with EasyBuild and FPM]]></title>
-    <link href="http://ajdecon.github.com/building-scientific-dev-environments-with-easybuild-and-module2pkg/"/>
+    <link href="http://blog.ajdecon.org/building-scientific-dev-environments-with-easybuild-and-module2pkg/"/>
     <updated>2015-04-11T11:41:00-06:00</updated>
-    <id>http://ajdecon.github.com/building-scientific-dev-environments-with-easybuild-and-module2pkg</id>
+    <id>http://blog.ajdecon.org/building-scientific-dev-environments-with-easybuild-and-module2pkg</id>
     <content type="html"><![CDATA[<p>Like any good sysadmin, I strongly prefer to install software using my OS&#8217;s
 built-in package management system. Unfortunately, a lot of the software
 used in scientific high-performance computing doesn&#8217;t make this easy.
@@ -28,7 +28,7 @@ build processes.</p>
 
 <p>This post consists of some notes on a workflow I&#8217;ve used for building scientific software and
 producing RPMs which can be used to distribute that software in the future.
-I mostly use this workflow mostly for <strong>personal projects</strong> &#8211; building and testing
+I use this workflow mostly for <strong>personal projects</strong> &#8211; building and testing
 clusters on Amazon EC2, for example. (<strong>Disclaimer:</strong> This is not the workflow in production use
 at the Day Job, where the software management problems are much more challenging!)</p>
 
@@ -71,7 +71,7 @@ with FPM. (More on that later.)</p>
     git: repo="https://github.com/ajdecon/module2pkg" dest=/opt/module2pkg
 
   - name: symlink for running module2pkg
-    file: src="http://ajdecon.github.com/opt/module2pkg/module2pkg" dest="/usr/local/bin/module2pkg" state=link
+    file: src="http://blog.ajdecon.org/opt/module2pkg/module2pkg" dest="/usr/local/bin/module2pkg" state=link
 
 
   # Set up and configure EasyBuild
@@ -471,9 +471,9 @@ show you can install them. In this case, let&#8217;s install GROMACS:</p>
   
   <entry>
     <title type="html"><![CDATA[Linkdump 2015-01-11]]></title>
-    <link href="http://ajdecon.github.com/linkdump-2015-01-11/"/>
+    <link href="http://blog.ajdecon.org/linkdump-2015-01-11/"/>
     <updated>2015-01-11T12:00:00-07:00</updated>
-    <id>http://ajdecon.github.com/linkdump-2015-01-11</id>
+    <id>http://blog.ajdecon.org/linkdump-2015-01-11</id>
     <content type="html"><![CDATA[<h3>HPC</h3>
 
 <ul>
@@ -503,9 +503,9 @@ show you can install them. In this case, let&#8217;s install GROMACS:</p>
   
   <entry>
     <title type="html"><![CDATA[Some thoughts on Uncommon in Common]]></title>
-    <link href="http://ajdecon.github.com/some-thoughts-on-uncommon-in-common/"/>
+    <link href="http://blog.ajdecon.org/some-thoughts-on-uncommon-in-common/"/>
     <updated>2015-01-11T10:13:00-07:00</updated>
-    <id>http://ajdecon.github.com/some-thoughts-on-uncommon-in-common</id>
+    <id>http://blog.ajdecon.org/some-thoughts-on-uncommon-in-common</id>
     <content type="html"><![CDATA[<p>I&#8217;m fascinated by the concept of the <a href="http://theslowweb.com/">Slow Web Movement</a>.
 I understand it as the idea that our online lives should follow the pace of
 our offline lives, rather than the reverse. That instead of receiving a
@@ -593,9 +593,9 @@ but I actually have some confidence that this is one site which won&#8217;t try 
   
   <entry>
     <title type="html"><![CDATA[Linkdump 2014-12-28]]></title>
-    <link href="http://ajdecon.github.com/linkdump-2014-12-28/"/>
+    <link href="http://blog.ajdecon.org/linkdump-2014-12-28/"/>
     <updated>2014-12-28T12:59:00-07:00</updated>
-    <id>http://ajdecon.github.com/linkdump-2014-12-28</id>
+    <id>http://blog.ajdecon.org/linkdump-2014-12-28</id>
     <content type="html"><![CDATA[<p>Been a while since I did one of these, so here&#8217;s a list of some of the
 interesting links I find in my Pinboard bookmarks from this December.</p>
 
@@ -638,9 +638,9 @@ interesting links I find in my Pinboard bookmarks from this December.</p>
   
   <entry>
     <title type="html"><![CDATA[Good links from the past week - 11/22]]></title>
-    <link href="http://ajdecon.github.com/good-links-from-the-past-week-11-22/"/>
+    <link href="http://blog.ajdecon.org/good-links-from-the-past-week-11-22/"/>
     <updated>2014-11-22T14:15:00-07:00</updated>
-    <id>http://ajdecon.github.com/good-links-from-the-past-week-11-22</id>
+    <id>http://blog.ajdecon.org/good-links-from-the-past-week-11-22</id>
     <content type="html"><![CDATA[<p>A few things I read and enjoyed over the past week. No guarantee that they
 were originally posted during that week&#8230; sometimes I&#8217;m a little slow. :)</p>
 
@@ -683,9 +683,9 @@ were originally posted during that week&#8230; sometimes I&#8217;m a little slow
   
   <entry>
     <title type="html"><![CDATA[Good links from the past week]]></title>
-    <link href="http://ajdecon.github.com/good-links-from-the-past-week/"/>
+    <link href="http://blog.ajdecon.org/good-links-from-the-past-week/"/>
     <updated>2014-11-22T14:15:00-07:00</updated>
-    <id>http://ajdecon.github.com/good-links-from-the-past-week</id>
+    <id>http://blog.ajdecon.org/good-links-from-the-past-week</id>
     <content type="html"><![CDATA[<p>A few things I read and enjoyed over the past week. No guarantee that they
 were originally posted during that week&#8230; sometimes I&#8217;m a little slow. :)</p>
 
@@ -728,9 +728,9 @@ were originally posted during that week&#8230; sometimes I&#8217;m a little slow
   
   <entry>
     <title type="html"><![CDATA[Good links from the past week]]></title>
-    <link href="http://ajdecon.github.com/good-links-from-the-past-week/"/>
+    <link href="http://blog.ajdecon.org/good-links-from-the-past-week/"/>
     <updated>2014-11-11T08:10:00-07:00</updated>
-    <id>http://ajdecon.github.com/good-links-from-the-past-week</id>
+    <id>http://blog.ajdecon.org/good-links-from-the-past-week</id>
     <content type="html"><![CDATA[<p>Being a list of things I read and enjoyed over the past week.</p>
 
 <h3>HPC</h3>
@@ -777,9 +777,9 @@ were originally posted during that week&#8230; sometimes I&#8217;m a little slow
   
   <entry>
     <title type="html"><![CDATA[Notice of Life Change: Heading to New Mexico and LANL]]></title>
-    <link href="http://ajdecon.github.com/heading-to-new-mexico-and-lanl/"/>
+    <link href="http://blog.ajdecon.org/heading-to-new-mexico-and-lanl/"/>
     <updated>2014-06-05T20:22:00-06:00</updated>
-    <id>http://ajdecon.github.com/heading-to-new-mexico-and-lanl</id>
+    <id>http://blog.ajdecon.org/heading-to-new-mexico-and-lanl</id>
     <content type="html"><![CDATA[<p>For those who haven&#8217;t heard yet: Leigh and I are moving to Santa Fe! I
 am joining the HPC-3 team at Los Alamos National Lab as a Cluster
 Administrator helping to manage the Lab&#8217;s production HPC systems.
@@ -806,9 +806,9 @@ to meet up for beer/coffee/etc, let me know!</p>
   
   <entry>
     <title type="html"><![CDATA[Big Systems Talks]]></title>
-    <link href="http://ajdecon.github.com/big-systems-talks/"/>
+    <link href="http://blog.ajdecon.org/big-systems-talks/"/>
     <updated>2013-10-20T22:09:00-06:00</updated>
-    <id>http://ajdecon.github.com/big-systems-talks</id>
+    <id>http://blog.ajdecon.org/big-systems-talks</id>
     <content type="html"><![CDATA[<p>Lately I&#8217;ve been watching a lot of recorded conference talks on YouTube,
 mostly about HPC, distributed systems or DevOps for big deployments.
 Some of these are a lot of fun and extremely interesting, but I don&#8217;t
@@ -824,9 +824,9 @@ a ton of awesome talks to YouTube.</p>
   
   <entry>
     <title type="html"><![CDATA[Building tiny compute clusters for fun and learning]]></title>
-    <link href="http://ajdecon.github.com/building-tiny-compute-clusters-for-fun-and-learning/"/>
+    <link href="http://blog.ajdecon.org/building-tiny-compute-clusters-for-fun-and-learning/"/>
     <updated>2013-07-20T09:54:00-06:00</updated>
-    <id>http://ajdecon.github.com/building-tiny-compute-clusters-for-fun-and-learning</id>
+    <id>http://blog.ajdecon.org/building-tiny-compute-clusters-for-fun-and-learning</id>
     <content type="html"><![CDATA[<p><img src="https://s3.amazonaws.com/ajdecon-public/Pi_Lego_detail.jpg" width=600></p>
 
 <p>Just for fun,
@@ -883,7 +883,7 @@ interesting discussion of this cluster on the
 </ul>
 
 
-<iframe width="560" height="315" src="http://ajdecon.github.com//www.youtube.com/embed/Jq5nrHz9I94" frameborder="0" allowfullscreen></iframe>
+<iframe width="560" height="315" src="http://blog.ajdecon.org//www.youtube.com/embed/Jq5nrHz9I94" frameborder="0" allowfullscreen></iframe>
 
 
 
@@ -899,7 +899,7 @@ his cluster.</li>
 </ul>
 
 
-<iframe width="560" height="315" src="http://ajdecon.github.com//www.youtube.com/embed/i_r3z1jYHAc" frameborder="0" allowfullscreen></iframe>
+<iframe width="560" height="315" src="http://blog.ajdecon.org//www.youtube.com/embed/i_r3z1jYHAc" frameborder="0" allowfullscreen></iframe>
 
 
 
@@ -917,7 +917,7 @@ interested teachers can build clusters they can take home.</li>
 </ul>
 
 
-<iframe width="560" height="315" src="http://ajdecon.github.com//www.youtube.com/embed/ciY4vsij_ak" frameborder="0" allowfullscreen></iframe>
+<iframe width="560" height="315" src="http://blog.ajdecon.org//www.youtube.com/embed/ciY4vsij_ak" frameborder="0" allowfullscreen></iframe>
 
 
 <br/><br/>
@@ -929,9 +929,9 @@ interested teachers can build clusters they can take home.</li>
   
   <entry>
     <title type="html"><![CDATA[Tools of choice, spring 2013 edition]]></title>
-    <link href="http://ajdecon.github.com/tools-of-choice/"/>
+    <link href="http://blog.ajdecon.org/tools-of-choice/"/>
     <updated>2013-05-05T12:30:00-06:00</updated>
-    <id>http://ajdecon.github.com/tools-of-choice</id>
+    <id>http://blog.ajdecon.org/tools-of-choice</id>
     <content type="html"><![CDATA[<p>This list encompasses 95% of my daily computer usage, and captures
 most of the tools that make my life easier, both at work and
 for general use. I re-do this list every once in a while,
@@ -1004,9 +1004,9 @@ like everyone else</li>
   
   <entry>
     <title type="html"><![CDATA[Book Review: YOU]]></title>
-    <link href="http://ajdecon.github.com/book-review-you/"/>
+    <link href="http://blog.ajdecon.org/book-review-you/"/>
     <updated>2013-04-27T12:56:00-06:00</updated>
-    <id>http://ajdecon.github.com/book-review-you</id>
+    <id>http://blog.ajdecon.org/book-review-you</id>
     <content type="html"><![CDATA[<p><a href="http://www.goodreads.com/book/show/15790854-you">YOU</a>, by Austin Grossman,
 is a novel about video games, growing up with your high school friends,
 and figuring out what the hell you
@@ -1078,9 +1078,9 @@ Invincible</em>.</p>
   
   <entry>
     <title type="html"><![CDATA[My normal reading list (RSS)]]></title>
-    <link href="http://ajdecon.github.com/my-normal-reading-list-rss/"/>
+    <link href="http://blog.ajdecon.org/my-normal-reading-list-rss/"/>
     <updated>2013-01-19T22:56:00-07:00</updated>
-    <id>http://ajdecon.github.com/my-normal-reading-list-rss</id>
+    <id>http://blog.ajdecon.org/my-normal-reading-list-rss</id>
     <content type="html"><![CDATA[<p>Since I&#8217;ve been harrassing people on Twitter for things to read lately, I
 figured it was only fair to share what lives in my feed reader these days.
 It also gave me the perfect excuse to clean it up, removing 20-30 feeds which
@@ -1272,9 +1272,9 @@ I decided I could live without. (Yes, this is the cleaned-up list!)</p>
   
   <entry>
     <title type="html"><![CDATA[Because I've been quiet lately...]]></title>
-    <link href="http://ajdecon.github.com/because-ive-been-quiet-lately-dot-dot-dot/"/>
+    <link href="http://blog.ajdecon.org/because-ive-been-quiet-lately-dot-dot-dot/"/>
     <updated>2013-01-16T20:02:00-07:00</updated>
-    <id>http://ajdecon.github.com/because-ive-been-quiet-lately-dot-dot-dot</id>
+    <id>http://blog.ajdecon.org/because-ive-been-quiet-lately-dot-dot-dot</id>
     <content type="html"><![CDATA[<p>Here&#8217;s a picture of a cat.</p>
 
 <p><img src="https://s3.amazonaws.com/ajdecon-public/mrd-20130105.jpg" width=300
@@ -1296,9 +1296,9 @@ on a cluster.</p>
   
   <entry>
     <title type="html"><![CDATA[Living in the future]]></title>
-    <link href="http://ajdecon.github.com/living-in-the-future/"/>
+    <link href="http://blog.ajdecon.org/living-in-the-future/"/>
     <updated>2013-01-06T01:52:00-07:00</updated>
-    <id>http://ajdecon.github.com/living-in-the-future</id>
+    <id>http://blog.ajdecon.org/living-in-the-future</id>
     <content type="html"><![CDATA[<p>In the past few hours, I have&#8230;</p>
 
 <ul>
@@ -1331,9 +1331,9 @@ while, that despite all our problems, we live in an age of wonders.</p>
   
   <entry>
     <title type="html"><![CDATA[Some notes on the HPC cluster software stack]]></title>
-    <link href="http://ajdecon.github.com/the-hpc-cluster-software-stack/"/>
+    <link href="http://blog.ajdecon.org/the-hpc-cluster-software-stack/"/>
     <updated>2012-11-03T18:48:00-06:00</updated>
-    <id>http://ajdecon.github.com/the-hpc-cluster-software-stack</id>
+    <id>http://blog.ajdecon.org/the-hpc-cluster-software-stack</id>
     <content type="html"><![CDATA[<p><strong>Updates:</strong></p>
 
 <ul>
@@ -2098,9 +2098,9 @@ based on the needs of the particular situation.</p>
   
   <entry>
     <title type="html"><![CDATA[Where do we come from? The dark side of the moon!]]></title>
-    <link href="http://ajdecon.github.com/where-do-we-come-from-the-dark-side-of-the-moon-a-review-of-iron-sky/"/>
+    <link href="http://blog.ajdecon.org/where-do-we-come-from-the-dark-side-of-the-moon-a-review-of-iron-sky/"/>
     <updated>2012-10-29T05:20:00-06:00</updated>
-    <id>http://ajdecon.github.com/where-do-we-come-from-the-dark-side-of-the-moon-a-review-of-iron-sky</id>
+    <id>http://blog.ajdecon.org/where-do-we-come-from-the-dark-side-of-the-moon-a-review-of-iron-sky</id>
     <content type="html"><![CDATA[<p>Months ago I came across a movie trailer which I had to share with everyone I knew.
 I was convinced that this movie could be nothing but concentrated awesome. It
 looked like it had everything an excellent action movie needs&#8230;
@@ -2143,9 +2143,9 @@ It&#8217;s only the writers and the actors who disappointed me. :-)</p>
   
   <entry>
     <title type="html"><![CDATA[Whedon on Romney: A candidate who isn't afraid to bring about the zombie apocalypse]]></title>
-    <link href="http://ajdecon.github.com/whedon-on-romney-a-candidate-who-isnt-afraid-to-bring-about-the-zombie-apocalypse/"/>
+    <link href="http://blog.ajdecon.org/whedon-on-romney-a-candidate-who-isnt-afraid-to-bring-about-the-zombie-apocalypse/"/>
     <updated>2012-10-29T05:08:00-06:00</updated>
-    <id>http://ajdecon.github.com/whedon-on-romney-a-candidate-who-isnt-afraid-to-bring-about-the-zombie-apocalypse</id>
+    <id>http://blog.ajdecon.org/whedon-on-romney-a-candidate-who-isnt-afraid-to-bring-about-the-zombie-apocalypse</id>
     <content type="html"><![CDATA[<iframe width="560" height="315" src="http://www.youtube.com/embed/6TiXUF9xbTo" frameborder="0" allowfullscreen></iframe>
 
 
@@ -2158,9 +2158,9 @@ much more interesting topics to talk about.</p>
   
   <entry>
     <title type="html"><![CDATA[Cloud services worth paying for]]></title>
-    <link href="http://ajdecon.github.com/cloud-services-worth-paying-for/"/>
+    <link href="http://blog.ajdecon.org/cloud-services-worth-paying-for/"/>
     <updated>2012-10-27T06:00:00-06:00</updated>
-    <id>http://ajdecon.github.com/cloud-services-worth-paying-for</id>
+    <id>http://blog.ajdecon.org/cloud-services-worth-paying-for</id>
     <content type="html"><![CDATA[<p>Despite being generally suspicious of any branding relating to &#8220;the cloud&#8221;, I actually do use
 a variety of Internet-based services to accomplish many of my computing tasks. Even more than
 that, I pay for many of them!</p>
@@ -2233,9 +2233,9 @@ dominated by Outlook and MS-Office, I&#8217;d do everything in Google&#8217;s to
   
   <entry>
     <title type="html"><![CDATA[Physics book recommendations (#askolo rescued answer)]]></title>
-    <link href="http://ajdecon.github.com/physics-book-recommendations-number-askolo-rescued-answer/"/>
+    <link href="http://blog.ajdecon.org/physics-book-recommendations-number-askolo-rescued-answer/"/>
     <updated>2012-10-26T01:42:00-06:00</updated>
-    <id>http://ajdecon.github.com/physics-book-recommendations-number-askolo-rescued-answer</id>
+    <id>http://blog.ajdecon.org/physics-book-recommendations-number-askolo-rescued-answer</id>
     <content type="html"><![CDATA[<p><em><a href="http://www.askolo.com">Askolo</a> is a question-answer site
 <a href="http://blog.ajdecon.org/some-thoughts-on-hpc-in-the-cloud-askolo-ques/">I played with for a while</a>, but it was recently accounced that
 the site was going into maintenance mode so the startup in question could focus on other projects. It&#8217;s a little sad, but

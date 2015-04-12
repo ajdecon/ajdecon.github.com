@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: awesome | Thinking Out Loud]]></title>
-  <link href="http://ajdecon.github.com/blog/categories/awesome/atom.xml" rel="self"/>
-  <link href="http://ajdecon.github.com/"/>
-  <updated>2015-04-12T13:31:50-06:00</updated>
-  <id>http://ajdecon.github.com/</id>
+  <link href="http://blog.ajdecon.org/blog/categories/awesome/atom.xml" rel="self"/>
+  <link href="http://blog.ajdecon.org/"/>
+  <updated>2015-04-12T13:36:40-06:00</updated>
+  <id>http://blog.ajdecon.org/</id>
   <author>
     <name><![CDATA[Adam DeConinck]]></name>
     <email><![CDATA[ajdecon@ajdecon.org]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Whedon on Romney: A candidate who isn't afraid to bring about the zombie apocalypse]]></title>
-    <link href="http://ajdecon.github.com/whedon-on-romney-a-candidate-who-isnt-afraid-to-bring-about-the-zombie-apocalypse/"/>
+    <link href="http://blog.ajdecon.org/whedon-on-romney-a-candidate-who-isnt-afraid-to-bring-about-the-zombie-apocalypse/"/>
     <updated>2012-10-29T05:08:00-06:00</updated>
-    <id>http://ajdecon.github.com/whedon-on-romney-a-candidate-who-isnt-afraid-to-bring-about-the-zombie-apocalypse</id>
+    <id>http://blog.ajdecon.org/whedon-on-romney-a-candidate-who-isnt-afraid-to-bring-about-the-zombie-apocalypse</id>
     <content type="html"><![CDATA[<iframe width="560" height="315" src="http://www.youtube.com/embed/6TiXUF9xbTo" frameborder="0" allowfullscreen></iframe>
 
 
@@ -30,9 +30,9 @@ much more interesting topics to talk about.</p>
   
   <entry>
     <title type="html"><![CDATA[Zombies as Real Science Fiction: a review of Feed and Deadline by Mira Grant]]></title>
-    <link href="http://ajdecon.github.com/zombies-as-real-science-fiction-a-review-of-f/"/>
+    <link href="http://blog.ajdecon.org/zombies-as-real-science-fiction-a-review-of-f/"/>
     <updated>2011-06-01T00:00:00-06:00</updated>
-    <id>http://ajdecon.github.com/zombies-as-real-science-fiction-a-review-of-f</id>
+    <id>http://blog.ajdecon.org/zombies-as-real-science-fiction-a-review-of-f</id>
     <content type="html"><![CDATA[<p>Last year I read a novel by Mira Grant (aka Seanan McGuire) called <em>Feed</em>. I picked it up because of the cover: the symbol for an RSS feed, drawn in blood, and a blurb of some sort indicating that it was about zombies. I was on a bit of a zombie kick at the time (because let's face it, zombies are <em>cool</em>), and I figured what the hell. Ten bucks, right?</p>
 
 

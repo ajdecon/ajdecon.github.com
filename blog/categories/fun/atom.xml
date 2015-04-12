@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: fun | Thinking Out Loud]]></title>
-  <link href="http://ajdecon.github.com/blog/categories/fun/atom.xml" rel="self"/>
-  <link href="http://ajdecon.github.com/"/>
-  <updated>2015-04-12T13:31:50-06:00</updated>
-  <id>http://ajdecon.github.com/</id>
+  <link href="http://blog.ajdecon.org/blog/categories/fun/atom.xml" rel="self"/>
+  <link href="http://blog.ajdecon.org/"/>
+  <updated>2015-04-12T13:36:40-06:00</updated>
+  <id>http://blog.ajdecon.org/</id>
   <author>
     <name><![CDATA[Adam DeConinck]]></name>
     <email><![CDATA[ajdecon@ajdecon.org]]></email>
@@ -15,18 +15,18 @@
   
   <entry>
     <title type="html"><![CDATA[The CDC wants you to prepare for the Zombie Apocalypse]]></title>
-    <link href="http://ajdecon.github.com/the-cdc-wants-you-to-prepare-for-the-zombie-a/"/>
+    <link href="http://blog.ajdecon.org/the-cdc-wants-you-to-prepare-for-the-zombie-a/"/>
     <updated>2011-05-19T00:00:00-06:00</updated>
-    <id>http://ajdecon.github.com/the-cdc-wants-you-to-prepare-for-the-zombie-a</id>
+    <id>http://blog.ajdecon.org/the-cdc-wants-you-to-prepare-for-the-zombie-a</id>
     <content type="html"><![CDATA[<p>[[posterous-content:H4Rm8FzIbk0O8tM8FSvS]]<p>I generally admire the hell out of the CDC, and this is no exception. <br />This is actually a hilarious and fun campaign for disaster preparedness. <p /> <a href="http://emergency.cdc.gov/socialmedia/zombies_blog.asp">http://emergency.cdc.gov/socialmedia/zombies_blog.asp</a></p></p>
 ]]></content>
   </entry>
   
   <entry>
     <title type="html"><![CDATA[ajdecon.usesthis]]></title>
-    <link href="http://ajdecon.github.com/ajdeconusesthis/"/>
+    <link href="http://blog.ajdecon.org/ajdeconusesthis/"/>
     <updated>2010-10-01T00:00:00-06:00</updated>
-    <id>http://ajdecon.github.com/ajdeconusesthis</id>
+    <id>http://blog.ajdecon.org/ajdeconusesthis</id>
     <content type="html"><![CDATA[<p>Any geek will tell you that their computer setup is a very personal thing. The combination of a person's machine, operating system, choice of editor, and myriad configuration options can be important to a person's workflow, and sometimes to their very peace of mind. These are Important Choices.</p>
 
 
