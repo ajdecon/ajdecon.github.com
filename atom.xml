@@ -4,7 +4,7 @@
   <title><![CDATA[Thinking Out Loud]]></title>
   <link href="http://ajdecon.github.com/atom.xml" rel="self"/>
   <link href="http://ajdecon.github.com/"/>
-  <updated>2015-04-12T13:26:09-06:00</updated>
+  <updated>2015-04-12T13:28:16-06:00</updated>
   <id>http://ajdecon.github.com/</id>
   <author>
     <name><![CDATA[Adam DeConinck]]></name>
@@ -14,7 +14,7 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Building and packaging environment modules with EasyBuild and FPM]]></title>
+    <title type="html"><![CDATA[Notes on building and packaging environment modules with EasyBuild and FPM]]></title>
     <link href="http://ajdecon.github.com/building-scientific-dev-environments-with-easybuild-and-module2pkg/"/>
     <updated>2015-04-11T11:41:00-06:00</updated>
     <id>http://ajdecon.github.com/building-scientific-dev-environments-with-easybuild-and-module2pkg</id>
@@ -26,9 +26,9 @@ libraries, don&#8217;t distribute packages but expect their users to build from 
 And many of these projects have non-standard, arcane, or just-plain-weird
 build processes.</p>
 
-<p>This post outlines a workflow I&#8217;ve used for building scientific software and
+<p>This post consists of some notes on a workflow I&#8217;ve used for building scientific software and
 producing RPMs which can be used to distribute that software in the future.
-I mostly use this workflow mostly for personal projects &#8211; building and testing
+I mostly use this workflow mostly for <strong>personal projects</strong> &#8211; building and testing
 clusters on Amazon EC2, for example. (<strong>Disclaimer:</strong> This is not the workflow in production use
 at the Day Job, where the software management problems are much more challenging!)</p>
 
