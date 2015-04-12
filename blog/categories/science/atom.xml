@@ -4,7 +4,7 @@
   <title><![CDATA[Category: science | Thinking Out Loud]]></title>
   <link href="http://ajdecon.github.com/blog/categories/science/atom.xml" rel="self"/>
   <link href="http://ajdecon.github.com/"/>
-  <updated>2015-04-12T13:23:58-06:00</updated>
+  <updated>2015-04-12T13:26:09-06:00</updated>
   <id>http://ajdecon.github.com/</id>
   <author>
     <name><![CDATA[Adam DeConinck]]></name>
@@ -29,7 +29,8 @@ build processes.</p>
 <p>This post outlines a workflow I've used for building scientific software and
 producing RPMs which can be used to distribute that software in the future.
 I mostly use this workflow mostly for personal projects -- building and testing
-clusters on Amazon EC2, for example.</p>
+clusters on Amazon EC2, for example. (<strong>Disclaimer:</strong> This is not the workflow in production use
+at the Day Job, where the software management problems are much more challenging!)</p>
 
 <p>The core components of this workflow are <a href="https://hpcugent.github.io/easybuild/">EasyBuild</a> --
 which automates building HPC software projects -- and <a href="https://github.com/jordansissel/fpm">FPM</a> --
